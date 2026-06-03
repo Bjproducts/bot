@@ -80,6 +80,8 @@ function createSessionStats(config, sourceName) {
         ictRejected: 0,
         gapResets: 0,
         lastGapSeconds: null,
+        sizingRejections: 0,
+        lastSizingRejectionReason: null,
         todayDate: todayString(),
         todayPnlUsd: 0,
         todayTrades: 0,
@@ -252,6 +254,9 @@ function printDashboard(stats, position, price, config, signal = null, ictSignal
         console.log(line(`Target Price    ${sizing && sizing.status === 'ACCEPTED' ? '$' + sizing.resolvedTargetPrice.toFixed(2) : '--'}`));
         console.log(line(`Position Size   ${sizing && sizing.status === 'ACCEPTED' ? '$' + sizing.recommendedPositionSizeUsd.toFixed(2) : '--'}`));
         console.log(line(`Risk Reward     ${sizing ? sizing.riskRewardRatio.toFixed(2) : '--'}`));
+        console.log(line(`Sizing Status   ${sizing ? sizing.status : '--'}`));
+        console.log(line(`Sizing Reject   ${sizing && sizing.status === 'REJECTED' ? shorten(sizing.rejectionReason, 50) : '--'}`));
+        console.log(line(`Sizing Rejects  ${stats.sizingRejections}  last: ${stats.lastSizingRejectionReason ? shorten(stats.lastSizingRejectionReason, 36) : '--'}`));
         if (!selectedCandidate) {
             console.log(line(`Selection Reject ${shorten(tradeSelection?.rejectionReason ?? 'No selection yet', 36)}`));
         }

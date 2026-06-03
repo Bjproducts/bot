@@ -167,9 +167,14 @@ function rejectionReasonFor(args) {
     if (realRiskRewardRatio !== null && realRiskRewardRatio < options.minRiskRewardRatio) {
         return `Risk/reward ${realRiskRewardRatio.toFixed(2)} below minimum ${options.minRiskRewardRatio}`;
     }
-    if (expectedProfitAtTPUsd < options.minExpectedProfitUsd) {
-        return `Expected profit below $${options.minExpectedProfitUsd.toFixed(2)}`;
-    }
+    // Phase 7C: selector no longer gates on expectedProfitAtTPUsd. The static
+    // orderSizeUsd reference used to compute that number under-estimates by
+    // a factor of (recommendedPositionSizeUsd / orderSizeUsd), so the
+    // selector was rejecting candidates whose actual sized profit would have
+    // passed the gate. Profit-min validation now lives in positionSizing.ts
+    // using the final sized position. expectedProfitAtTPUsd / targetFit
+    // remain as descriptive fields on the candidate for ranking.
+    void expectedProfitAtTPUsd;
     return '';
 }
 function scoreCandidate(evaluation, targetFit, reactionConfirmed, volumeConfirmed) {

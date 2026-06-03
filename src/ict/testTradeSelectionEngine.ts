@@ -107,13 +107,19 @@ const fixtures: TradeSelectionFixture[] = [
     expected: expected('BUY', 'higher-confidence-fvg', 0.6, 'PREFERRED_RANGE'),
   },
   {
-    name: 'candidate below $0.50 target rejected',
+    // Phase 7C: the selector no longer gates on expectedProfitAtTPUsd
+    // (that gate used a static orderSizeUsd reference and under-rejected
+    // valid setups). Sizing now owns the profit-min gate using the real
+    // sized position. The selector still surfaces targetFit=BELOW_MINIMUM
+    // for downstream visibility and ranking, but the candidate is
+    // returned for sizing to decide.
+    name: 'candidate below $0.50 target qualifies for sizing (selector no longer gates on profit)',
     evaluations: [
       evaluation(fvgZone('small-target-fvg', 'BULLISH'), 'BUY', 90, true),
     ],
     orderSizeUsd: 100,
     takeProfitPct: 0.004,
-    expected: expected('NONE', null),
+    expected: expected('BUY', 'small-target-fvg', 0.4, 'BELOW_MINIMUM'),
   },
   {
     name: 'candidate between $0.50-$1.00 preferred',

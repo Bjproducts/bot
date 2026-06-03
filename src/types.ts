@@ -109,6 +109,10 @@ export interface SessionStats {
   gapResets:       number;
   lastGapSeconds:  number | null;
 
+  // Phase 7C sizing rejection counters.
+  sizingRejections: number;
+  lastSizingRejectionReason: string | null;
+
   // Calendar-day counters (reset when calendar date changes)
   todayDate:       string;   // 'YYYY-MM-DD' of the running calendar day
   todayPnlUsd:     number;

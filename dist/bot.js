@@ -41,6 +41,7 @@ const state_1 = require("./state");
 const volumeSpikeReversal_1 = require("./signals/volumeSpikeReversal");
 const positionExitManager_1 = require("./positionExitManager");
 const positionSizing_1 = require("./risk/positionSizing");
+const sizingRejectionLog_1 = require("./risk/sizingRejectionLog");
 const scoreAttribution_1 = require("./analytics/scoreAttribution");
 const tradeOutcomeAnalytics_1 = require("./analytics/tradeOutcomeAnalytics");
 const ifvgDetector_1 = require("./ict/ifvgDetector");
@@ -298,7 +299,24 @@ class BotEngine {
             sizingEvaluations: 1,
         });
         if (sizing.status === 'REJECTED') {
-            logEvent('ENTRY_SKIP', side, this.tick, `position sizing rejected: ${sizing.rejectionReason} rr=${sizing.riskRewardRatio.toFixed(2)}`);
+            // Phase 7C: structured per-rejection log written to
+            // logs/sizing-rejections.log so we can audit every refused entry
+            // with full sizing context.
+            (0, sizingRejectionLog_1.appendSizingRejection)(sizing, {
+                symbol: this.config.symbol,
+                signalSource: this.config.signalSource,
+                side,
+                targetProfitMinUsd: this.config.targetProfitMinUsd,
+                targetProfitMaxUsd: this.config.targetProfitMaxUsd,
+                maxRiskPerTradeUsd: this.config.maxRiskPerTradeUsd,
+                maxPositionUsd: this.config.maxPositionUsd,
+            });
+            this.stats = {
+                ...this.stats,
+                sizingRejections: this.stats.sizingRejections + 1,
+                lastSizingRejectionReason: sizing.rejectionReason,
+            };
+            logEvent('ENTRY_SKIP', side, this.tick, `position sizing rejected: ${sizing.rejectionReason} entry=${sizing.entryPrice.toFixed(2)} stop=${sizing.stopPrice.toFixed(2)} risk=${sizing.riskDistance.toFixed(4)} size=$${sizing.recommendedPositionSizeUsd.toFixed(2)} expProfit=$${sizing.expectedProfitUsd.toFixed(4)} expLoss=$${sizing.expectedLossUsd.toFixed(4)} rr=${sizing.riskRewardRatio.toFixed(2)}`);
             return;
         }
         if (!this.canOpenNewPosition()) {

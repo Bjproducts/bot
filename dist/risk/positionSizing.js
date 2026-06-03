@@ -97,6 +97,28 @@ function calculatePositionSizing(input) {
             resolvedTargetPrice: targetPrice,
         });
     }
+    // Phase 7C: post-sizing profit-min gate. The selector no longer rejects
+    // on expected profit (it used a static $orderSizeUsd reference which
+    // under-estimated). Validation now runs against the final sized
+    // position so a candidate is only rejected if the sizer truly cannot
+    // reach the minimum profit objective.
+    if (expectedProfitUsd < config.targetProfitMinUsd) {
+        return rejected(input, `Expected profit $${expectedProfitUsd.toFixed(2)} < minimum $${config.targetProfitMinUsd.toFixed(2)} (position $${boundedSize.toFixed(2)}, risk ${riskDistance.toFixed(4)}, reward ${rewardDistance.toFixed(4)})`, {
+            expectedMovePercent,
+            rewardDistance,
+            riskDistance,
+            riskRewardRatio,
+            confidenceMultiplier,
+            scoreMultiplier,
+            sizingMode,
+            targetRMultiple,
+            recommendedPositionSizeUsd: boundedSize,
+            expectedProfitUsd,
+            expectedLossUsd,
+            hardStopPrice: stopPrice,
+            resolvedTargetPrice: targetPrice,
+        });
+    }
     const riskUtilizationPercent = riskUtilization(expectedLossUsd, config.maxRiskPerTradeUsd);
     return {
         status: 'ACCEPTED',
@@ -174,7 +196,7 @@ function calculateRiskFirst(input, values) {
         });
     }
     if (expectedProfitUsd < config.targetProfitMinUsd) {
-        return rejected(input, `Expected profit below $${config.targetProfitMinUsd.toFixed(2)}`, {
+        return rejected(input, `Expected profit $${expectedProfitUsd.toFixed(2)} < minimum $${config.targetProfitMinUsd.toFixed(2)} (position $${boundedSize.toFixed(2)}, risk ${riskDistance.toFixed(4)}, reward ${resolvedRewardDistance.toFixed(4)})`, {
             expectedMovePercent: resolvedExpectedMovePercent,
             rewardDistance: resolvedRewardDistance,
             riskDistance,

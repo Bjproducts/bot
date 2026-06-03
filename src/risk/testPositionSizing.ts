@@ -235,11 +235,15 @@ function testRiskFirstRejectsWhenMaxPositionPreventsProfit(): TestCase {
   });
   return {
     name: 'risk-first rejects when max position prevents profit target',
-    expected: 'REJECTED expectedProfit below $1.00',
+    expected: 'REJECTED with "Expected profit < minimum" and position-context fields in reason',
     actual: `${result.status} expectedProfit=$${result.expectedProfitUsd} reason=${result.rejectionReason}`,
+    // Phase 7C: rejection reason now includes position + risk + reward
+    // context so post-sizing audit can see exactly why the trade was
+    // skipped. Assertion follows the new format.
     passed: result.status === 'REJECTED'
       && result.expectedProfitUsd < config.targetProfitMinUsd
-      && result.rejectionReason.includes('Expected profit below'),
+      && result.rejectionReason.includes('< minimum')
+      && result.rejectionReason.includes('position'),
   };
 }
 

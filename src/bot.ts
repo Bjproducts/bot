@@ -17,6 +17,7 @@ import { EntryZoneDisrespectEvaluation, PositionCloseReason } from './positionEx
 import { evaluatePositionLifecycleExit } from './positionExitManager';
 import { calculatePositionSizing } from './risk/positionSizing';
 import { PositionSizingResult } from './risk/positionSizingTypes';
+import { appendSizingRejection } from './risk/sizingRejectionLog';
 import { createScoreAttribution } from './analytics/scoreAttribution';
 import { generateScoreAttributionReports } from './analytics/tradeOutcomeAnalytics';
 import { ScoreAttribution } from './analytics/scoreAttributionTypes';
@@ -346,11 +347,28 @@ export class BotEngine {
     });
 
     if (sizing.status === 'REJECTED') {
+      // Phase 7C: structured per-rejection log written to
+      // logs/sizing-rejections.log so we can audit every refused entry
+      // with full sizing context.
+      appendSizingRejection(sizing, {
+        symbol: this.config.symbol,
+        signalSource: this.config.signalSource,
+        side,
+        targetProfitMinUsd: this.config.targetProfitMinUsd,
+        targetProfitMaxUsd: this.config.targetProfitMaxUsd,
+        maxRiskPerTradeUsd: this.config.maxRiskPerTradeUsd,
+        maxPositionUsd: this.config.maxPositionUsd,
+      });
+      this.stats = {
+        ...this.stats,
+        sizingRejections: this.stats.sizingRejections + 1,
+        lastSizingRejectionReason: sizing.rejectionReason,
+      };
       logEvent(
         'ENTRY_SKIP',
         side,
         this.tick,
-        `position sizing rejected: ${sizing.rejectionReason} rr=${sizing.riskRewardRatio.toFixed(2)}`,
+        `position sizing rejected: ${sizing.rejectionReason} entry=${sizing.entryPrice.toFixed(2)} stop=${sizing.stopPrice.toFixed(2)} risk=${sizing.riskDistance.toFixed(4)} size=$${sizing.recommendedPositionSizeUsd.toFixed(2)} expProfit=$${sizing.expectedProfitUsd.toFixed(4)} expLoss=$${sizing.expectedLossUsd.toFixed(4)} rr=${sizing.riskRewardRatio.toFixed(2)}`,
       );
       return;
     }
