@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.evaluatePositionExit = evaluatePositionExit;
+exports.calculateProgressToTargetPercent = calculateProgressToTargetPercent;
+exports.shouldActivateBreakeven = shouldActivateBreakeven;
 exports.evaluatePositionLifecycleExit = evaluatePositionLifecycleExit;
 exports.evaluateHardStopExit = evaluateHardStopExit;
 exports.calculateUnrealizedPnl = calculateUnrealizedPnl;
@@ -14,6 +16,7 @@ function evaluatePositionExit(position, currentPrice, settings, now = new Date()
     const hardStopPrice = position.hardStopEnabled ? position.hardStopPrice : null;
     const positionAgeMinutes = calculatePositionAgeMinutes(position.openedAt, now);
     const reason = closeReason(position, currentPrice, settings, unrealizedPnlUsd, positionAgeMinutes);
+    const progressToTargetPercent = calculateProgressToTargetPercent(position, currentPrice);
     return {
         shouldClose: reason !== null,
         reason,
@@ -27,7 +30,39 @@ function evaluatePositionExit(position, currentPrice, settings, now = new Date()
         maxLossUsd: settings.maxLossUsd,
         positionAgeMinutes,
         maxPositionMinutes: settings.maxPositionMinutes,
+        breakevenActive: position.stopAtBreakeven,
+        breakevenTriggerPercent: typeof settings.breakevenTriggerPercent === 'number'
+            ? settings.breakevenTriggerPercent
+            : 50,
+        breakevenActivationPrice: position.breakevenActivationPrice,
+        breakevenActivationTime: position.breakevenActivationTime,
+        progressToTargetPercent,
     };
+}
+/**
+ * Phase 7D: percentage of the target distance the trade has traversed.
+ * Returns null if the trade has no managed target or the math is
+ * undefined (entry==target, NONE side, etc.). Negative values mean the
+ * trade is currently in drawdown relative to entry.
+ */
+function calculateProgressToTargetPercent(position, currentPrice) {
+    if (position.side === 'NONE')
+        return null;
+    if (typeof position.targetPrice !== 'number')
+        return null;
+    const targetDistance = Math.abs(position.targetPrice - position.averageEntryPrice);
+    if (targetDistance <= 0)
+        return null;
+    const move = position.side === 'LONG'
+        ? currentPrice - position.averageEntryPrice
+        : position.averageEntryPrice - currentPrice;
+    return (move / targetDistance) * 100;
+}
+function shouldActivateBreakeven(position, currentPrice, triggerPercent = 50) {
+    if (position.side === 'NONE' || position.stopAtBreakeven)
+        return false;
+    const progress = calculateProgressToTargetPercent(position, currentPrice);
+    return progress !== null && progress >= triggerPercent;
 }
 function evaluatePositionLifecycleExit(position, currentPrice, candle, settings, now = new Date()) {
     const hardStop = evaluateHardStopExit(position, candle);
@@ -111,22 +146,15 @@ function closeReason(position, currentPrice, settings, unrealizedPnlUsd, positio
         if (breakevenStopHit)
             return 'BREAKEVEN_STOP_EXIT';
     }
-    if (settings.useQuickProfitExit !== false && unrealizedPnlUsd >= settings.profitTargetUsdMin) {
-        return 'QUICK_PROFIT_EXIT';
-    }
-    const takeProfitPrice = calculateTakeProfitPrice(position, settings.takeProfitPct);
-    const takeProfitHit = position.side === 'LONG'
-        ? currentPrice >= takeProfitPrice
-        : currentPrice <= takeProfitPrice;
-    if (takeProfitHit)
-        return 'TAKE_PROFIT';
     if (unrealizedPnlUsd <= -settings.maxLossUsd) {
         return 'RISK_EXIT';
     }
-    if (positionAgeMinutes !== null
-        && positionAgeMinutes >= settings.maxPositionMinutes) {
-        return 'TIME_EXIT';
-    }
+    // Phase 7D: time-based exits removed. Trades close only via target hit,
+    // breakeven stop, hard stop, emergency risk exit, or entry-zone disrespect.
+    // Position age is still tracked and surfaced on the evaluation object for
+    // diagnostics, but it never triggers an exit.
+    void positionAgeMinutes;
+    void settings;
     return null;
 }
 function calculatePositionAgeMinutes(openedAt, now) {

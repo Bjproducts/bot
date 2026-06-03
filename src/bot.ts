@@ -14,7 +14,7 @@ import { Signal } from './signals/types';
 import { TradeJournal } from './journal/tradeJournal';
 import { TradeEvent, CompletedTrade } from './journal/types';
 import { EntryZoneDisrespectEvaluation, PositionCloseReason } from './positionExitTypes';
-import { evaluatePositionLifecycleExit } from './positionExitManager';
+import { evaluatePositionLifecycleExit, shouldActivateBreakeven } from './positionExitManager';
 import { calculatePositionSizing } from './risk/positionSizing';
 import { PositionSizingResult } from './risk/positionSizingTypes';
 import { appendSizingRejection } from './risk/sizingRejectionLog';
@@ -719,6 +719,8 @@ export class BotEngine {
       targetDisrespected: false,
       stopAtBreakeven: false,
       stopMovedToBreakevenAt: null,
+      breakevenActivationPrice: null,
+      breakevenActivationTime: null,
     };
   }
 
@@ -828,17 +830,22 @@ export class BotEngine {
       this.updateIctTradeManagement(position, candle);
     }
 
-    const latestPosition = this.positions.find(active => active.id === position.id) ?? position;
+    let latestPosition = this.positions.find(active => active.id === position.id) ?? position;
+    latestPosition = this.activateBreakEvenIfEligible(
+      latestPosition,
+      price,
+      candle?.timestamp ?? new Date(),
+    );
     const lifecycleExit = evaluatePositionLifecycleExit(latestPosition, price, candle, {
       takeProfitPct: config.takeProfitPct,
       profitTargetUsdMin: config.profitTargetUsdMin,
       profitTargetUsdMax: config.profitTargetUsdMax,
       maxPositionMinutes: config.maxPositionMinutes,
       maxLossUsd: config.maxLossUsd,
-      // Phase 5g: quick-profit exit is always enabled. Previously it was
-      // suppressed whenever an ICT-managed target existed, which meant the
-      // bot could not book the $0.50-$1.50 objective even when reached.
+      // Phase 7D: retained for settings compatibility; the exit evaluator no
+      // longer closes by quick-profit or time-based rules.
       useQuickProfitExit: true,
+      breakevenTriggerPercent: 50,
     });
     const disrespectEvaluation = lifecycleExit.entryZoneDisrespect;
     if (
@@ -903,31 +910,15 @@ export class BotEngine {
         updatedPosition = {
           ...updatedPosition,
           ...this.makeManagedTargetState(opposingTarget),
-          stopAtBreakeven: true,
-          stopMovedToBreakevenAt: updatedPosition.stopMovedToBreakevenAt ?? candle.timestamp.toISOString(),
         };
         stateChanged = true;
         logEvent(
           'TARGET',
           side,
           this.tick,
-          `opposing ${opposingTarget.zone?.type ?? 'zone'} target=$${fp(opposingTarget.price)}  SL=BE`,
+          `opposing ${opposingTarget.zone?.type ?? 'zone'} target=$${fp(opposingTarget.price)}`,
         );
       }
-    }
-
-    if (
-      updatedPosition.targetSource === 'OPPOSING_FVG'
-      && this.opposingTargetEncountered(updatedPosition, candle)
-      && !updatedPosition.stopAtBreakeven
-    ) {
-      updatedPosition = {
-        ...updatedPosition,
-        stopAtBreakeven: true,
-        stopMovedToBreakevenAt: candle.timestamp.toISOString(),
-      };
-      stateChanged = true;
-      logEvent('BREAKEVEN', side, this.tick, `opposing FVG encountered  SL=BE @ $${fp(updatedPosition.averageEntryPrice)}`);
     }
 
     if (
@@ -952,17 +943,51 @@ export class BotEngine {
           targetZoneLow: null,
           targetZoneDirection: null,
           targetDisrespected: true,
-          stopAtBreakeven: true,
-          stopMovedToBreakevenAt: updatedPosition.stopMovedToBreakevenAt ?? candle.timestamp.toISOString(),
         };
         stateChanged = true;
-        logEvent('TARGET', side, this.tick, `opposing FVG disrespected; retarget swing=$${fp(swingTargetPrice)}  SL=BE`);
+        logEvent('TARGET', side, this.tick, `opposing FVG disrespected; retarget swing=$${fp(swingTargetPrice)}`);
       }
     }
 
     if (stateChanged) {
       this.updatePosition(updatedPosition);
     }
+  }
+
+  private activateBreakEvenIfEligible(
+    position: PositionState,
+    price: number,
+    activationTime: Date,
+  ): PositionState {
+    if (!shouldActivateBreakeven(position, price, 50)) return position;
+
+    const activationIso = activationTime.toISOString();
+    const activated: PositionState = {
+      ...position,
+      stopAtBreakeven: true,
+      stopMovedToBreakevenAt: activationIso,
+      breakevenActivationPrice: price,
+      breakevenActivationTime: activationIso,
+    };
+
+    this.updatePosition(activated);
+    logEvent(
+      'BREAKEVEN',
+      position.side,
+      this.tick,
+      `BE Activated  trigger=50%  activationPrice=$${fp(price)}  activationTime=${activationIso}  stop=entry $${fp(position.averageEntryPrice)}`,
+    );
+    this.journal.logEvent(this.makeEvent(
+      'BREAKEVEN_ACTIVATED',
+      price,
+      position.activePositionSize,
+      0,
+      this.currentSignalDirection(),
+      undefined,
+      undefined,
+      activated,
+    ));
+    return activated;
   }
 
   private opposingTargetEncountered(position: PositionState, candle: Candle): boolean {
@@ -1108,7 +1133,7 @@ export class BotEngine {
   }
 
   private makeEvent(
-    action: 'ENTRY' | 'DCA' | PositionCloseReason,
+    action: TradeEvent['action'],
     price: number,
     size: number,
     realizedPnlUsd: number,
@@ -1157,6 +1182,9 @@ export class BotEngine {
       targetZoneId: position.targetZoneId ?? undefined,
       targetDisrespected: position.targetDisrespected ?? undefined,
       stopAtBreakeven: position.stopAtBreakeven,
+      breakevenActivated: position.stopAtBreakeven,
+      breakevenActivationPrice: position.breakevenActivationPrice ?? undefined,
+      breakevenActivationTime: position.breakevenActivationTime ?? undefined,
     };
   }
 
@@ -1310,6 +1338,8 @@ export class BotEngine {
       targetDisrespected: null,
       stopAtBreakeven: activePositions.every(position => position.stopAtBreakeven),
       stopMovedToBreakevenAt: null,
+      breakevenActivationPrice: null,
+      breakevenActivationTime: null,
       hardStopPrice: null,
       hardStopEnabled: activePositions.some(position => position.hardStopEnabled),
       stopPrice: null,

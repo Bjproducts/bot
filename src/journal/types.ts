@@ -3,7 +3,7 @@ import { EntryZoneDirection, EntryZoneType } from '../types';
 import { ScoreBreakdown } from '../analytics/scoreAttributionTypes';
 import { StopSource } from '../ict/tradeCandidateTypes';
 
-export type TradeAction = 'ENTRY' | 'DCA' | PositionCloseReason;
+export type TradeAction = 'ENTRY' | 'DCA' | 'BREAKEVEN_ACTIVATED' | PositionCloseReason;
 
 export interface TradeEvent {
   timestamp: string;
@@ -36,6 +36,9 @@ export interface TradeEvent {
   targetZoneId?: string;
   targetDisrespected?: boolean;
   stopAtBreakeven?: boolean;
+  breakevenActivated?: boolean;
+  breakevenActivationPrice?: number;
+  breakevenActivationTime?: string;
   positionSizeUsd?: number;
   sizingMode?: string;
   hardStopPrice?: number;
@@ -88,6 +91,9 @@ export interface CompletedTrade {
   targetZoneId?: string;
   targetDisrespected?: boolean;
   stopAtBreakeven?: boolean;
+  breakevenActivated?: boolean;
+  breakevenActivationPrice?: number;
+  breakevenActivationTime?: string;
   positionSizeUsd?: number;
   sizingMode?: string;
   hardStopPrice?: number;
@@ -141,6 +147,9 @@ export const CSV_HEADER = [
   'targetZoneId',
   'targetDisrespected',
   'stopAtBreakeven',
+  'breakevenActivated',
+  'breakevenActivationPrice',
+  'breakevenActivationTime',
   'positionSizeUsd',
   'sizingMode',
   'hardStopPrice',

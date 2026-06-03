@@ -23,6 +23,7 @@ export function evaluatePositionExit(
   const hardStopPrice = position.hardStopEnabled ? position.hardStopPrice : null;
   const positionAgeMinutes = calculatePositionAgeMinutes(position.openedAt, now);
   const reason = closeReason(position, currentPrice, settings, unrealizedPnlUsd, positionAgeMinutes);
+  const progressToTargetPercent = calculateProgressToTargetPercent(position, currentPrice);
 
   return {
     shouldClose: reason !== null,
@@ -37,7 +38,44 @@ export function evaluatePositionExit(
     maxLossUsd: settings.maxLossUsd,
     positionAgeMinutes,
     maxPositionMinutes: settings.maxPositionMinutes,
+    breakevenActive: position.stopAtBreakeven,
+    breakevenTriggerPercent: typeof settings.breakevenTriggerPercent === 'number'
+      ? settings.breakevenTriggerPercent
+      : 50,
+    breakevenActivationPrice: position.breakevenActivationPrice,
+    breakevenActivationTime: position.breakevenActivationTime,
+    progressToTargetPercent,
   };
+}
+
+/**
+ * Phase 7D: percentage of the target distance the trade has traversed.
+ * Returns null if the trade has no managed target or the math is
+ * undefined (entry==target, NONE side, etc.). Negative values mean the
+ * trade is currently in drawdown relative to entry.
+ */
+export function calculateProgressToTargetPercent(
+  position: PositionState,
+  currentPrice: number,
+): number | null {
+  if (position.side === 'NONE') return null;
+  if (typeof position.targetPrice !== 'number') return null;
+  const targetDistance = Math.abs(position.targetPrice - position.averageEntryPrice);
+  if (targetDistance <= 0) return null;
+  const move = position.side === 'LONG'
+    ? currentPrice - position.averageEntryPrice
+    : position.averageEntryPrice - currentPrice;
+  return (move / targetDistance) * 100;
+}
+
+export function shouldActivateBreakeven(
+  position: PositionState,
+  currentPrice: number,
+  triggerPercent: number = 50,
+): boolean {
+  if (position.side === 'NONE' || position.stopAtBreakeven) return false;
+  const progress = calculateProgressToTargetPercent(position, currentPrice);
+  return progress !== null && progress >= triggerPercent;
 }
 
 export function evaluatePositionLifecycleExit(
@@ -165,28 +203,16 @@ function closeReason(
     if (breakevenStopHit) return 'BREAKEVEN_STOP_EXIT';
   }
 
-  if (settings.useQuickProfitExit !== false && unrealizedPnlUsd >= settings.profitTargetUsdMin) {
-    return 'QUICK_PROFIT_EXIT';
-  }
-
-  const takeProfitPrice = calculateTakeProfitPrice(position, settings.takeProfitPct);
-  const takeProfitHit = position.side === 'LONG'
-    ? currentPrice >= takeProfitPrice
-    : currentPrice <= takeProfitPrice;
-
-  if (takeProfitHit) return 'TAKE_PROFIT';
-
   if (unrealizedPnlUsd <= -settings.maxLossUsd) {
     return 'RISK_EXIT';
   }
 
-  if (
-    positionAgeMinutes !== null
-    && positionAgeMinutes >= settings.maxPositionMinutes
-  ) {
-    return 'TIME_EXIT';
-  }
-
+  // Phase 7D: time-based exits removed. Trades close only via target hit,
+  // breakeven stop, hard stop, emergency risk exit, or entry-zone disrespect.
+  // Position age is still tracked and surfaced on the evaluation object for
+  // diagnostics, but it never triggers an exit.
+  void positionAgeMinutes;
+  void settings;
   return null;
 }
 

@@ -208,10 +208,10 @@ function test8QuickProfitExitFiresWithManagedTarget() {
     };
     const evaluation = (0, positionExitManager_1.evaluatePositionLifecycleExit)(position, 101, null, settings, new Date('2026-06-02T12:00:00.000Z'));
     return {
-        name: 'Quick-profit exit still fires in ICT mode with managed target',
-        expected: 'reason=QUICK_PROFIT_EXIT (target=110 not hit, +$1.05 unrealized)',
+        name: 'Quick-profit exit no longer fires before managed target',
+        expected: 'reason=null (target=110 not hit, +$1.05 unrealized)',
         actual: evaluation.reason ?? 'null',
-        passed: evaluation.reason === 'QUICK_PROFIT_EXIT',
+        passed: evaluation.reason === null,
     };
 }
 function test9ScalpModeShortUsesRMultiple() {

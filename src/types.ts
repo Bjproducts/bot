@@ -47,6 +47,8 @@ export interface PositionState {
   targetDisrespected: boolean | null;
   stopAtBreakeven:    boolean;
   stopMovedToBreakevenAt: string | null;
+  breakevenActivationPrice: number | null;
+  breakevenActivationTime: string | null;
   hardStopPrice:      number | null;
   hardStopEnabled:    boolean;
   stopPrice:          number | null;

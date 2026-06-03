@@ -86,6 +86,9 @@ export class TradeJournal {
       csv(e.targetZoneId ?? ''),
       e.targetDisrespected !== undefined ? String(e.targetDisrespected) : '',
       e.stopAtBreakeven !== undefined ? String(e.stopAtBreakeven) : '',
+      e.breakevenActivated !== undefined ? String(e.breakevenActivated) : '',
+      e.breakevenActivationPrice !== undefined ? e.breakevenActivationPrice.toFixed(2) : '',
+      e.breakevenActivationTime ?? '',
       e.positionSizeUsd !== undefined ? e.positionSizeUsd.toFixed(2) : '',
       e.sizingMode ?? '',
       e.hardStopPrice !== undefined ? e.hardStopPrice.toFixed(2) : '',
@@ -145,7 +148,10 @@ export class TradeJournal {
       ? `  target=${e.targetSource ?? '--'}:$${e.targetPrice.toFixed(2)}` +
         `  targetZone=${e.targetZoneId ?? '--'}` +
         `  targetDisrespected=${e.targetDisrespected !== undefined ? e.targetDisrespected : '--'}` +
-        `  stopAtBE=${e.stopAtBreakeven !== undefined ? e.stopAtBreakeven : '--'}`
+        `  stopAtBE=${e.stopAtBreakeven !== undefined ? e.stopAtBreakeven : '--'}` +
+        `  beActivated=${e.breakevenActivated !== undefined ? e.breakevenActivated : '--'}` +
+        `  beActivationPrice=${moneyOrDash(e.breakevenActivationPrice)}` +
+        `  beActivationTime=${e.breakevenActivationTime ?? '--'}`
       : '';
     const sizingPart = e.positionSizeUsd !== undefined
       ? `  positionSize=$${e.positionSizeUsd.toFixed(2)}` +

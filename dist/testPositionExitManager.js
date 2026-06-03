@@ -43,52 +43,12 @@ const recent = '2026-06-01T11:50:00.000Z';
 const old = '2026-06-01T11:20:00.000Z';
 const fixtures = [
     {
-        name: 'LONG closes at TP',
-        position: position('LONG', recent),
-        price: 101,
-        settings: settings({ profitTargetUsdMin: 10 }),
-        now,
-        expectedReason: 'TAKE_PROFIT',
-    },
-    {
-        name: 'SHORT closes at TP',
-        position: position('SHORT', recent),
-        price: 99,
-        settings: settings({ profitTargetUsdMin: 10 }),
-        now,
-        expectedReason: 'TAKE_PROFIT',
-    },
-    {
-        name: 'LONG closes at +$0.50 quick profit',
-        position: position('LONG', recent),
-        price: 100.5,
-        settings: settings({ takeProfitPct: 0.02 }),
-        now,
-        expectedReason: 'QUICK_PROFIT_EXIT',
-    },
-    {
-        name: 'SHORT closes at +$0.50 quick profit',
-        position: position('SHORT', recent),
-        price: 99.5,
-        settings: settings({ takeProfitPct: 0.02 }),
-        now,
-        expectedReason: 'QUICK_PROFIT_EXIT',
-    },
-    {
         name: 'position closes at max loss',
         position: position('LONG', recent),
         price: 99,
         settings: settings({ takeProfitPct: 0.02, maxLossUsd: 1 }),
         now,
         expectedReason: 'RISK_EXIT',
-    },
-    {
-        name: 'position closes at max hold time',
-        position: position('LONG', old),
-        price: 100,
-        settings: settings({ takeProfitPct: 0.02, maxPositionMinutes: 30 }),
-        now,
-        expectedReason: 'TIME_EXIT',
     },
     {
         name: 'LONG closes at managed target before fixed TP',
@@ -123,6 +83,11 @@ const results = fixtures.map((fixture) => {
         passed: actual.shouldClose && actual.reason === fixture.expectedReason,
     };
 });
+results.push(testFixedTakeProfitDoesNotCloseWithoutManagedTarget());
+results.push(testQuickProfitDoesNotClose());
+results.push(testTimeExitDoesNotClose());
+results.push(testBreakevenActivatesAtHalfTargetDistance());
+results.push(testBreakevenDoesNotActivateBeforeHalfTargetDistance());
 const zoneDisrespectFixtures = [
     {
         name: 'SHORT closes when candle body closes above bearish entry zone high',
@@ -192,7 +157,7 @@ function testCompletedTradeRecordWritten() {
         timestamp: now.toISOString(),
         symbol: 'BTC',
         marketDataSource: 'TEST',
-        action: 'QUICK_PROFIT_EXIT',
+        action: 'MANAGED_TARGET_EXIT',
         side: 'LONG',
         price: 100.5,
         size: 1,
@@ -217,17 +182,17 @@ function testCompletedTradeRecordWritten() {
         totalInvestedUsd: 100,
         realizedPnlUsd: 0.5,
         pnlPct: 0.5,
-        reason: 'QUICK_PROFIT_EXIT',
+        reason: 'MANAGED_TARGET_EXIT',
     };
     journal.logClose(event, trade);
     const completedPath = path.join(logsDir, 'completed-trades.json');
     const saved = JSON.parse(fs.readFileSync(completedPath, 'utf-8'));
     const actual = saved[0]?.reason ?? 'missing';
-    const passed = saved.length === 1 && actual === 'QUICK_PROFIT_EXIT';
+    const passed = saved.length === 1 && actual === 'MANAGED_TARGET_EXIT';
     fs.rmSync(logsDir, { recursive: true, force: true });
     return {
         name: 'completed trade record is written',
-        expected: 'QUICK_PROFIT_EXIT',
+        expected: 'MANAGED_TARGET_EXIT',
         actual,
         passed,
     };
@@ -259,6 +224,8 @@ function position(side, openedAt) {
         targetDisrespected: null,
         stopAtBreakeven: false,
         stopMovedToBreakevenAt: null,
+        breakevenActivationPrice: null,
+        breakevenActivationTime: null,
         hardStopPrice: null,
         hardStopEnabled: false,
         stopPrice: null,
@@ -401,12 +368,12 @@ function testExitPriorityChoosesZoneDisrespectBeforeTimeExit() {
     positionState.openedAt = old;
     const result = (0, positionExitManager_1.evaluatePositionLifecycleExit)(positionState, 102.5, candle(101, 103, 100.5, 102.5), settings({ maxLossUsd: 999, profitTargetUsdMin: 999, takeProfitPct: 0.99 }), now);
     return {
-        name: 'exit priority chooses zone disrespect before time exit',
+        name: 'exit priority chooses zone disrespect while time exit is disabled',
         expected: 'ENTRY_ZONE_DISRESPECT_EXIT',
         actual: result.reason,
         passed: result.reason === 'ENTRY_ZONE_DISRESPECT_EXIT'
             && result.entryZoneDisrespect.reason === 'ENTRY_ZONE_DISRESPECT_EXIT'
-            && result.positionExit.reason === 'TIME_EXIT',
+            && result.positionExit.reason === null,
     };
 }
 function testLongHardStopExit() {
@@ -436,13 +403,70 @@ function testExitPriorityChoosesHardStopBeforeZoneDisrespectAndTimeExit() {
     };
     const result = (0, positionExitManager_1.evaluatePositionLifecycleExit)(positionState, 102.5, candle(101, 103, 100.5, 102.5), settings({ maxLossUsd: 999, profitTargetUsdMin: 999, takeProfitPct: 0.99 }), now);
     return {
-        name: 'exit priority chooses hard stop before zone disrespect and time exit',
+        name: 'exit priority chooses hard stop before zone disrespect while time exit is disabled',
         expected: 'HARD_STOP_EXIT',
         actual: result.reason,
         passed: result.reason === 'HARD_STOP_EXIT'
             && result.hardStop.reason === 'HARD_STOP_EXIT'
             && result.entryZoneDisrespect.reason === 'ENTRY_ZONE_DISRESPECT_EXIT'
-            && result.positionExit.reason === 'TIME_EXIT',
+            && result.positionExit.reason === null,
+    };
+}
+function testFixedTakeProfitDoesNotCloseWithoutManagedTarget() {
+    const result = (0, positionExitManager_1.evaluatePositionExit)(position('LONG', recent), 101, settings({ profitTargetUsdMin: 999, takeProfitPct: 0.01 }), now);
+    return {
+        name: 'fixed percent take-profit no longer closes trades',
+        expected: 'NO_EXIT',
+        actual: result.reason,
+        passed: !result.shouldClose && result.reason === null,
+    };
+}
+function testQuickProfitDoesNotClose() {
+    const result = (0, positionExitManager_1.evaluatePositionExit)(position('LONG', recent), 100.5, settings({ profitTargetUsdMin: 0.5, takeProfitPct: 0.99 }), now);
+    return {
+        name: 'quick profit no longer closes trades',
+        expected: 'NO_EXIT',
+        actual: result.reason,
+        passed: !result.shouldClose && result.reason === null,
+    };
+}
+function testTimeExitDoesNotClose() {
+    const result = (0, positionExitManager_1.evaluatePositionExit)(position('LONG', old), 100, settings({ maxPositionMinutes: 30, profitTargetUsdMin: 999, takeProfitPct: 0.99, maxLossUsd: 999 }), now);
+    return {
+        name: 'time-based exit no longer closes trades',
+        expected: 'NO_EXIT',
+        actual: result.reason,
+        passed: !result.shouldClose && result.reason === null && result.positionAgeMinutes !== null,
+    };
+}
+function testBreakevenActivatesAtHalfTargetDistance() {
+    const positionState = {
+        ...position('LONG', recent),
+        targetPrice: 110,
+        targetSource: 'SCALP_R',
+    };
+    const progress = (0, positionExitManager_1.calculateProgressToTargetPercent)(positionState, 105);
+    const activates = (0, positionExitManager_1.shouldActivateBreakeven)(positionState, 105, 50);
+    return {
+        name: 'break-even activates at 50% target progress',
+        expected: '50 true',
+        actual: `${progress?.toFixed(0) ?? 'null'} ${activates}`,
+        passed: progress === 50 && activates,
+    };
+}
+function testBreakevenDoesNotActivateBeforeHalfTargetDistance() {
+    const positionState = {
+        ...position('SHORT', recent),
+        targetPrice: 90,
+        targetSource: 'SCALP_R',
+    };
+    const progress = (0, positionExitManager_1.calculateProgressToTargetPercent)(positionState, 96);
+    const activates = (0, positionExitManager_1.shouldActivateBreakeven)(positionState, 96, 50);
+    return {
+        name: 'break-even does not activate before 50% target progress',
+        expected: '40 false',
+        actual: `${progress?.toFixed(0) ?? 'null'} ${activates}`,
+        passed: progress === 40 && !activates,
     };
 }
 function testCompletedHardStopTradeRecordWritten() {

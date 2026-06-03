@@ -1,5 +1,65 @@
 # Development Log
 
+## Phase 7D - Break-Even Management + Time Exit Removal
+
+### Objective
+
+Remove time-based exits and make trade lifecycle management close only through hard stop, managed target hit, structure invalidation, or emergency risk controls. Add 50% target-progress break-even management without changing ICT logic, FVG/IFVG logic, target selection, or risk-first sizing.
+
+### Exit Logic Changes
+
+- `TIME_EXIT` is no longer triggered by `evaluatePositionExit`.
+- Fixed percentage take-profit and quick-profit exits no longer close trades.
+- Active close paths are now:
+  - `HARD_STOP_EXIT`
+  - `MANAGED_TARGET_EXIT`
+  - `BREAKEVEN_STOP_EXIT`
+  - `ENTRY_ZONE_DISRESPECT_EXIT`
+  - `RISK_EXIT`
+
+### Break-Even Management
+
+When current price reaches at least 50% of the distance from entry to the managed target:
+
+```text
+progressToTargetPercent = favorableMove / abs(targetPrice - entryPrice) * 100
+
+if progressToTargetPercent >= 50:
+  stopAtBreakeven = true
+  breakevenActivationPrice = current price
+  breakevenActivationTime = candle timestamp
+```
+
+For both LONG and SHORT positions, the break-even stop is the entry price.
+
+### Logging + Dashboard
+
+- Added journal fields:
+  - `breakevenActivated`
+  - `breakevenActivationPrice`
+  - `breakevenActivationTime`
+- Added dashboard fields:
+  - Break Even Active
+  - Break Even Trigger
+  - Progress To TP
+  - BE Active Price
+  - BE Active Time
+- Dashboard now shows `Time Exit disabled` instead of a max-hold close rule.
+
+### Files Modified
+
+- `src/positionExitManager.ts`
+- `src/positionExitTypes.ts`
+- `src/bot.ts`
+- `src/types.ts`
+- `src/state.ts`
+- `src/sessionStats.ts`
+- `src/journal/types.ts`
+- `src/journal/tradeJournal.ts`
+- `src/testPositionExitManager.ts`
+- `src/risk/testTargetModes.ts`
+- `docs/DEVLOG.md`
+
 ## Phase 7A - MSS Displacement Model
 
 ### Objective

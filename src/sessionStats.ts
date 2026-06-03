@@ -3,7 +3,7 @@ import * as path from 'path';
 import { SessionStats, PositionState, BotConfig } from './types';
 import { Signal } from './signals/types';
 import { IctSignalResult } from './ict/ictSignalTypes';
-import { calculateTakeProfitPrice } from './positionExitManager';
+import { calculateProgressToTargetPercent, calculateTakeProfitPrice } from './positionExitManager';
 import { LIVE_ARM_CONFIRMATION } from './execution/exchangeTypes';
 import { createScoreAttribution } from './analytics/scoreAttribution';
 import { ScoreAttributionReport } from './analytics/scoreAttributionTypes';
@@ -286,11 +286,14 @@ export function printDashboard(
     console.log(line(`Risk Distance   ${position.stopRiskDistance !== null ? position.stopRiskDistance.toFixed(4) : '--'}`));
     console.log(line(`Zone Size       ${position.stopZoneSize !== null ? position.stopZoneSize.toFixed(4) : '--'}`));
     console.log(line(`Target R        ${position.targetRMultiple !== null ? position.targetRMultiple.toFixed(2) : '--'}`));
-    console.log(line(`Stop State      ${position.stopAtBreakeven ? 'BE' : 'Initial'}`));
-    console.log(line(`Quick Target    $${config.profitTargetUsdMin.toFixed(2)}-$${config.profitTargetUsdMax.toFixed(2)}`));
+    console.log(line(`Break Even Active ${position.stopAtBreakeven ? 'YES' : 'NO'}`));
+    console.log(line(`Break Even Trigger ${formatPercent(50)}`));
+    console.log(line(`Progress To TP  ${formatProgress(calculateProgressToTargetPercent(position, price))}`));
+    console.log(line(`BE Active Price ${position.breakevenActivationPrice !== null ? '$' + fp(position.breakevenActivationPrice) : '--'}`));
+    console.log(line(`BE Active Time  ${formatIsoTime(position.breakevenActivationTime)}`));
     console.log(line(`Max Loss        $${config.maxLossUsd.toFixed(2)}`));
     console.log(line(`Position Age    ${formatPositionAge(position.openedAt)}`));
-    console.log(line(`Max Hold        ${config.maxPositionMinutes}m`));
+    console.log(line(`Time Exit       disabled`));
     console.log(line(`Entry Zone Type ${formatEntryZone(position)}`));
     console.log(line(`Zone High       ${formatZonePrice(position.entryZoneHigh)}`));
     console.log(line(`Zone Low        ${formatZonePrice(position.entryZoneLow)}`));
@@ -383,6 +386,21 @@ function formatManagedTarget(position: PositionState): string {
 
 function formatOptionalUsd(value: number | null): string {
   return value === null ? '--' : `$${fp(value)}`;
+}
+
+function formatPercent(value: number): string {
+  return `${value.toFixed(0)}%`;
+}
+
+function formatProgress(value: number | null): string {
+  return value === null ? '--' : `${value.toFixed(2)}%`;
+}
+
+function formatIsoTime(value: string | null): string {
+  if (!value) return '--';
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toISOString();
 }
 
 function loadTopPerformingFactors(): string[] {
