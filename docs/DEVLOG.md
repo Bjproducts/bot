@@ -1,5 +1,50 @@
 # Development Log
 
+## Phase 7A - MSS Displacement Model
+
+### Objective
+
+Shift the ICT model from sweep-driven validation to displacement/FVG-driven validation while preserving risk-first sizing, hard stops, analytics, trade selection ranking, and `targetReachProbability`.
+
+### Model Changes
+
+- Liquidity sweep is no longer mandatory for validated FVG acceptance. It remains recorded as confidence context.
+- MSS remains required and is evaluated on the break candle that creates the FVG.
+- Consequent Encroachment / midpoint reactions no longer produce BUY/SELL entries or a 45 confidence score. Midpoint interaction remains diagnostic only.
+- FVG and IFVG invalidation now require the candle body to close beyond the zone boundary.
+- IFVG inversion now also requires a body close beyond the source FVG boundary.
+- IFVGs formed inside a respected same-direction parent FVG receive:
+  - `parentFvgId`
+  - `parentFvgRespected`
+  - `confidenceOverride = 100`
+  - `confidenceAttribution`
+
+### Confidence Attribution
+
+When an IFVG carries a parent-FVG confidence override, the ICT signal engine uses the higher of the reaction score and the override. The signal reason includes the confidence attribution text so journal/session output can explain why confidence was boosted.
+
+### Files Modified
+
+- `src/ict/validatedFvgDetector.ts`
+- `src/ict/fvgDetector.ts`
+- `src/ict/ifvgDetector.ts`
+- `src/ict/reactionEngine.ts`
+- `src/ict/ictSignalEngine.ts`
+- `src/ict/types.ts`
+- `src/ict/fixtures.ts`
+- `src/ict/reactionFixtures.ts`
+- `src/ict/testValidatedFvgDetector.ts`
+- `src/ict/testFvgIfvg.ts`
+- `src/ict/testIctSignalEngine.ts`
+- `docs/DEVLOG.md`
+
+### Tests Updated
+
+- No-sweep FVG fixtures now validate when displacement and MSS pass.
+- Midpoint-only reaction fixtures now return `NONE` / `TOUCH`.
+- FVG/IFVG invalidation fixtures now require body-close invalidation.
+- Added IFVG parent-FVG confidence attribution coverage.
+
 ## Phase 6C - FVG Origin Stops
 
 ### Objective

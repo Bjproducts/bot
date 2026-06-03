@@ -18,7 +18,6 @@ import {
 
 const SCORE_NONE = 0;
 const SCORE_TOUCH = 20;
-const SCORE_MIDPOINT = 45;
 const SCORE_BOUNDARY = 75;
 const SCORE_DISPLACEMENT = 100;
 
@@ -220,28 +219,6 @@ function evaluateTier(params: {
     };
   }
 
-  if (touchedMidpoint && midpointResult === 'BULLISH') {
-    return {
-      tier: 'MIDPOINT',
-      winner: 'BUY',
-      score: SCORE_MIDPOINT,
-      midpointResult,
-      boundaryCloseResult,
-      displacementReaction,
-    };
-  }
-
-  if (touchedMidpoint && midpointResult === 'BEARISH') {
-    return {
-      tier: 'MIDPOINT',
-      winner: 'SELL',
-      score: SCORE_MIDPOINT,
-      midpointResult,
-      boundaryCloseResult,
-      displacementReaction,
-    };
-  }
-
   return {
     tier: 'TOUCH',
     winner: 'NONE',
@@ -293,14 +270,14 @@ function evaluateBodyCloseConfirmation(
   candle: Candle,
   zone: IctZoneBase,
 ): IctReactionCheck {
-  const passed = (winner === 'BUY' && candle.close > candle.open && candle.close >= zone.midpoint)
-    || (winner === 'SELL' && candle.close < candle.open && candle.close <= zone.midpoint);
+  const passed = (winner === 'BUY' && candle.close > candle.open && candle.close > zone.high)
+    || (winner === 'SELL' && candle.close < candle.open && candle.close < zone.low);
 
   return {
     status: passed ? 'PASS' : 'FAIL',
     passed,
     detail: passed
-      ? `Body close confirms ${winner} reaction`
+      ? `Body close confirms ${winner} reaction beyond FVG boundary`
       : 'Body close did not confirm the winning side',
   };
 }
@@ -350,7 +327,7 @@ function buildReasons(
 ): string[] {
   const reasons: string[] = [`Reaction tier ${tier.tier} (score ${score})`];
   if (tier.midpointResult !== 'NOT_EVALUATED') {
-    reasons.push(`Midpoint close ${tier.midpointResult.toLowerCase()}`);
+    reasons.push(`Midpoint observed ${tier.midpointResult.toLowerCase()} but not scored`);
   }
   if (tier.boundaryCloseResult !== 'NEUTRAL' && tier.boundaryCloseResult !== 'NOT_EVALUATED') {
     reasons.push(`Boundary close ${tier.boundaryCloseResult.toLowerCase()}`);

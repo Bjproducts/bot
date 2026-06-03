@@ -9,10 +9,11 @@ const fixtures = [
         targetDirection: 'BULLISH',
         expected: {
             foundRawFvg: true,
-            accepted: false,
-            validatedCount: 0,
-            rejectionIncludes: 'liquidity',
+            accepted: true,
+            validatedCount: 1,
             liquiditySweep: 'FAIL',
+            displacement: 'PASS',
+            marketStructureShift: 'PASS',
         },
     },
     {
@@ -30,16 +31,17 @@ const fixtures = [
         },
     },
     {
-        name: 'bearish FVG with buy-side wick but no rejection is rejected',
+        name: 'bearish FVG with buy-side wick but no rejection is accepted without sweep boost',
         candles: bearishAfterBuySideWickOnly(),
         targetIndex: 7,
         targetDirection: 'BEARISH',
         expected: {
             foundRawFvg: true,
-            accepted: false,
-            validatedCount: 0,
-            rejectionIncludes: 'reject buy-side',
+            accepted: true,
+            validatedCount: 1,
             liquiditySweep: 'FAIL',
+            displacement: 'PASS',
+            marketStructureShift: 'PASS',
         },
     },
     {
@@ -57,16 +59,17 @@ const fixtures = [
         },
     },
     {
-        name: 'bullish FVG with sell-side wick but no rejection is rejected',
+        name: 'bullish FVG with sell-side wick but no rejection is accepted without sweep boost',
         candles: bullishAfterSellSideWickOnly(),
         targetIndex: 7,
         targetDirection: 'BULLISH',
         expected: {
             foundRawFvg: true,
-            accepted: false,
-            validatedCount: 0,
-            rejectionIncludes: 'reject sell-side',
+            accepted: true,
+            validatedCount: 1,
             liquiditySweep: 'FAIL',
+            displacement: 'PASS',
+            marketStructureShift: 'PASS',
         },
     },
     {

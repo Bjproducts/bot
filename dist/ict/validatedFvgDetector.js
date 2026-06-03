@@ -36,14 +36,13 @@ function validateFVG(rawFvg, candles, options = DEFAULT_OPTIONS) {
     const marketStructureShift = evaluateMarketStructureShift(rawFvg, candles, options);
     const premiumDiscount = evaluatePremiumDiscount(rawFvg, candles, options);
     const sessionFilter = evaluateSessionFilter(rawFvg, candles, options);
-    const checks = [
-        liquiditySweep,
+    const requiredChecks = [
         displacement,
         marketStructureShift,
         premiumDiscount,
         sessionFilter,
     ];
-    const rejectionReasons = checks
+    const rejectionReasons = requiredChecks
         .filter(check => !check.passed)
         .map(check => check.detail);
     const accepted = rejectionReasons.length === 0;
@@ -96,7 +95,7 @@ function evaluateLiquiditySweep(rawFvg, candles, options) {
             passed,
             detail: passed
                 ? 'Buy-side liquidity swept and rejected before bearish FVG'
-                : 'Bearish FVG did not sweep and reject buy-side liquidity first',
+                : 'No buy-side sweep before bearish FVG; recorded as confidence context only',
             sweptSide: 'BUY_SIDE',
             sweepCandleIndex: rawFvg.candle1Index,
             referenceLevel,
@@ -112,7 +111,7 @@ function evaluateLiquiditySweep(rawFvg, candles, options) {
         passed,
         detail: passed
             ? 'Sell-side liquidity swept and rejected before bullish FVG'
-            : 'Bullish FVG did not sweep and reject sell-side liquidity first',
+            : 'No sell-side sweep before bullish FVG; recorded as confidence context only',
         sweptSide: 'SELL_SIDE',
         sweepCandleIndex: rawFvg.candle1Index,
         referenceLevel,
@@ -185,8 +184,8 @@ function evaluateMarketStructureShift(rawFvg, candles, options) {
             status: passed ? 'PASS' : 'FAIL',
             passed,
             detail: passed
-                ? 'Bearish market structure shift confirmed by close below prior low'
-                : 'Bearish FVG did not close below prior structure low',
+                ? 'Bearish MSS confirmed by break candle that created the FVG'
+                : 'Bearish FVG break candle did not close below prior structure low',
             mssCandleIndex: rawFvg.candle3Index,
             referenceLevel,
             breakPrice,
@@ -199,8 +198,8 @@ function evaluateMarketStructureShift(rawFvg, candles, options) {
         status: passed ? 'PASS' : 'FAIL',
         passed,
         detail: passed
-            ? 'Bullish market structure shift confirmed by close above prior high'
-            : 'Bullish FVG did not close above prior structure high',
+            ? 'Bullish MSS confirmed by break candle that created the FVG'
+            : 'Bullish FVG break candle did not close above prior structure high',
         mssCandleIndex: rawFvg.candle3Index,
         referenceLevel,
         breakPrice,

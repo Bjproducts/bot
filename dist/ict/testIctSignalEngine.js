@@ -3,6 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ictSignalEngine_1 = require("./ictSignalEngine");
 const bullishFvg = fvgZone('signal-fvg-bull', 'BULLISH');
 const bearishIfvg = ifvgZone('signal-ifvg-bear', 'BEARISH');
+const parentBoostedIfvg = {
+    ...ifvgZone('signal-ifvg-parent-boost', 'BULLISH'),
+    confidenceOverride: 100,
+    confidenceAttribution: 'IFVG inside respected parent FVG parent-fvg; confidence override 100',
+};
 const invalidatedFvg = { ...bullishFvg, id: 'signal-invalidated-fvg', invalidated: true };
 const fixtures = [
     {
@@ -34,6 +39,12 @@ const fixtures = [
         zone: bullishFvg,
         reaction: reaction('signal-fvg-bull', 'NONE', 100),
         expected: expected('NONE', 100, 'FVG', 'signal-fvg-bull', 'NONE', 75),
+    },
+    {
+        name: 'IFVG inside respected parent FVG receives confidence 100',
+        zone: parentBoostedIfvg,
+        reaction: reaction('signal-ifvg-parent-boost', 'BUY', 75),
+        expected: expected('BUY', 100, 'IFVG', 'signal-ifvg-parent-boost', 'BUY', 75),
     },
 ];
 const results = fixtures.map(fixture => {

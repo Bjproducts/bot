@@ -143,7 +143,7 @@ function updateFVGState(zone, candles) {
         if (zone.direction === 'BULLISH') {
             if (candle.low <= zone.low)
                 filled = true;
-            if (candle.close < zone.low) {
+            if (bodyClosedBelow(candle, zone.low)) {
                 invalidated = true;
                 flipped = true;
             }
@@ -151,13 +151,19 @@ function updateFVGState(zone, candles) {
         else {
             if (candle.high >= zone.high)
                 filled = true;
-            if (candle.close > zone.high) {
+            if (bodyClosedAbove(candle, zone.high)) {
                 invalidated = true;
                 flipped = true;
             }
         }
     }
     return { ...zone, filled, invalidated, flipped };
+}
+function bodyClosedBelow(candle, level) {
+    return candle.open < level && candle.close < level;
+}
+function bodyClosedAbove(candle, level) {
+    return candle.open > level && candle.close > level;
 }
 function isValidCandle(candle) {
     return Number.isFinite(candle.open)

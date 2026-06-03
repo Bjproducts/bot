@@ -17,20 +17,24 @@ function createIctSignal(input) {
     // Phase 5f: gate on reactionWinner + reactionScore (canonical fields).
     // output + confidence remain consistent aliases for any legacy callers.
     const winner = input.reaction.reactionWinner;
-    const score = input.reaction.reactionScore;
+    const score = effectiveReactionScore(input);
     if (winner !== 'BUY' && winner !== 'SELL') {
         return noneSignal(input, minConfidence, evaluatedAt, `Reaction winner is ${winner}`);
     }
     if (score < minConfidence) {
         return noneSignal(input, minConfidence, evaluatedAt, `Reaction score ${formatNumber(score)} is below minimum ${formatNumber(minConfidence)}`);
     }
-    return signal(input, minConfidence, evaluatedAt, winner, `Reaction winner ${winner} met score threshold`);
+    const attribution = confidenceAttribution(input);
+    const reason = attribution
+        ? `Reaction winner ${winner} met score threshold; ${attribution}`
+        : `Reaction winner ${winner} met score threshold`;
+    return signal(input, minConfidence, evaluatedAt, winner, reason, score);
 }
 exports.evaluateIctSignal = createIctSignal;
-function signal(input, minConfidence, evaluatedAt, action, reason) {
+function signal(input, minConfidence, evaluatedAt, action, reason, confidence) {
     return {
         signal: action,
-        confidence: input.reaction.reactionScore,
+        confidence,
         reason,
         sourceZoneType: input.zone.type,
         zoneId: input.zone.id,
@@ -50,6 +54,18 @@ function noneSignal(input, minConfidence, evaluatedAt, reason) {
         minConfidence,
         evaluatedAt,
     };
+}
+function effectiveReactionScore(input) {
+    const override = input.zone.type === 'IFVG' ? input.zone.confidenceOverride : undefined;
+    if (Number.isFinite(override)) {
+        return Math.max(input.reaction.reactionScore, Math.min(100, Math.max(0, override)));
+    }
+    return input.reaction.reactionScore;
+}
+function confidenceAttribution(input) {
+    if (input.zone.type !== 'IFVG')
+        return '';
+    return input.zone.confidenceAttribution ?? '';
 }
 function normalizeMinConfidence(options) {
     const value = options?.minConfidence ?? exports.DEFAULT_ICT_SIGNAL_MIN_CONFIDENCE;

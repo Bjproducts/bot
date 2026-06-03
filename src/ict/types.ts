@@ -25,6 +25,10 @@ export interface IFVGZone extends IctZoneBase {
   type: 'IFVG';
   sourceFvgId: string;
   inversionCandleIndex: number;
+  parentFvgId?: string;
+  parentFvgRespected?: boolean;
+  confidenceOverride?: number;
+  confidenceAttribution?: string;
 }
 
 export interface DetectionResult<TZone extends IctZoneBase> {

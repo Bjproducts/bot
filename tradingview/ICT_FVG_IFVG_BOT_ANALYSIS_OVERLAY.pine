@@ -53,6 +53,7 @@ zoneTextMode = input.string("Off", "Zone text", options = ["Off", "Compact", "Fu
 showLabels = input.bool(true, "Show labels")
 showTradeManagement = input.bool(true, "Show targets and BE stop")
 keepHistoricalTradeLines = input.bool(false, "Keep historical trade lines")
+showParityDebug = input.bool(true, "Show bot parity debug")
 showTable = input.bool(true, "Show latest analysis table")
 
 bool uiMinimal = uiMode == "MINIMAL"
@@ -69,6 +70,10 @@ var string[] zoneTypes = array.new_string()
 var string[] zoneIds = array.new_string()
 var float[] zoneRangeMultiples = array.new_float()
 var int[] zoneCreatedBars = array.new_int()
+var float[] zoneBuyStopPrices = array.new_float()
+var float[] zoneSellStopPrices = array.new_float()
+var string[] zoneBuyStopSources = array.new_string()
+var string[] zoneSellStopSources = array.new_string()
 var bool[] zoneInvalidated = array.new_bool()
 var bool[] zoneFilled = array.new_bool()
 var bool[] zoneFlipped = array.new_bool()
@@ -94,6 +99,9 @@ var float latestHardStopPrice = na
 var float latestExpectedMovePercent = na
 var float latestRewardDistance = na
 var float latestRiskDistance = na
+var float latestBotStopPrice = na
+var string latestStopSource = "--"
+var string latestParityStatus = "--"
 var float latestTargetReachProbability = na
 var string latestReactionTier = "--"
 var string latestReactionWinner = "--"
@@ -120,6 +128,7 @@ var float activeEntry = na
 var float activeTarget = na
 var float activeInitialStop = na
 var string activeTargetSource = "--"
+var string activeStopSource = "--"
 var int activeEntryBarIndex = na
 var string activeEntryTime = "--"
 var int activeTargetZoneIndex = na
@@ -307,6 +316,9 @@ reactionWinnerOf(string zoneDirection, string tier, float zoneHigh, float zoneLo
 targetLineColor(string mode) =>
     mode == "STRUCTURE" ? color.fuchsia : mode == "SCALP" ? color.orange : color.lime
 
+priceMatches(float a, float b) =>
+    not na(a) and not na(b) and math.abs(a - b) <= math.max(syminfo.mintick, 0.0000001)
+
 skipReasonFor(bool targetValid, bool stopValid, bool sizingAccepted, string sizingReason, float probability, float rr) =>
     not targetValid ? "target too far" :
      not stopValid ? "Invalid target or stop" :
@@ -362,12 +374,16 @@ pruneOldestZone() =>
     array.shift(zoneIds)
     array.shift(zoneRangeMultiples)
     array.shift(zoneCreatedBars)
+    array.shift(zoneBuyStopPrices)
+    array.shift(zoneSellStopPrices)
+    array.shift(zoneBuyStopSources)
+    array.shift(zoneSellStopSources)
     array.shift(zoneInvalidated)
     array.shift(zoneFilled)
     array.shift(zoneFlipped)
     array.shift(zoneReacted)
 
-addZone(string zoneType, string direction, float zoneLow, float zoneHigh, int leftBar, string reasonText, float zoneRangeMultiple) =>
+addZone(string zoneType, string direction, float zoneLow, float zoneHigh, int leftBar, string reasonText, float zoneRangeMultiple, float buyStopPrice, float sellStopPrice, string buyStopSource, string sellStopSource) =>
     while array.size(zoneHighs) >= maxTrackedZones
         pruneOldestZone()
     float midpoint = (zoneLow + zoneHigh) / 2
@@ -393,10 +409,28 @@ addZone(string zoneType, string direction, float zoneLow, float zoneHigh, int le
     array.push(zoneIds, zoneId)
     array.push(zoneRangeMultiples, zoneRangeMultiple)
     array.push(zoneCreatedBars, bar_index)
+    array.push(zoneBuyStopPrices, buyStopPrice)
+    array.push(zoneSellStopPrices, sellStopPrice)
+    array.push(zoneBuyStopSources, buyStopSource)
+    array.push(zoneSellStopSources, sellStopSource)
     array.push(zoneInvalidated, false)
     array.push(zoneFilled, false)
     array.push(zoneFlipped, false)
     array.push(zoneReacted, false)
+
+botStopPrice(int zoneIndex, string signal, float fallbackLow, float fallbackHigh) =>
+    if zoneIndex < 0 or zoneIndex >= array.size(zoneHighs)
+        signal == "BUY" ? fallbackLow : fallbackHigh
+    else
+        float storedStop = signal == "BUY" ? array.get(zoneBuyStopPrices, zoneIndex) : array.get(zoneSellStopPrices, zoneIndex)
+        na(storedStop) ? (signal == "BUY" ? fallbackLow : fallbackHigh) : storedStop
+
+botStopSource(int zoneIndex, string signal) =>
+    if zoneIndex < 0 or zoneIndex >= array.size(zoneHighs)
+        signal == "BUY" ? "zoneLow fallback" : "zoneHigh fallback"
+    else
+        string storedSource = signal == "BUY" ? array.get(zoneBuyStopSources, zoneIndex) : array.get(zoneSellStopSources, zoneIndex)
+        storedSource != "" ? storedSource : (signal == "BUY" ? "zoneLow fallback" : "zoneHigh fallback")
 
 float bullishLow = c1High
 float bullishHigh = c3Low
@@ -411,10 +445,10 @@ bool bearishPdOk = premiumDiscountOk("BEARISH", bearishMid)
 bool validBearishFvg = rawBearishFvg and bearLiquiditySweep and displacementBearish and bearMss and bearishPdOk and sessionOk
 
 if validBullishFvg
-    addZone("FVG", "BULLISH", bullishLow, bullishHigh, bar_index - 2, "sell-side sweep + displacement + MSS", rangeMultiple)
+    addZone("FVG", "BULLISH", bullishLow, bullishHigh, bar_index - 2, "sell-side sweep + displacement + MSS", rangeMultiple, c1Low, c1High, "firstCandleLow", "firstCandleHigh")
 
 if validBearishFvg
-    addZone("FVG", "BEARISH", bearishLow, bearishHigh, bar_index - 2, "buy-side sweep + displacement + MSS", rangeMultiple)
+    addZone("FVG", "BEARISH", bearishLow, bearishHigh, bar_index - 2, "buy-side sweep + displacement + MSS", rangeMultiple, c1Low, c1High, "firstCandleLow", "firstCandleHigh")
 
 if showRejectedRawFvgs and rawBullishFvg and not validBullishFvg
     string reason = rejectionReason("BULLISH", bullLiquiditySweep, displacementBullish, bullMss, bullishPdOk, sessionOk)
@@ -449,6 +483,8 @@ string bestTargetSource = "--"
 float bestExpectedProfitUsd = na
 float bestExpectedLossUsd = na
 float bestRiskRewardRatio = na
+float bestBotStopPrice = na
+string bestStopSource = "--"
 string bestRankingText = "--"
 string bestSelectionReason = "--"
 string runnerUpText = "--"
@@ -525,12 +561,14 @@ if zoneCount > 0
             if zType == "FVG" and not flipped
                 array.set(zoneFlipped, i, true)
                 string ifvgDirection = zDirection == "BULLISH" ? "BEARISH" : "BULLISH"
-                addZone("IFVG", ifvgDirection, zLow, zHigh, bar_index, "source FVG invalidated", array.get(zoneRangeMultiples, i))
+                addZone("IFVG", ifvgDirection, zLow, zHigh, bar_index, "source FVG invalidated", array.get(zoneRangeMultiples, i), low, high, "displacementOrigin", "displacementOrigin")
                 if tradeOnIfvgFormation
                     string formationSignal = ifvgDirection == "BULLISH" ? "BUY" : "SELL"
                     float formationConfidence = 100
                     float formationEntry = close
-                    float formationStop = formationSignal == "BUY" ? zLow : zHigh
+                    int formationZoneIndex = array.size(zoneHighs) - 1
+                    float formationStop = botStopPrice(formationZoneIndex, formationSignal, zLow, zHigh)
+                    string formationStopSource = botStopSource(formationZoneIndex, formationSignal)
                     [formationOpposingTarget, formationOpposingTargetIndex] = findOpposingTarget(formationSignal, formationEntry)
                     float formationSwingTarget = fallbackSwingTarget(formationSignal, formationEntry)
                     float formationRiskDistance = math.abs(formationEntry - formationStop)
@@ -590,6 +628,8 @@ if zoneCount > 0
                         bestExpectedProfitUsd := formationExpectedProfit
                         bestExpectedLossUsd := formationExpectedLoss
                         bestRiskRewardRatio := formationRr
+                        bestBotStopPrice := formationStop
+                        bestStopSource := formationStopSource
                         bestRankingText := "1. " + formationSignal + " IFVG\nProb=" + str.tostring(formationProbability, "#.##") + "\nScore=" + str.tostring(formationScore, "#.##")
                         bestSelectionReason := formationHadPreviousBest ? "Higher probability" : "First qualified candidate"
                         bestReason := formationSignal + " fresh IFVG formation, score=" + str.tostring(formationScore) + ", confidence=100"
@@ -597,7 +637,8 @@ if zoneCount > 0
         float confidence = reactionScore
         string signal = reactionConfirmed and not invalidated and not reacted ? reactionWinner : "NONE"
         float entryForCandidate = close
-        float candidateStop = signal == "BUY" ? zLow : zHigh
+        float candidateStop = botStopPrice(i, signal, zLow, zHigh)
+        string candidateStopSource = botStopSource(i, signal)
         [candidateOpposingTarget, candidateOpposingTargetIndex] = findOpposingTarget(signal, entryForCandidate)
         float candidateSwingTarget = fallbackSwingTarget(signal, entryForCandidate)
         float candidateRiskDistance = math.abs(entryForCandidate - candidateStop)
@@ -663,6 +704,8 @@ if zoneCount > 0
             bestExpectedProfitUsd := expectedProfit
             bestExpectedLossUsd := expectedLoss
             bestRiskRewardRatio := candidateRr
+            bestBotStopPrice := candidateStop
+            bestStopSource := candidateStopSource
             bestRankingText := "1. " + signal + " " + zType + "\nProb=" + str.tostring(probability, "#.##") + "\nScore=" + str.tostring(score, "#.##")
             bestSelectionReason := candidateHadPreviousBest ? "Higher probability" : "First qualified candidate"
             bestReason := signal + " reaction confirmed, tier=" + reactionTier + ", probability=" + str.tostring(probability, "#.##") + ", score=" + str.tostring(score) + ", confidence=" + str.tostring(confidence, "#.##")
@@ -692,6 +735,10 @@ latestZoneFreshnessScore := bestZoneFreshnessScore
 latestSelectedTarget := bestSelectedTarget
 latestTargetMode := bestTargetMode
 latestTargetSource := bestTargetSource
+latestBotStopPrice := bestBotStopPrice
+latestStopSource := bestStopSource
+if bestSignal == "NONE"
+    latestParityStatus := "--"
 latestRankingText := runnerUpText == "--" ? bestRankingText : bestRankingText + "\n\n" + runnerUpText
 latestSelectionReason := bestSelectionReason
 
@@ -708,7 +755,8 @@ if newManagedSignal
     float entryPrice = close
     [opposingTarget, opposingTargetIndex] = findOpposingTarget(latestSignal, entryPrice)
     float swingTarget = fallbackSwingTarget(latestSignal, entryPrice)
-    float selectedStop = latestSignal == "BUY" ? latestZoneLow : latestZoneHigh
+    float selectedStop = not na(latestBotStopPrice) ? latestBotStopPrice : latestSignal == "BUY" ? latestZoneLow : latestZoneHigh
+    string selectedStopSource = latestStopSource != "--" ? latestStopSource : latestSignal == "BUY" ? "zoneLow fallback" : "zoneHigh fallback"
     float riskDistanceForScalp = math.abs(entryPrice - selectedStop)
     float scalpTarget = latestSignal == "BUY" ? entryPrice + riskDistanceForScalp * targetRMultiple : entryPrice - riskDistanceForScalp * targetRMultiple
     float structureTarget = not na(opposingTarget) ? opposingTarget : swingTarget
@@ -717,6 +765,11 @@ if newManagedSignal
     bool structureQualified = structureValid and not na(structureRr) and structureRr >= minRiskRewardRatio
     float selectedTarget = not na(latestSelectedTarget) ? latestSelectedTarget : exitTargetMode == "SCALP" ? scalpTarget : exitTargetMode == "STRUCTURE" ? structureTarget : structureQualified and math.abs(structureTarget - entryPrice) <= math.abs(scalpTarget - entryPrice) ? structureTarget : scalpTarget
     string selectedTargetSource = latestTargetSource != "--" ? latestTargetSource : exitTargetMode == "SCALP" ? "SCALP" : exitTargetMode == "STRUCTURE" ? "STRUCTURE" : (not na(opposingTarget) ? "HYBRID Opposing FVG" : "HYBRID Swing")
+    float botMirrorStop = not na(latestBotStopPrice) ? latestBotStopPrice : selectedStop
+    float botMirrorTarget = not na(latestSelectedTarget) ? latestSelectedTarget : selectedTarget
+    float botMirrorRisk = math.abs(entryPrice - botMirrorStop)
+    bool parityPass = priceMatches(selectedStop, botMirrorStop) and priceMatches(selectedTarget, botMirrorTarget) and priceMatches(riskDistanceForScalp, botMirrorRisk)
+    latestParityStatus := parityPass ? "PARITY PASS" : "PARITY FAIL"
     bool targetIsValid = latestSignal == "BUY" ? selectedTarget > entryPrice : selectedTarget < entryPrice
     bool stopIsValid = latestSignal == "BUY" ? selectedStop < entryPrice : selectedStop > entryPrice
     bool canEvaluateSizing = not na(selectedTarget) and targetIsValid and not na(selectedStop) and stopIsValid and not na(latestConfidence) and not na(latestScore)
@@ -732,6 +785,7 @@ if newManagedSignal
         latestRiskUtilizationPercent := riskUtilization
         latestRiskUtilizationWarning := riskWarningFlag > 0
         latestHardStopPrice := selectedStop
+        latestStopSource := selectedStopSource
         latestExpectedMovePercent := expectedMovePct
         latestRewardDistance := rewardDistance
         latestRiskDistance := riskDistance
@@ -752,6 +806,7 @@ if newManagedSignal
         latestRiskUtilizationPercent := na
         latestRiskUtilizationWarning := false
         latestHardStopPrice := selectedStop
+        latestStopSource := selectedStopSource
         latestExpectedMovePercent := na
         latestRewardDistance := na
         latestRiskDistance := na
@@ -773,6 +828,7 @@ if newManagedSignal
         activeTarget := selectedTarget
         activeInitialStop := selectedStop
         activeTargetSource := selectedTargetSource
+        activeStopSource := selectedStopSource
         activeEntryBarIndex := bar_index
         activeEntryTime := str.format_time(time, "yyyy-MM-dd HH:mm", "UTC")
         activeTargetZoneIndex := opposingTargetIndex
@@ -830,11 +886,15 @@ if showLabels and latestSignal != "NONE" and barstate.isconfirmed and latestSizi
     string entryText = latestSignal + "\n" + str.tostring(latestTargetReachProbability, "#") + "%\nRR " + str.tostring(latestRiskRewardRatio, "#.##") + "\n+$" + str.tostring(latestExpectedProfitUsd, "#.##") + " / -$" + str.tostring(latestExpectedLossUsd, "#.##")
     label.new(bar_index, labelY, entryText, style = labelStyle, color = labelColor, textcolor = color.white, size = size.small)
 
+if showParityDebug and showLabels and latestSignal != "NONE" and barstate.isconfirmed and latestSizingAccepted
+    string parityText = "BOT PARITY\n" + latestParityStatus + "\nEntry: " + str.tostring(latestEntryPrice, format.mintick) + "\nSL: " + str.tostring(latestHardStopPrice, format.mintick) + "\nTP: " + str.tostring(latestSelectedTarget, format.mintick) + "\nRisk: " + str.tostring(latestRiskDistance, format.mintick) + "\nRR: " + str.tostring(latestRiskRewardRatio, "#.##") + "\nStop Source: " + latestStopSource
+    label.new(bar_index, latestSignal == "BUY" ? high : low, parityText, style = latestSignal == "BUY" ? label.style_label_down : label.style_label_up, color = latestParityStatus == "PARITY PASS" ? color.new(color.green, 0) : color.new(color.red, 0), textcolor = color.white, size = size.small)
+
 if showScoreBreakdown and uiDebug and showLabels and latestSignal != "NONE" and barstate.isconfirmed
     string breakdown = "Score Breakdown\nDisplacement " + str.tostring(latestDisplacementScore, "#.##") + "\nReaction Tier " + str.tostring(latestReactionTierScore, "#.##") + "\nRR Fit " + str.tostring(latestRrFitScore, "#.##") + "\nTarget Penalty -" + str.tostring(latestTargetDistancePenalty, "#.##") + "\nFreshness " + str.tostring(latestZoneFreshnessScore, "#.##") + "\nProbability " + str.tostring(latestTargetReachProbability, "#.##")
     label.new(bar_index, latestSignal == "BUY" ? high : low, breakdown + "\n\nCandidate Ranking\n" + latestRankingText + "\n\nReason selected:\n" + latestSelectionReason, style = latestSignal == "BUY" ? label.style_label_down : label.style_label_up, color = color.new(color.black, 0), textcolor = color.white, size = size.small)
 
-var table analysisTable = table.new(position.top_right, 2, 11, border_width = 1)
+var table analysisTable = table.new(position.top_right, 2, 13, border_width = 1)
 if showTable and barstate.islast
     table.cell(analysisTable, 0, 0, "Nado ICT Analysis", text_color = color.white, bgcolor = color.black)
     table.cell(analysisTable, 1, 0, syminfo.ticker, text_color = color.white, bgcolor = color.black)
@@ -858,3 +918,7 @@ if showTable and barstate.islast
     table.cell(analysisTable, 1, 9, not na(latestRiskRewardRatio) ? str.tostring(latestRiskRewardRatio, "#.##") : "--")
     table.cell(analysisTable, 0, 10, "Position Size")
     table.cell(analysisTable, 1, 10, not na(latestPositionSizeUsd) ? "$" + str.tostring(latestPositionSizeUsd, "#.##") : "--")
+    table.cell(analysisTable, 0, 11, "Stop Source")
+    table.cell(analysisTable, 1, 11, activeTrade ? activeStopSource : latestStopSource)
+    table.cell(analysisTable, 0, 12, "Parity")
+    table.cell(analysisTable, 1, 12, latestParityStatus, text_color = latestParityStatus == "PARITY PASS" ? color.lime : latestParityStatus == "PARITY FAIL" ? color.red : color.white)

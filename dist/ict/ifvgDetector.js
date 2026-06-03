@@ -49,7 +49,7 @@ function detectBullishIFVG(existingFVG, candle, candleIndex) {
         return null;
     if (!isValidCandle(candle))
         return null;
-    if (candle.close > existingFVG.high) {
+    if (bodyClosedAbove(candle, existingFVG.high)) {
         return {
             id: makeIfvgId('BULLISH', existingFVG.id, candleIndex),
             type: 'IFVG',
@@ -72,7 +72,7 @@ function detectBearishIFVG(existingFVG, candle, candleIndex) {
         return null;
     if (!isValidCandle(candle))
         return null;
-    if (candle.close < existingFVG.low) {
+    if (bodyClosedBelow(candle, existingFVG.low)) {
         return {
             id: makeIfvgId('BEARISH', existingFVG.id, candleIndex),
             type: 'IFVG',
@@ -104,7 +104,7 @@ function detectIFVGs(fvgs, candles) {
                 ? detectBullishIFVG(fvg, candle, i)
                 : detectBearishIFVG(fvg, candle, i);
             if (ifvg) {
-                zones.push(updateIFVGState(ifvg, candles));
+                zones.push(updateIFVGState(applyParentFvgAttribution(ifvg, fvgs, candles), candles));
                 seenSourceFvgs.add(fvg.id);
                 break;
             }
@@ -141,16 +141,54 @@ function updateIFVGState(zone, candles) {
         const tradesIntoZone = candle.low <= zone.high && candle.high >= zone.low;
         if (tradesIntoZone)
             filled = true;
-        if (zone.direction === 'BULLISH' && candle.close < zone.low) {
+        if (zone.direction === 'BULLISH' && bodyClosedBelow(candle, zone.low)) {
             invalidated = true;
             flipped = true;
         }
-        if (zone.direction === 'BEARISH' && candle.close > zone.high) {
+        if (zone.direction === 'BEARISH' && bodyClosedAbove(candle, zone.high)) {
             invalidated = true;
             flipped = true;
         }
     }
     return { ...zone, filled, invalidated, flipped };
+}
+function applyParentFvgAttribution(ifvg, fvgs, candles) {
+    const parent = fvgs.find(fvg => fvg.direction === ifvg.direction
+        && fvg.id !== ifvg.sourceFvgId
+        && ifvg.low >= fvg.low
+        && ifvg.high <= fvg.high
+        && parentWasRespected(fvg, candles, ifvg.inversionCandleIndex));
+    if (!parent)
+        return ifvg;
+    return {
+        ...ifvg,
+        parentFvgId: parent.id,
+        parentFvgRespected: true,
+        confidenceOverride: 100,
+        confidenceAttribution: `IFVG inside respected parent FVG ${parent.id}; confidence override 100`,
+    };
+}
+function parentWasRespected(parent, candles, untilIndexExclusive) {
+    let retracedIntoParent = false;
+    for (let i = parent.candle3Index + 1; i < untilIndexExclusive; i++) {
+        const candle = candles[i];
+        if (!candle || !isValidCandle(candle))
+            continue;
+        if (parent.direction === 'BULLISH' && bodyClosedBelow(candle, parent.low))
+            return false;
+        if (parent.direction === 'BEARISH' && bodyClosedAbove(candle, parent.high))
+            return false;
+        if (candle.low <= parent.high && candle.high >= parent.low) {
+            retracedIntoParent = true;
+        }
+    }
+    return retracedIntoParent;
+}
+function bodyClosedBelow(candle, level) {
+    return candle.open < level && candle.close < level;
+}
+function bodyClosedAbove(candle, level) {
+    return candle.open > level && candle.close > level;
 }
 function isValidCandle(candle) {
     return Number.isFinite(candle.open)

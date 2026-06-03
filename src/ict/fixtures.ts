@@ -38,7 +38,7 @@ export const bullishIfvgFlipFixture: IctFixture = {
     candle(0, 104, 105, 100, 101),
     candle(1, 100, 101, 95, 96),
     candle(2, 95, 98, 92, 93),
-    candle(3, 99, 107, 99, 106),
+    candle(3, 101, 107, 100.5, 106),
   ],
 };
 
@@ -48,7 +48,7 @@ export const bearishIfvgFlipFixture: IctFixture = {
     candle(0, 98, 100, 95, 99),
     candle(1, 100, 105, 99, 104),
     candle(2, 104, 106, 102, 105),
-    candle(3, 105, 106, 99, 99.5),
+    candle(3, 99.8, 106, 99, 99.5),
   ],
 };
 
@@ -58,7 +58,7 @@ export const invalidatedZoneFixture: IctFixture = {
     candle(0, 98, 100, 95, 99),
     candle(1, 100, 105, 99, 104),
     candle(2, 104, 106, 102, 105),
-    candle(3, 105, 106, 98, 99),
+    candle(3, 99.5, 106, 98, 99),
   ],
 };
 

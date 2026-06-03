@@ -114,6 +114,7 @@ const tests = [
             },
         },
     }),
+    testParentFvgConfidenceAttribution(),
 ];
 for (const test of tests) {
     printResult(test);
@@ -202,4 +203,74 @@ function printResult(test) {
 }
 function stableJson(value) {
     return JSON.stringify(value);
+}
+function testParentFvgConfidenceAttribution() {
+    const candles = [
+        c(0, 100, 101, 99, 100),
+        c(1, 100, 105, 99.5, 104),
+        c(2, 106, 112, 106, 111),
+        c(3, 109, 109.5, 105, 108),
+        c(4, 108, 109, 104, 105),
+        c(5, 105, 105.5, 103, 104.5),
+        c(6, 106.2, 108, 104.2, 107),
+    ];
+    const parent = {
+        id: 'parent-bullish',
+        type: 'FVG',
+        direction: 'BULLISH',
+        high: 110,
+        low: 100,
+        midpoint: 105,
+        createdAt: candles[2].timestamp.toISOString(),
+        invalidated: false,
+        filled: true,
+        flipped: false,
+        candle1Index: 0,
+        candle2Index: 1,
+        candle3Index: 2,
+    };
+    const source = {
+        id: 'source-bearish',
+        type: 'FVG',
+        direction: 'BEARISH',
+        high: 106,
+        low: 104,
+        midpoint: 105,
+        createdAt: candles[4].timestamp.toISOString(),
+        invalidated: true,
+        filled: true,
+        flipped: true,
+        candle1Index: 2,
+        candle2Index: 3,
+        candle3Index: 4,
+    };
+    const ifvg = (0, ifvgDetector_1.detectIFVGs)([parent, source], candles).find(zone => zone.sourceFvgId === source.id);
+    const actual = {
+        totalIFVGs: ifvg ? 1 : 0,
+        parentFvgId: ifvg?.parentFvgId ?? null,
+        parentFvgRespected: ifvg?.parentFvgRespected ?? false,
+        confidenceOverride: ifvg?.confidenceOverride ?? null,
+    };
+    const expected = {
+        totalIFVGs: 1,
+        parentFvgId: parent.id,
+        parentFvgRespected: true,
+        confidenceOverride: 100,
+    };
+    return {
+        name: 'IFVG inside respected parent FVG receives confidence attribution',
+        expected,
+        actual,
+        passed: stableJson(actual) === stableJson(expected),
+    };
+}
+function c(minute, open, high, low, close) {
+    return {
+        timestamp: new Date(Date.UTC(2026, 5, 1, 0, minute, 0)),
+        open,
+        high,
+        low,
+        close,
+        volume: 100,
+    };
 }
