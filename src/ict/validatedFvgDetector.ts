@@ -117,15 +117,16 @@ function evaluateLiquiditySweep(
   }
 
   if (rawFvg.direction === 'BEARISH') {
-    const referenceLevel = maxHigh(prior);
+    const referenceLevel = liquiditySwingHigh(prior);
     const sweepPrice = sweepCandle.high;
-    const passed = sweepPrice > referenceLevel;
+    const rejected = referenceLevel !== null && sweepCandle.close < referenceLevel;
+    const passed = referenceLevel !== null && sweepPrice > referenceLevel && rejected;
     return {
       status: passed ? 'PASS' : 'FAIL',
       passed,
       detail: passed
-        ? 'Buy-side liquidity swept before bearish FVG'
-        : 'Bearish FVG did not sweep buy-side liquidity first',
+        ? 'Buy-side liquidity swept and rejected before bearish FVG'
+        : 'Bearish FVG did not sweep and reject buy-side liquidity first',
       sweptSide: 'BUY_SIDE',
       sweepCandleIndex: rawFvg.candle1Index,
       referenceLevel,
@@ -133,20 +134,31 @@ function evaluateLiquiditySweep(
     };
   }
 
-  const referenceLevel = minLow(prior);
+  const referenceLevel = liquiditySwingLow(prior);
   const sweepPrice = sweepCandle.low;
-  const passed = sweepPrice < referenceLevel;
+  const rejected = referenceLevel !== null && sweepCandle.close > referenceLevel;
+  const passed = referenceLevel !== null && sweepPrice < referenceLevel && rejected;
   return {
     status: passed ? 'PASS' : 'FAIL',
     passed,
     detail: passed
-      ? 'Sell-side liquidity swept before bullish FVG'
-      : 'Bullish FVG did not sweep sell-side liquidity first',
+      ? 'Sell-side liquidity swept and rejected before bullish FVG'
+      : 'Bullish FVG did not sweep and reject sell-side liquidity first',
     sweptSide: 'SELL_SIDE',
     sweepCandleIndex: rawFvg.candle1Index,
     referenceLevel,
     sweepPrice,
   };
+}
+
+function liquiditySwingHigh(candles: readonly Candle[]): number | null {
+  if (candles.length === 0) return null;
+  return maxHigh(candles);
+}
+
+function liquiditySwingLow(candles: readonly Candle[]): number | null {
+  if (candles.length === 0) return null;
+  return minLow(candles);
 }
 
 function evaluateDisplacement(

@@ -54,6 +54,19 @@ const fixtures: Fixture[] = [
     },
   },
   {
+    name: 'bearish FVG with buy-side wick but no rejection is rejected',
+    candles: bearishAfterBuySideWickOnly(),
+    targetIndex: 7,
+    targetDirection: 'BEARISH',
+    expected: {
+      foundRawFvg: true,
+      accepted: false,
+      validatedCount: 0,
+      rejectionIncludes: 'reject buy-side',
+      liquiditySweep: 'FAIL',
+    },
+  },
+  {
     name: 'bullish FVG after sell-side sweep is accepted',
     candles: bullishAfterSellSideSweep(),
     targetIndex: 7,
@@ -65,6 +78,19 @@ const fixtures: Fixture[] = [
       liquiditySweep: 'PASS',
       displacement: 'PASS',
       marketStructureShift: 'PASS',
+    },
+  },
+  {
+    name: 'bullish FVG with sell-side wick but no rejection is rejected',
+    candles: bullishAfterSellSideWickOnly(),
+    targetIndex: 7,
+    targetDirection: 'BULLISH',
+    expected: {
+      foundRawFvg: true,
+      accepted: false,
+      validatedCount: 0,
+      rejectionIncludes: 'reject sell-side',
+      liquiditySweep: 'FAIL',
     },
   },
   {
@@ -200,8 +226,21 @@ function bearishAfterBuySideSweep(): Candle[] {
     c(1, 101.2, 102.5, 100.5, 101.5),
     c(2, 101.4, 103, 100.8, 102),
     c(3, 102, 103.5, 101, 103),
-    c(4, 102.5, 104, 101.5, 103.5),
-    c(5, 103.5, 105.5, 104, 104.5),
+    c(4, 102.5, 105, 101.5, 103.5),
+    c(5, 105.2, 106.5, 104.4, 104.8),
+    c(6, 104.5, 105, 97.5, 98.2),
+    c(7, 98.4, 103, 97, 98),
+  ];
+}
+
+function bearishAfterBuySideWickOnly(): Candle[] {
+  return [
+    c(0, 101, 102, 100, 101),
+    c(1, 101.2, 102.5, 100.5, 101.5),
+    c(2, 101.4, 103, 100.8, 102),
+    c(3, 102, 103.5, 101, 103),
+    c(4, 102.5, 105, 101.5, 103.5),
+    c(5, 105.2, 106.5, 104.4, 105.4),
     c(6, 104.5, 105, 97.5, 98.2),
     c(7, 98.4, 103, 97, 98),
   ];
@@ -213,8 +252,21 @@ function bullishAfterSellSideSweep(): Candle[] {
     c(1, 102.2, 103.5, 100.5, 101.5),
     c(2, 101.4, 103.8, 100.8, 102),
     c(3, 102, 104, 101, 103),
-    c(4, 102.5, 103.8, 101.5, 102.8),
-    c(5, 101, 101.5, 99, 100.2),
+    c(4, 102.5, 103.8, 99, 102.8),
+    c(5, 99.4, 100.5, 98, 99.5),
+    c(6, 100.2, 107, 99.5, 106.5),
+    c(7, 106.3, 108, 102, 107),
+  ];
+}
+
+function bullishAfterSellSideWickOnly(): Candle[] {
+  return [
+    c(0, 102, 104, 100, 102),
+    c(1, 102.2, 103.5, 100.5, 101.5),
+    c(2, 101.4, 103.8, 100.8, 102),
+    c(3, 102, 104, 101, 103),
+    c(4, 102.5, 103.8, 99, 102.8),
+    c(5, 99.4, 100.5, 98, 98.6),
     c(6, 100.2, 107, 99.5, 106.5),
     c(7, 106.3, 108, 102, 107),
   ];

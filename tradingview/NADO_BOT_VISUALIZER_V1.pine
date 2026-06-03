@@ -1,0 +1,616 @@
+//@version=6
+indicator("Nado Bot Visualizer v1", overlay = true,
+     max_boxes_count = 500, max_labels_count = 500, max_lines_count = 500)
+
+// =====================================================================
+// Nado Bot Visualizer v1
+//
+// Mirrors the bot's decision pipeline (FVG detection -> validation gates
+// -> reaction tier -> candidate scoring -> entry / skip) and renders it
+// as a visual explanation layer. This is NOT a strategy. It draws what
+// the bot would see and why it would buy, sell, or skip.
+//
+// Decision pipeline (mirrors src/ict/* in the project):
+//   1. Detect raw 3-candle FVG.
+//   2. Validate: liquidity sweep, displacement, MSS.
+//   3. Evaluate reaction tier: TOUCH | MIDPOINT | BOUNDARY | DISPLACEMENT.
+//   4. Compute targetReachProbability and confidence.
+//   5. Pick best candidate per bar (highest probability).
+//   6. Emit BOT ENTRY only if every gate passes; otherwise show SKIP.
+// =====================================================================
+
+// ─── Inputs ───────────────────────────────────────────────────────────
+g_validation = "Validation thresholds"
+liquidityLookback  = input.int(5,    "Liquidity sweep lookback (bars)",   minval = 1, group = g_validation)
+mssLookback        = input.int(5,    "Market structure lookback (bars)",  minval = 1, group = g_validation)
+dispBodyMin        = input.float(0.60, "Displacement body/range min",      minval = 0, maxval = 1, step = 0.05, group = g_validation)
+dispRangeMin       = input.float(1.20, "Displacement range multiple min",  minval = 0, step = 0.05, group = g_validation)
+
+g_scoring = "Scoring & gates"
+minConfidence      = input.float(75, "Min confidence (reaction score)",   minval = 0, maxval = 100, group = g_scoring)
+minRR              = input.float(1.5, "Min risk/reward",                   minval = 0, step = 0.1, group = g_scoring)
+targetRMultiple    = input.float(1.5, "Target R multiple (scalp TP)",      minval = 0.1, step = 0.1, group = g_scoring)
+preferredMinUsd    = input.float(1.00, "Preferred profit min ($)",         minval = 0, step = 0.10, group = g_scoring)
+preferredMaxUsd    = input.float(1.50, "Preferred profit max ($)",         minval = 0, step = 0.10, group = g_scoring)
+orderSizeUsd       = input.float(100, "Position size for profit display ($)", minval = 0, group = g_scoring)
+
+g_render = "Rendering"
+fvgForwardBars     = input.int(25, "FVG forward extension (bars)",         minval = 5, maxval = 200, group = g_render)
+maxStaleBars       = input.int(30, "Max bars before freezing stale FVG",   minval = 5, maxval = 500, group = g_render)
+maxActiveFvgs      = input.int(20, "Max active FVGs on chart",             minval = 5, maxval = 50, group = g_render)
+recentEventsKeep   = input.int(20, "Keep most recent N entries / exits",   minval = 5, maxval = 50, group = g_render)
+
+g_toggles = "Toggles"
+showCandidates     = input.bool(true,  "Show candidate labels",            group = g_toggles)
+showRejections     = input.bool(true,  "Show SKIP / rejection labels",     group = g_toggles)
+showReactionTier   = input.bool(true,  "Show reaction-tier label per FVG", group = g_toggles)
+showBotEntries     = input.bool(true,  "Show BOT BUY / SELL entries",      group = g_toggles)
+showSlTp           = input.bool(true,  "Show SL / TP lines",               group = g_toggles)
+showRrBox          = input.bool(true,  "Show R/R box",                     group = g_toggles)
+showExplain        = input.bool(true,  "Show explainability panel",        group = g_toggles)
+showPositionPanel  = input.bool(true,  "Show active-position panel",       group = g_toggles)
+
+// ─── Per-bar candle aliases (c1 = oldest of the FVG pattern) ──────────
+c1H = high[2]
+c1L = low[2]
+c2H = high[1]
+c2L = low[1]
+c2O = open[1]
+c2C = close[1]
+c3H = high
+c3L = low
+c3C = close
+
+// ─── Raw FVG patterns ─────────────────────────────────────────────────
+rawBullishFvg = bar_index >= 2 and c1H < c3L
+rawBearishFvg = bar_index >= 2 and c1L > c3H
+
+// ─── Validation measurements ──────────────────────────────────────────
+priorSweepHigh = ta.highest(high[3], liquidityLookback)
+priorSweepLow  = ta.lowest(low[3],   liquidityLookback)
+priorMssHigh   = ta.highest(high[3], mssLookback)
+priorMssLow    = ta.lowest(low[3],   mssLookback)
+avgPriorRange  = ta.sma(high - low, liquidityLookback)[2]
+
+dispRange  = c2H - c2L
+dispBody   = math.abs(c2C - c2O)
+dispBR     = dispRange > 0 ? dispBody / dispRange : 0.0
+dispMult   = avgPriorRange > 0 ? dispRange / avgPriorRange : 0.0
+
+dispBullishOk = c2C > c2O and dispBR >= dispBodyMin and dispMult >= dispRangeMin
+dispBearishOk = c2C < c2O and dispBR >= dispBodyMin and dispMult >= dispRangeMin
+sweepBullishOk = c1L < priorSweepLow
+sweepBearishOk = c1H > priorSweepHigh
+mssBullishOk   = c3C > priorMssHigh
+mssBearishOk   = c3C < priorMssLow
+
+validBullFvg = rawBullishFvg and sweepBullishOk and dispBullishOk and mssBullishOk
+validBearFvg = rawBearishFvg and sweepBearishOk and dispBearishOk and mssBearishOk
+
+// Why a raw FVG failed (for SKIP labels at detection time).
+rejectionReason(string dir, bool raw, bool valid, bool sweepOk, bool dispOk, bool mssOk) =>
+    if not raw or valid
+        ""
+    else
+        not sweepOk    ? (dir == "BULL" ? "No sell-side sweep" : "No buy-side sweep") :
+         not dispOk    ? "No displacement" :
+         not mssOk     ? "No MSS" :
+         ""
+
+// ─── Active FVG state (parallel arrays) ───────────────────────────────
+var box[]    fvgBox        = array.new<box>()
+var line[]   fvgMidLine    = array.new<line>()
+var float[]  fvgLow        = array.new<float>()
+var float[]  fvgHigh       = array.new<float>()
+var float[]  fvgMid        = array.new<float>()
+var string[] fvgDir        = array.new<string>()   // "BULL" or "BEAR"
+var int[]    fvgCreatedBar = array.new<int>()
+var int[]    fvgRightBar   = array.new<int>()
+var bool[]   fvgReacted    = array.new<bool>()
+var bool[]   fvgInvalid    = array.new<bool>()
+var bool[]   fvgFrozen     = array.new<bool>()     // stop extending right edge
+var string[] fvgReactTier  = array.new<string>()   // "NONE"/"TOUCH"/"MIDPOINT"/"BOUNDARY"/"DISPLACEMENT"
+var float[]  fvgReactScore = array.new<float>()
+var int[]    fvgReactBar   = array.new<int>()      // bar where reaction was first detected
+
+// ─── Color helpers ────────────────────────────────────────────────────
+bullBorder = color.new(color.lime, 0)
+bullFill   = color.new(color.lime, 85)
+bearBorder = color.new(color.red, 0)
+bearFill   = color.new(color.red, 85)
+frozenFill = color.new(color.gray, 90)
+invalidFill = color.new(color.gray, 80)
+
+reactionColor(string tier) =>
+    tier == "DISPLACEMENT" ? color.new(color.lime,  0)  :
+     tier == "BOUNDARY"    ? color.new(color.aqua,  0)  :
+     tier == "MIDPOINT"    ? color.new(color.yellow,0)  :
+     tier == "TOUCH"       ? color.new(color.gray, 20)  :
+                             color.new(color.gray, 70)
+
+addFvg(string dir, float zLow, float zHigh, int leftBar) =>
+    float zm = (zLow + zHigh) / 2
+    color border  = dir == "BULL" ? bullBorder : bearBorder
+    color fill    = dir == "BULL" ? bullFill   : bearFill
+    int   right   = bar_index + fvgForwardBars
+    box   b       = box.new(left = leftBar, top = zHigh, right = right, bottom = zLow,
+                            border_color = border, bgcolor = fill)
+    line  m       = line.new(x1 = leftBar, y1 = zm, x2 = right, y2 = zm,
+                             color = color.new(border, 35), style = line.style_dashed)
+    array.push(fvgBox,        b)
+    array.push(fvgMidLine,    m)
+    array.push(fvgLow,        zLow)
+    array.push(fvgHigh,       zHigh)
+    array.push(fvgMid,        zm)
+    array.push(fvgDir,        dir)
+    array.push(fvgCreatedBar, bar_index)
+    array.push(fvgRightBar,   right)
+    array.push(fvgReacted,    false)
+    array.push(fvgInvalid,    false)
+    array.push(fvgFrozen,     false)
+    array.push(fvgReactTier,  "NONE")
+    array.push(fvgReactScore, 0.0)
+    array.push(fvgReactBar,   na)
+
+    if array.size(fvgBox) > maxActiveFvgs
+        // Drop the oldest entry to keep the chart readable.
+        box.delete(array.shift(fvgBox))
+        line.delete(array.shift(fvgMidLine))
+        array.shift(fvgLow)
+        array.shift(fvgHigh)
+        array.shift(fvgMid)
+        array.shift(fvgDir)
+        array.shift(fvgCreatedBar)
+        array.shift(fvgRightBar)
+        array.shift(fvgReacted)
+        array.shift(fvgInvalid)
+        array.shift(fvgFrozen)
+        array.shift(fvgReactTier)
+        array.shift(fvgReactScore)
+        array.shift(fvgReactBar)
+
+// Register newly-formed validated FVGs (one bar after the 3-candle pattern closes).
+if validBullFvg
+    addFvg("BULL", c1H, c3L, bar_index - 2)
+if validBearFvg
+    addFvg("BEAR", c3H, c1L, bar_index - 2)
+
+// SKIP labels for raw FVGs that fail validation — captured at formation.
+if showRejections and rawBullishFvg and not validBullFvg
+    string reason = rejectionReason("BULL", rawBullishFvg, validBullFvg, sweepBullishOk, dispBullishOk, mssBullishOk)
+    if reason != ""
+        label.new(bar_index, low, "SKIP\n" + reason, style = label.style_label_up,
+            color = color.new(color.gray, 25), textcolor = color.white, size = size.tiny)
+if showRejections and rawBearishFvg and not validBearFvg
+    string reason = rejectionReason("BEAR", rawBearishFvg, validBearFvg, sweepBearishOk, dispBearishOk, mssBearishOk)
+    if reason != ""
+        label.new(bar_index, high, "SKIP\n" + reason, style = label.style_label_down,
+            color = color.new(color.gray, 25), textcolor = color.white, size = size.tiny)
+
+// ─── Reaction tier evaluation per active FVG (current bar) ────────────
+// Returns winner ("BUY"/"SELL"/"NONE") via the chart's relationship to the
+// zone:
+//   close > high    -> BOUNDARY or DISPLACEMENT (BUY)
+//   close < low     -> BOUNDARY or DISPLACEMENT (SELL)
+//   range incl mid, close > mid -> MIDPOINT BUY
+//   range incl mid, close < mid -> MIDPOINT SELL
+//   range incl zone but not mid -> TOUCH (no winner)
+reactionTierOf(float zLow, float zHigh, float zMid) =>
+    bool touchedZone = low <= zHigh and high >= zLow
+    bool touchedMid  = low <= zMid  and high >= zMid
+    bool boundaryBull = close > zHigh
+    bool boundaryBear = close < zLow
+    bool displacementHere = dispBR >= dispBodyMin and dispMult >= dispRangeMin
+    string tier   = "NONE"
+    string winner = "NONE"
+    float  scoreV = 0.0
+    if displacementHere and boundaryBull
+        tier := "DISPLACEMENT"
+        winner := "BUY"
+        scoreV := 100
+    else if displacementHere and boundaryBear
+        tier := "DISPLACEMENT"
+        winner := "SELL"
+        scoreV := 100
+    else if boundaryBull
+        tier := "BOUNDARY"
+        winner := "BUY"
+        scoreV := 75
+    else if boundaryBear
+        tier := "BOUNDARY"
+        winner := "SELL"
+        scoreV := 75
+    else if touchedMid and close > zMid
+        tier := "MIDPOINT"
+        winner := "BUY"
+        scoreV := 45
+    else if touchedMid and close < zMid
+        tier := "MIDPOINT"
+        winner := "SELL"
+        scoreV := 45
+    else if touchedZone
+        tier := "TOUCH"
+        winner := "NONE"
+        scoreV := 20
+    [tier, winner, scoreV]
+
+reactionTierScoreOf(string tier) =>
+    tier == "DISPLACEMENT" ? 30 :
+     tier == "BOUNDARY"    ? 22 :
+     tier == "MIDPOINT"    ?  8 : 0
+
+displacementProbabilityComponent(float multiple) =>
+    multiple < 1.2 ? 0 :
+     multiple >= 3.0 ? 20 :
+     math.round(10 + (multiple - 1.2) * (10 / 1.8))
+
+rrFitScoreOf(float rr) =>
+    rr < minRR ? 0 :
+     rr >= 5  ? 8 :
+     math.round(20 - ((rr - minRR) / math.max(0.01, 5 - minRR)) * 12)
+
+scalpFitScoreOf(float expProfit) =>
+    expProfit <= 0 ? 0 :
+     expProfit >= preferredMinUsd and expProfit <= preferredMaxUsd ? 25 :
+     expProfit >= preferredMinUsd / 2 and expProfit <= preferredMaxUsd * 2 ? 12 : 0
+
+freshnessScoreOf(int ageBars) =>
+    ageBars <= 5  ? 15 :
+     ageBars <= 20 ? 10 :
+     ageBars <= 50 ?  5 : 0
+
+distancePenaltyOf(float movePct) =>
+    movePct <= 1 ? 0 :
+     movePct <= 2 ?  8 :
+     movePct <= 5 ? 18 : 30
+
+// ─── Per-bar best-candidate selection ─────────────────────────────────
+var float bestProb       = na
+var float bestConfidence = na
+var float bestScore      = na
+var string bestWinner    = "NONE"
+var string bestTier      = "NONE"
+var string bestDir       = "NONE"
+var float bestZoneLow    = na
+var float bestZoneHigh   = na
+var int   bestFvgIndex   = na
+var float bestExpProfit  = na
+var float bestRr         = na
+var string bestReason    = "Waiting for setup"
+var string skipReason    = ""
+
+if barstate.isconfirmed
+    bestProb := na
+    bestConfidence := na
+    bestScore := na
+    bestWinner := "NONE"
+    bestTier := "NONE"
+    bestDir := "NONE"
+    bestZoneLow := na
+    bestZoneHigh := na
+    bestFvgIndex := na
+    bestExpProfit := na
+    bestRr := na
+    bestReason := "No candidate this bar"
+    skipReason := ""
+
+    int n = array.size(fvgBox)
+    if n > 0
+        for i = 0 to n - 1
+            if array.get(fvgInvalid, i)
+                continue
+            float zLow  = array.get(fvgLow, i)
+            float zHigh = array.get(fvgHigh, i)
+            float zMid  = array.get(fvgMid, i)
+            string dir  = array.get(fvgDir, i)
+            int    createdBar = array.get(fvgCreatedBar, i)
+
+            [tier, winner, scoreV] = reactionTierOf(zLow, zHigh, zMid)
+            // Persist the highest-tier reaction we've seen for this FVG so the
+            // box can be color-coded later even if a weaker bar follows.
+            string prevTier = array.get(fvgReactTier, i)
+            float  prevScoreV = array.get(fvgReactScore, i)
+            if scoreV > prevScoreV
+                array.set(fvgReactTier,  i, tier)
+                array.set(fvgReactScore, i, scoreV)
+                array.set(fvgReactBar,   i, bar_index)
+
+            // Freeze the zone the first time it reacts at MIDPOINT or higher,
+            // and mark invalidated if price closes through the far edge.
+            bool reactionWorthy = tier == "MIDPOINT" or tier == "BOUNDARY" or tier == "DISPLACEMENT"
+            if reactionWorthy and not array.get(fvgReacted, i)
+                array.set(fvgReacted, i, true)
+                array.set(fvgRightBar, i, bar_index)
+                box.set_right(array.get(fvgBox, i), bar_index)
+                line.set_x2(array.get(fvgMidLine, i), bar_index)
+                array.set(fvgFrozen, i, true)
+
+            bool invalidated = dir == "BULL" ? close < zLow : close > zHigh
+            if invalidated and not array.get(fvgInvalid, i)
+                array.set(fvgInvalid, i, true)
+                array.set(fvgFrozen, i, true)
+                box.set_bgcolor(array.get(fvgBox, i), invalidFill)
+                box.set_border_color(array.get(fvgBox, i), color.new(color.gray, 25))
+                box.set_right(array.get(fvgBox, i), bar_index)
+                line.set_color(array.get(fvgMidLine, i), color.new(color.gray, 25))
+                line.set_x2(array.get(fvgMidLine, i), bar_index)
+
+            // Score the candidate.
+            float confidence    = scoreV   // reaction score == confidence (bot parity)
+            float rTierScore    = reactionTierScoreOf(tier)
+            float dispScore     = displacementProbabilityComponent(dispMult)
+            // Provisional risk = distance from entry (close) to far zone edge.
+            float sl            = dir == "BULL" ? zLow : zHigh
+            float riskDist      = math.abs(close - sl)
+            float targetPrice   = dir == "BULL" ? close + riskDist * targetRMultiple : close - riskDist * targetRMultiple
+            float rewardDist    = math.abs(targetPrice - close)
+            float rr            = riskDist > 0 ? rewardDist / riskDist : 0
+            float rewardPct     = close > 0 ? rewardDist / close : 0
+            float expProfit     = orderSizeUsd * rewardPct
+            float movePct       = rewardPct * 100
+            float rrFit         = rrFitScoreOf(rr)
+            float scalpFit      = scalpFitScoreOf(expProfit)
+            int   age           = bar_index - createdBar
+            float freshness     = freshnessScoreOf(age)
+            float distPen       = distancePenaltyOf(movePct)
+            float probability   = math.max(0, math.min(100, rTierScore + dispScore + rrFit + scalpFit + freshness - distPen))
+            float zoneQuality   = 10  // FVG only — IFVG layer omitted in v1
+            float targetFitVal  = scalpFit > 0 ? math.min(25, scalpFit) : 0
+            float rawScore      = confidence * 0.45 + zoneQuality + targetFitVal + (tier == "BOUNDARY" or tier == "DISPLACEMENT" ? 12 : 0)
+            // Gate keepers — emit a SKIP reason for the FIRST gate that fails.
+            string thisSkip = ""
+            if tier == "TOUCH" or tier == "NONE"
+                thisSkip := "Reaction tier too weak"
+            else if confidence < minConfidence
+                thisSkip := "Confidence " + str.tostring(confidence, "#") + " < " + str.tostring(minConfidence, "#")
+            else if rr < minRR
+                thisSkip := "RR " + str.tostring(rr, "#.##") + " < " + str.tostring(minRR, "#.##")
+
+            // Rank: prefer higher probability, then higher score, then higher confidence.
+            bool better = na(bestProb) or probability > bestProb or
+                 (probability == bestProb and rawScore > nz(bestScore)) or
+                 (probability == bestProb and rawScore == nz(bestScore) and confidence > nz(bestConfidence))
+            if winner != "NONE" and better
+                bestProb := probability
+                bestConfidence := confidence
+                bestScore := rawScore
+                bestWinner := winner
+                bestTier := tier
+                bestDir := dir
+                bestZoneLow := zLow
+                bestZoneHigh := zHigh
+                bestFvgIndex := i
+                bestExpProfit := expProfit
+                bestRr := rr
+                bestReason := winner + " from " + tier + " on " + dir + " FVG"
+                skipReason := thisSkip
+
+            // Tier label rendering (per-FVG, current bar only).
+            if showReactionTier and reactionWorthy and not array.get(fvgInvalid, i)
+                string tierTxt = "Reaction: " + tier + "\nScore: " + str.tostring(scoreV, "#")
+                label.new(bar_index, dir == "BULL" ? zHigh : zLow, tierTxt,
+                    style = dir == "BULL" ? label.style_label_down : label.style_label_up,
+                    color = reactionColor(tier), textcolor = color.white, size = size.tiny)
+
+// ─── Stale FVG freezing ───────────────────────────────────────────────
+if barstate.isconfirmed
+    int n = array.size(fvgBox)
+    if n > 0
+        for i = 0 to n - 1
+            bool frozen = array.get(fvgFrozen, i)
+            int  age = bar_index - array.get(fvgCreatedBar, i)
+            if not frozen
+                if age >= maxStaleBars
+                    array.set(fvgFrozen, i, true)
+                    box.set_bgcolor(array.get(fvgBox, i), frozenFill)
+                    line.set_color(array.get(fvgMidLine, i), color.new(color.gray, 35))
+                else
+                    int rightBar = bar_index + math.min(fvgForwardBars, maxStaleBars - age)
+                    box.set_right(array.get(fvgBox, i), rightBar)
+                    line.set_x2(array.get(fvgMidLine, i), rightBar)
+                    array.set(fvgRightBar, i, rightBar)
+
+// ─── Candidate label ──────────────────────────────────────────────────
+var label[] candidateLabels = array.new<label>()
+
+if showCandidates and barstate.isconfirmed and bestWinner != "NONE"
+    string txt = bestWinner + " CANDIDATE\n" +
+         "Conf: " + str.tostring(bestConfidence, "#") + "\n" +
+         "Score: " + str.tostring(bestScore, "#") + "\n" +
+         "Prob: " + str.tostring(bestProb, "#") + "%"
+    color  c   = bestWinner == "BUY" ? color.new(color.lime, 15) : color.new(color.red, 15)
+    label  lbl = label.new(bar_index, bestWinner == "BUY" ? low : high, txt,
+        style = bestWinner == "BUY" ? label.style_label_up : label.style_label_down,
+        color = c, textcolor = color.white, size = size.small)
+    array.push(candidateLabels, lbl)
+    if array.size(candidateLabels) > recentEventsKeep
+        label.delete(array.shift(candidateLabels))
+
+// SKIP label when a candidate exists but gate-fails (confidence / RR / tier).
+if showRejections and barstate.isconfirmed and skipReason != ""
+    label.new(bar_index, bestWinner == "BUY" ? low : high,
+        "SKIP\n" + skipReason,
+        style = bestWinner == "BUY" ? label.style_label_up : label.style_label_down,
+        color = color.new(color.gray, 0), textcolor = color.white, size = size.tiny)
+
+// ─── Bot entry trigger + active trade state ───────────────────────────
+var bool   tradeActive       = false
+var string tradeSide         = "NONE"
+var float  tradeEntry        = na
+var float  tradeSL           = na
+var float  tradeTP           = na
+var int    tradeEntryBar     = na
+var line   tradeEntryLine    = na
+var line   tradeSlLine       = na
+var line   tradeTpLine       = na
+var box    tradeRrBox        = na
+var label  tradeEntryLabel   = na
+
+var label[] entryHistory = array.new<label>()
+var label[] exitHistory  = array.new<label>()
+
+bool botEntryOk = bestWinner != "NONE"
+     and skipReason == ""
+     and (bestTier == "BOUNDARY" or bestTier == "DISPLACEMENT")
+     and bestConfidence >= minConfidence
+     and bestRr >= minRR
+     and not tradeActive
+
+if showBotEntries and barstate.isconfirmed and botEntryOk
+    tradeActive   := true
+    tradeSide     := bestWinner
+    tradeEntry    := close
+    tradeSL       := bestWinner == "BUY" ? bestZoneLow : bestZoneHigh
+    float riskDist = math.abs(tradeEntry - tradeSL)
+    tradeTP       := bestWinner == "BUY" ? tradeEntry + riskDist * targetRMultiple : tradeEntry - riskDist * targetRMultiple
+    tradeEntryBar := bar_index
+
+    color sideColor = bestWinner == "BUY" ? color.new(color.lime, 0) : color.new(color.red, 0)
+    color slColor   = color.new(color.red, 0)
+    color tpColor   = color.new(color.lime, 0)
+
+    // Arrow + label
+    plotshapeNote = bestWinner == "BUY" ? "▲ BOT BUY" : "▼ BOT SELL"
+    label entryLbl = label.new(bar_index,
+         bestWinner == "BUY" ? low - syminfo.mintick * 4 : high + syminfo.mintick * 4,
+         plotshapeNote + "\n@ " + str.tostring(tradeEntry, format.mintick) +
+         "\nConf " + str.tostring(bestConfidence, "#") +
+         "  Prob " + str.tostring(bestProb, "#") + "%" +
+         "\nRR " + str.tostring(bestRr, "#.##") +
+         "  exp $" + str.tostring(bestExpProfit, "#.##"),
+         style = bestWinner == "BUY" ? label.style_label_up : label.style_label_down,
+         color = sideColor, textcolor = color.white, size = size.small)
+    array.push(entryHistory, entryLbl)
+    if array.size(entryHistory) > recentEventsKeep
+        label.delete(array.shift(entryHistory))
+
+    if showSlTp
+        tradeEntryLine := line.new(bar_index, tradeEntry, bar_index + 40, tradeEntry,
+            color = color.new(color.white, 30), style = line.style_dotted, width = 1)
+        tradeSlLine    := line.new(bar_index, tradeSL, bar_index + 40, tradeSL,
+            color = slColor, style = line.style_dashed, width = 2)
+        tradeTpLine    := line.new(bar_index, tradeTP, bar_index + 40, tradeTP,
+            color = tpColor, style = line.style_solid, width = 2)
+        label.new(bar_index + 40, tradeSL, " SL", style = label.style_label_left,
+            color = slColor, textcolor = color.white, size = size.tiny)
+        label.new(bar_index + 40, tradeTP, " TP " + str.tostring(targetRMultiple, "#.##") + "R",
+            style = label.style_label_left, color = tpColor, textcolor = color.white, size = size.tiny)
+
+    if showRrBox
+        // Compact R/R box: entry to TP filled green, entry to SL filled red.
+        box rrTpBox = box.new(left = bar_index, top = tradeTP, right = bar_index + 12, bottom = tradeEntry,
+             border_color = color.new(color.lime, 30), bgcolor = color.new(color.lime, 88))
+        box rrSlBox = box.new(left = bar_index, top = tradeEntry, right = bar_index + 12, bottom = tradeSL,
+             border_color = color.new(color.red, 30), bgcolor = color.new(color.red, 88))
+        tradeRrBox := rrTpBox  // remember one for cleanup; the other lives on chart with the trade
+        tradeEntryLabel := entryLbl
+
+// ─── Active trade management ──────────────────────────────────────────
+var float currentR = na
+
+if tradeActive and barstate.isconfirmed
+    bool tpHit = tradeSide == "BUY" ? high >= tradeTP : low <= tradeTP
+    bool slHit = tradeSide == "BUY" ? low  <= tradeSL : high >= tradeSL
+    float move = tradeSide == "BUY" ? close - tradeEntry : tradeEntry - close
+    float riskDist = math.abs(tradeEntry - tradeSL)
+    currentR := riskDist > 0 ? move / riskDist : na
+
+    // Extend the active SL/TP lines forward each bar.
+    if showSlTp and not na(tradeEntryLine)
+        line.set_x2(tradeEntryLine, bar_index + 5)
+        line.set_x2(tradeSlLine, bar_index + 5)
+        line.set_x2(tradeTpLine, bar_index + 5)
+
+    if tpHit or slHit
+        string exitNote = tpHit ? "✓ TP HIT  +" + str.tostring(targetRMultiple, "#.##") + "R"
+                                : "✗ SL HIT  -1R"
+        color  exitColor = tpHit ? color.new(color.lime, 0) : color.new(color.red, 0)
+        label exitLbl = label.new(bar_index,
+             tradeSide == "BUY" ? high + syminfo.mintick * 4 : low - syminfo.mintick * 4,
+             exitNote, style = tradeSide == "BUY" ? label.style_label_down : label.style_label_up,
+             color = exitColor, textcolor = color.white, size = size.small)
+        array.push(exitHistory, exitLbl)
+        if array.size(exitHistory) > recentEventsKeep
+            label.delete(array.shift(exitHistory))
+        tradeActive := false
+        currentR := na
+
+// ─── Bot entry triangle (separate from label, so it always renders) ──
+plotshape(showBotEntries and tradeActive and bar_index == tradeEntryBar and tradeSide == "BUY",
+     title = "BOT BUY ENTRY", style = shape.triangleup,
+     location = location.belowbar, color = color.new(color.lime, 0), size = size.normal)
+plotshape(showBotEntries and tradeActive and bar_index == tradeEntryBar and tradeSide == "SELL",
+     title = "BOT SELL ENTRY", style = shape.triangledown,
+     location = location.abovebar, color = color.new(color.red, 0), size = size.normal)
+
+// ─── Explainability panel (top-right) ────────────────────────────────
+var table explainTable = table.new(position.top_right, 2, 14, border_width = 1)
+
+if showExplain and barstate.islast
+    string actionTxt = bestWinner == "NONE" ? "SKIP" : (botEntryOk or tradeActive ? bestWinner : "SKIP")
+    color  actionBg  = actionTxt == "BUY" ? color.new(color.lime, 20)
+                     : actionTxt == "SELL" ? color.new(color.red, 20)
+                     : color.new(color.gray, 30)
+    string reasonTxt = bestWinner == "NONE" ? "No qualifying reaction"
+                     : skipReason != "" ? skipReason
+                     : bestReason
+
+    int activeFvgCount = 0
+    for i = 0 to array.size(fvgInvalid) - 1
+        if not array.get(fvgInvalid, i)
+            activeFvgCount += 1
+
+    table.cell(explainTable, 0, 0,  "NADO BOT STATUS", text_color = color.white, bgcolor = color.black, text_size = size.small)
+    table.cell(explainTable, 1, 0,  syminfo.ticker,    text_color = color.white, bgcolor = color.black, text_size = size.small)
+    table.cell(explainTable, 0, 1,  "Active FVGs",     text_size = size.small)
+    table.cell(explainTable, 1, 1,  str.tostring(activeFvgCount), text_size = size.small)
+    table.cell(explainTable, 0, 2,  "Selected FVG",    text_size = size.small)
+    table.cell(explainTable, 1, 2,  na(bestFvgIndex) ? "--" : "#" + str.tostring(bestFvgIndex) + " " + bestDir, text_size = size.small)
+    table.cell(explainTable, 0, 3,  "Sweep",           text_size = size.small)
+    table.cell(explainTable, 1, 3,  (sweepBullishOk or sweepBearishOk) ? "PASS" : "FAIL",
+         text_color = (sweepBullishOk or sweepBearishOk) ? color.lime : color.red, text_size = size.small)
+    table.cell(explainTable, 0, 4,  "MSS",             text_size = size.small)
+    table.cell(explainTable, 1, 4,  (mssBullishOk or mssBearishOk) ? "PASS" : "FAIL",
+         text_color = (mssBullishOk or mssBearishOk) ? color.lime : color.red, text_size = size.small)
+    table.cell(explainTable, 0, 5,  "Displacement",    text_size = size.small)
+    table.cell(explainTable, 1, 5,  (dispBullishOk or dispBearishOk) ? "PASS" : "FAIL",
+         text_color = (dispBullishOk or dispBearishOk) ? color.lime : color.red, text_size = size.small)
+    table.cell(explainTable, 0, 6,  "Reaction",        text_size = size.small)
+    table.cell(explainTable, 1, 6,  bestTier, text_color = reactionColor(bestTier), text_size = size.small)
+    table.cell(explainTable, 0, 7,  "Confidence",      text_size = size.small)
+    table.cell(explainTable, 1, 7,  na(bestConfidence) ? "--" : str.tostring(bestConfidence, "#"), text_size = size.small)
+    table.cell(explainTable, 0, 8,  "Reach Prob",      text_size = size.small)
+    table.cell(explainTable, 1, 8,  na(bestProb) ? "--" : str.tostring(bestProb, "#") + "%", text_size = size.small)
+    table.cell(explainTable, 0, 9,  "RR",              text_size = size.small)
+    table.cell(explainTable, 1, 9,  na(bestRr) ? "--" : str.tostring(bestRr, "#.##"), text_size = size.small)
+    table.cell(explainTable, 0, 10, "Exp Profit",      text_size = size.small)
+    table.cell(explainTable, 1, 10, na(bestExpProfit) ? "--" : "$" + str.tostring(bestExpProfit, "#.##"), text_size = size.small)
+    table.cell(explainTable, 0, 11, "Action",          text_size = size.small)
+    table.cell(explainTable, 1, 11, actionTxt, text_color = color.white, bgcolor = actionBg, text_size = size.small)
+    table.cell(explainTable, 0, 12, "Reason",          text_size = size.small)
+    table.cell(explainTable, 1, 12, reasonTxt, text_size = size.small)
+
+// ─── Active position panel (bottom-right) ────────────────────────────
+var table positionTable = table.new(position.bottom_right, 2, 6, border_width = 1)
+
+if showPositionPanel and barstate.islast
+    if tradeActive
+        color sideColor = tradeSide == "BUY" ? color.new(color.lime, 20) : color.new(color.red, 20)
+        table.cell(positionTable, 0, 0, "ACTIVE TRADE", text_color = color.white, bgcolor = color.black, text_size = size.small)
+        table.cell(positionTable, 1, 0, tradeSide,      text_color = color.white, bgcolor = sideColor, text_size = size.small)
+        table.cell(positionTable, 0, 1, "Entry",        text_size = size.small)
+        table.cell(positionTable, 1, 1, str.tostring(tradeEntry, format.mintick), text_size = size.small)
+        table.cell(positionTable, 0, 2, "SL",           text_size = size.small)
+        table.cell(positionTable, 1, 2, str.tostring(tradeSL, format.mintick),    text_color = color.red, text_size = size.small)
+        table.cell(positionTable, 0, 3, "TP",           text_size = size.small)
+        table.cell(positionTable, 1, 3, str.tostring(tradeTP, format.mintick) + "  (" + str.tostring(targetRMultiple, "#.##") + "R)",
+             text_color = color.lime, text_size = size.small)
+        string rTxt = na(currentR) ? "--" : (currentR >= 0 ? "+" : "") + str.tostring(currentR, "#.##") + "R"
+        color  rCol = na(currentR) ? color.gray : currentR >= 0 ? color.lime : color.red
+        table.cell(positionTable, 0, 4, "Current R",    text_size = size.small)
+        table.cell(positionTable, 1, 4, rTxt, text_color = rCol, text_size = size.small)
+        table.cell(positionTable, 0, 5, "Bars in trade", text_size = size.small)
+        table.cell(positionTable, 1, 5, str.tostring(bar_index - tradeEntryBar), text_size = size.small)
+    else
+        table.cell(positionTable, 0, 0, "ACTIVE TRADE", text_color = color.white, bgcolor = color.black, text_size = size.small)
+        table.cell(positionTable, 1, 0, "NONE",         text_color = color.gray,  bgcolor = color.new(color.black, 60), text_size = size.small)

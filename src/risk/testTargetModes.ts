@@ -38,6 +38,7 @@ const tests: TestResult[] = [
   test6TradeRejectedIfRrBelowMin(),
   test7TradeRejectedIfExpectedLossExceedsMax(),
   test8QuickProfitExitFiresWithManagedTarget(),
+  test9ScalpModeShortUsesRMultiple(),
 ];
 
 let failures = 0;
@@ -244,6 +245,25 @@ function test8QuickProfitExitFiresWithManagedTarget(): TestResult {
     expected: 'reason=QUICK_PROFIT_EXIT (target=110 not hit, +$1.05 unrealized)',
     actual: evaluation.reason ?? 'null',
     passed: evaluation.reason === 'QUICK_PROFIT_EXIT',
+  };
+}
+
+function test9ScalpModeShortUsesRMultiple(): TestResult {
+  // entry=100, stop=102 -> riskDistance=2; 1.5R short target = 97.
+  const result = selectManagedTarget({
+    side: 'SHORT',
+    entryPrice: 100,
+    stopPrice: 102,
+    opposingZones: [],
+    swingTargetPrice: 90,
+    config: cfg({ exitTargetMode: 'SCALP', targetRMultiple: 1.5 }),
+  });
+  const target = result.selectedTarget;
+  return {
+    name: 'SCALP mode short target uses R-multiple price distance',
+    expected: 'selectedTarget.source=SCALP_R and price=97',
+    actual: target ? `${target.source} ${target.price}` : 'null',
+    passed: target?.source === 'SCALP_R' && approximatelyEqual(target.price, 97),
   };
 }
 

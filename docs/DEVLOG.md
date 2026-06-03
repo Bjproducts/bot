@@ -1,5 +1,70 @@
 # Development Log
 
+## Phase 6A - ICT Sweep Rewrite + True Price RR Targets
+
+### Objective
+
+Make validated ICT sweeps require a real rejection close, and lock target placement to chart-visible price risk/reward.
+
+### Sweep Logic
+
+`detectValidatedFVGs` now treats the configured liquidity lookback as the swing reference and requires rejection through that level:
+
+```text
+Bearish FVG / buy-side sweep:
+referenceLevel = highest high in liquidity lookback
+passed = sweepCandle.high > referenceLevel
+      && sweepCandle.close < referenceLevel
+
+Bullish FVG / sell-side sweep:
+referenceLevel = lowest low in liquidity lookback
+passed = sweepCandle.low < referenceLevel
+      && sweepCandle.close > referenceLevel
+```
+
+A wick through liquidity without a close back through the reference level is rejected.
+
+### True Price RR Targets
+
+The existing Phase 5B risk-first path already resolves bot TP from price risk distance:
+
+```text
+riskDistance = abs(entryPrice - stopPrice)
+BUY target = entryPrice + riskDistance * TARGET_R_MULTIPLE
+SELL target = entryPrice - riskDistance * TARGET_R_MULTIPLE
+```
+
+Phase 6A adds explicit short-side regression coverage so chart RR at `1 : TARGET_R_MULTIPLE` stays aligned with the bot TP.
+
+### Files Modified
+
+- `src/ict/validatedFvgDetector.ts`
+- `src/ict/testValidatedFvgDetector.ts`
+- `src/risk/testPositionSizing.ts`
+- `src/risk/testTargetModes.ts`
+- `docs/DEVLOG.md`
+
+### Tests Added
+
+- Bearish FVG buy-side sweep passes only when price trades above the swing high and closes back below it.
+- Bearish FVG buy-side wick-only sweep is rejected.
+- Bullish FVG sell-side sweep passes only when price trades below the swing low and closes back above it.
+- Bullish FVG sell-side wick-only sweep is rejected.
+- Risk-first short sizing resolves TP from `entry - riskDistance * TARGET_R_MULTIPLE`.
+- SCALP short target selection resolves TP from `entry - riskDistance * TARGET_R_MULTIPLE`.
+
+### Verification
+
+Focused commands:
+
+```powershell
+npm.cmd run ict:validated-fvg-test
+npm.cmd run position:sizing-test
+npm.cmd run risk:target-modes-test
+```
+
+Focused verification passed after fixing a strict TypeScript nullable reference in the new sweep branch.
+
 ## Phase 5c — Validated FVG Rejection Diagnostics
 
 ### Objective

@@ -50,6 +50,7 @@ tests.push(testMinPositionRespected());
 tests.push(testLowRiskRewardRejected());
 tests.push(testRiskFirstTargetsOneDollarRisk());
 tests.push(testRiskFirstTargetMultipleProfit());
+tests.push(testRiskFirstShortTargetUsesPriceRMultiple());
 tests.push(testRiskFirstRejectsWhenMaxPositionPreventsProfit());
 tests.push(testRiskFirstRejectsWhenMinPositionExceedsRisk());
 tests.push(testRiskUtilizationWarningOnMaxClamp());
@@ -201,6 +202,25 @@ function testRiskFirstTargetMultipleProfit(): TestCase {
     passed: result.status === 'ACCEPTED'
       && Math.abs(result.expectedProfitUsd - 1.5) <= 0.0001
       && Math.abs(result.resolvedTargetPrice - 101.5) <= 0.0001,
+  };
+}
+
+function testRiskFirstShortTargetUsesPriceRMultiple(): TestCase {
+  const result = calculatePositionSizing({
+    ...baseInput,
+    signal: 'SELL',
+    entryPrice: 100,
+    targetPrice: 90,
+    stopPrice: 102,
+    config: riskFirstConfig,
+  });
+  return {
+    name: 'risk-first short target uses true price R multiple',
+    expected: 'SELL entry=100 stop=102 -> target=$97.00 at 1.5R',
+    actual: `${result.status} target=$${result.resolvedTargetPrice} rr=${result.riskRewardRatio}`,
+    passed: result.status === 'ACCEPTED'
+      && Math.abs(result.resolvedTargetPrice - 97) <= 0.0001
+      && Math.abs(result.riskRewardRatio - 1.5) <= 0.0001,
   };
 }
 
