@@ -158,6 +158,7 @@ function makeConfig(patch: Partial<BotConfig> = {}): BotConfig {
     botMode: 'live',
     signalSource: 'ICT',
     marketDataSource: 'SIMULATOR',
+    realPublicHost: 'https://api.binance.com',
     symbol: 'BTC',
     side: 'LONG',
     orderSizeUsd: 100,

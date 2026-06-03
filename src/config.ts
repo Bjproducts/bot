@@ -91,6 +91,7 @@ export function loadConfig(): BotConfig {
     botMode: rawMode as BotMode,
     signalSource: rawSignalSource as SignalSource,
     marketDataSource: rawSource as MarketDataSourceName,
+    realPublicHost: normalizeRealPublicHost(process.env['REAL_PUBLIC_HOST']),
     symbol,
     side: side as 'LONG' | 'SHORT',
 
@@ -157,6 +158,15 @@ function envPositionSizingMode(key: string, fallback: PositionSizingMode): Posit
   if (raw === '') return fallback;
   if (raw === 'PROFIT_FIRST' || raw === 'RISK_FIRST') return raw;
   throw new Error(`${key} must be "PROFIT_FIRST" or "RISK_FIRST", got "${raw}"`);
+}
+
+export const DEFAULT_REAL_PUBLIC_HOST = 'https://api.binance.com';
+
+export function normalizeRealPublicHost(raw: string | undefined | null): string {
+  const trimmed = (raw ?? '').trim();
+  if (trimmed.length === 0) return DEFAULT_REAL_PUBLIC_HOST;
+  // Strip a trailing slash so the adapter can append `/api/v3/...` cleanly.
+  return trimmed.replace(/\/+$/, '');
 }
 
 function envExitTargetMode(key: string, fallback: ExitTargetMode): ExitTargetMode {

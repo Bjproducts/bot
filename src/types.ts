@@ -135,6 +135,10 @@ export interface BotConfig {
 
   // Data source
   marketDataSource: MarketDataSourceName;
+  // Phase 5e: REAL_PUBLIC host is configurable so the bot can fall back to
+  // the read-only mirror (data-api.binance.vision) when api.binance.com is
+  // blocked by region (e.g. AWS Lightsail us-east-2 returns HTTP 451).
+  realPublicHost: string;
 
   symbol: string;
   side:   'LONG' | 'SHORT';

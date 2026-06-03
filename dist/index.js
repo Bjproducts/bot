@@ -38,6 +38,7 @@ if (config.botMode === 'live') {
 }
 if (config.marketDataSource === 'REAL_PUBLIC') {
     console.log('');
+    console.log(`  REAL_PUBLIC host: ${config.realPublicHost}`);
     console.log('  REAL_PUBLIC: candles arrive about once per minute.');
     console.log('  No API key, wallet, private key, or exchange order path is used.');
 }

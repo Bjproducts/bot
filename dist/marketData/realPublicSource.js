@@ -1,15 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RealPublicSource = void 0;
+exports.buildKlineUrl = buildKlineUrl;
+const config_1 = require("../config");
 /**
- * RealPublicSource — fetches 1-minute OHLCV candles from Binance's
- * free public REST API. No API key required.
+ * RealPublicSource — fetches 1-minute OHLCV candles from a Binance-compatible
+ * public REST endpoint. No API key required.
  *
- * Endpoint:
- *   GET https://api.binance.com/api/v3/klines
- *       ?symbol=BTCUSDT&interval=1m&limit=2
+ * Endpoint host is configurable via `BotConfig.realPublicHost` (env
+ * `REAL_PUBLIC_HOST`), defaulting to `https://api.binance.com`. The Binance
+ * read-only mirror `https://data-api.binance.vision` is also supported and
+ * useful when the main API gateway is blocked by region (HTTP 451).
  *
- * Behaviour:
+ * Endpoint path:
+ *   GET <host>/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=2
+ *
+ * Behaviour (unchanged from the api.binance.com-only implementation):
  *   · Returns a new Candle only when a new 1-minute candle has closed
  *     (detected by comparing open timestamps).
  *   · Returns null on ticks where we've already seen the latest candle.
@@ -18,8 +24,9 @@ exports.RealPublicSource = void 0;
  *   · currentPrice() always returns the last successfully fetched close.
  */
 class RealPublicSource {
-    sourceName = 'REAL_PUBLIC (Binance)';
+    sourceName;
     symbol;
+    host;
     lastCandleOpenTime = 0;
     lastPrice;
     binanceSymbol;
@@ -27,6 +34,8 @@ class RealPublicSource {
         this.symbol = config.symbol;
         this.lastPrice = config.startPrice; // fallback until first fetch
         this.binanceSymbol = RealPublicSource.toBinanceSymbol(config.symbol);
+        this.host = (0, config_1.normalizeRealPublicHost)(config.realPublicHost);
+        this.sourceName = `REAL_PUBLIC (${displayHost(this.host)})`;
     }
     // ─── IMarketDataSource ────────────────────────────────────────────────────
     async nextCandle() {
@@ -52,8 +61,7 @@ class RealPublicSource {
     }
     // ─── Binance fetch ────────────────────────────────────────────────────────
     async fetchLatestClosedCandle() {
-        const url = `https://api.binance.com/api/v3/klines` +
-            `?symbol=${this.binanceSymbol}&interval=1m&limit=2`;
+        const url = buildKlineUrl(this.host, this.binanceSymbol, 2);
         const response = await fetch(url, {
             signal: AbortSignal.timeout(8_000), // 8-second timeout
         });
@@ -104,6 +112,24 @@ class RealPublicSource {
     }
 }
 exports.RealPublicSource = RealPublicSource;
+/**
+ * Pure URL builder so tests can verify host + symbol composition without
+ * invoking fetch. Trailing slashes on `host` are tolerated (the config loader
+ * already strips them; this is defence in depth).
+ */
+function buildKlineUrl(host, binanceSymbol, limit = 2) {
+    const normalized = (host ?? config_1.DEFAULT_REAL_PUBLIC_HOST).replace(/\/+$/, '');
+    const base = normalized.length > 0 ? normalized : config_1.DEFAULT_REAL_PUBLIC_HOST;
+    return `${base}/api/v3/klines?symbol=${binanceSymbol}&interval=1m&limit=${limit}`;
+}
+function displayHost(host) {
+    try {
+        return new URL(host).host;
+    }
+    catch {
+        return host;
+    }
+}
 function ts() {
     return new Date().toTimeString().slice(0, 8);
 }

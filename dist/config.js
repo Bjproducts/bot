@@ -33,8 +33,9 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DEFAULT_MAX_POSITION_MINUTES = void 0;
+exports.DEFAULT_REAL_PUBLIC_HOST = exports.DEFAULT_MAX_POSITION_MINUTES = void 0;
 exports.loadConfig = loadConfig;
+exports.normalizeRealPublicHost = normalizeRealPublicHost;
 const dotenv = __importStar(require("dotenv"));
 const path = __importStar(require("path"));
 const DEFAULT_SIGNAL_SOURCE = 'VOLUME_SPIKE';
@@ -106,6 +107,7 @@ function loadConfig() {
         botMode: rawMode,
         signalSource: rawSignalSource,
         marketDataSource: rawSource,
+        realPublicHost: normalizeRealPublicHost(process.env['REAL_PUBLIC_HOST']),
         symbol,
         side: side,
         orderSizeUsd: envFloat('ORDER_SIZE_USD', 100),
@@ -167,6 +169,14 @@ function envPositionSizingMode(key, fallback) {
     if (raw === 'PROFIT_FIRST' || raw === 'RISK_FIRST')
         return raw;
     throw new Error(`${key} must be "PROFIT_FIRST" or "RISK_FIRST", got "${raw}"`);
+}
+exports.DEFAULT_REAL_PUBLIC_HOST = 'https://api.binance.com';
+function normalizeRealPublicHost(raw) {
+    const trimmed = (raw ?? '').trim();
+    if (trimmed.length === 0)
+        return exports.DEFAULT_REAL_PUBLIC_HOST;
+    // Strip a trailing slash so the adapter can append `/api/v3/...` cleanly.
+    return trimmed.replace(/\/+$/, '');
 }
 function envExitTargetMode(key, fallback) {
     const raw = (process.env[key] ?? '').trim().toUpperCase();
