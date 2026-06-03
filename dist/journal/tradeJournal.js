@@ -114,6 +114,11 @@ class TradeJournal {
             e.positionSizeUsd !== undefined ? e.positionSizeUsd.toFixed(2) : '',
             e.sizingMode ?? '',
             e.hardStopPrice !== undefined ? e.hardStopPrice.toFixed(2) : '',
+            e.entryPrice !== undefined ? e.entryPrice.toFixed(2) : '',
+            e.stopPrice !== undefined ? e.stopPrice.toFixed(2) : '',
+            e.riskDistance !== undefined ? e.riskDistance.toFixed(4) : '',
+            e.zoneSize !== undefined ? e.zoneSize.toFixed(4) : '',
+            e.stopSource ?? '',
             e.expectedProfitUsd !== undefined ? e.expectedProfitUsd.toFixed(4) : '',
             e.expectedLossUsd !== undefined ? e.expectedLossUsd.toFixed(4) : '',
             e.riskRewardRatio !== undefined ? e.riskRewardRatio.toFixed(4) : '',
@@ -169,6 +174,11 @@ class TradeJournal {
             ? `  positionSize=$${e.positionSizeUsd.toFixed(2)}` +
                 `  sizingMode=${e.sizingMode ?? '--'}` +
                 `  hardStop=${moneyOrDash(e.hardStopPrice)}` +
+                `  entry=${moneyOrDash(e.entryPrice)}` +
+                `  stop=${moneyOrDash(e.stopPrice)}` +
+                `  stopSource=${e.stopSource ?? '--'}` +
+                `  riskDistance=${e.riskDistance !== undefined ? e.riskDistance.toFixed(4) : '--'}` +
+                `  zoneSize=${e.zoneSize !== undefined ? e.zoneSize.toFixed(4) : '--'}` +
                 `  expectedProfit=$${money(e.expectedProfitUsd)}` +
                 `  expectedLoss=$${money(e.expectedLossUsd)}` +
                 `  rr=${e.riskRewardRatio !== undefined ? e.riskRewardRatio.toFixed(2) : '--'}` +

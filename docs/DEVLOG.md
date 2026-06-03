@@ -1,5 +1,129 @@
 # Development Log
 
+## Phase 6C - FVG Origin Stops
+
+### Objective
+
+Replace candidate stop placement from FVG/IFVG zone boundaries to origin-based stops while keeping reaction logic, candidate ranking, confidence scoring, and `targetReachProbability` unchanged.
+
+### Stop Logic Changed
+
+Candidate stop attribution now resolves through `src/ict/stopAttribution.ts`.
+
+```text
+FVG BUY:
+stopPrice = first candle low
+stopSource = firstCandleLow
+
+FVG SELL:
+stopPrice = first candle high
+stopSource = firstCandleHigh
+
+IFVG BUY:
+stopPrice = inversion / displacement candle low
+stopSource = displacementOrigin
+
+IFVG SELL:
+stopPrice = inversion / displacement candle high
+stopSource = displacementOrigin
+```
+
+The previous zone-boundary stop is still calculated inside the helper only as reference metadata for regression tests; it is no longer passed into target selection, RR, sizing, or hard stop placement for ICT candidates.
+
+### Files Modified
+
+- `src/ict/stopAttribution.ts`
+- `src/ict/testStopAttribution.ts`
+- `src/bot.ts`
+- `package.json`
+- `docs/DEVLOG.md`
+
+### Regression Tests
+
+Added `npm run ict:stop-test`:
+
+- Bullish FVG stop uses `firstCandleLow`.
+- Bearish FVG stop uses `firstCandleHigh`.
+- Bullish IFVG displacement-origin stop reduces risk versus old `zoneLow` boundary stop.
+- Bearish IFVG displacement-origin stop reduces risk versus old `zoneHigh` boundary stop.
+
+## Phase 6B - Stop Source Attribution
+
+### Objective
+
+Record stop attribution for every ICT trade candidate without changing trading logic.
+
+### Attribution Fields Added
+
+Every `TradeCandidate` now carries:
+
+```text
+entryPrice
+stopPrice
+riskDistance
+zoneSize
+stopSource
+```
+
+Supported `stopSource` values:
+
+```text
+zoneLow
+zoneHigh
+firstCandleLow
+firstCandleHigh
+displacementOrigin
+IFVGOrigin
+swingLow
+swingHigh
+```
+
+### Current Stop Attribution
+
+No stop placement logic changed. The current bot still assigns:
+
+```text
+LONG / BUY  stopPrice = zone.low   stopSource = zoneLow
+SHORT / SELL stopPrice = zone.high stopSource = zoneHigh
+```
+
+`riskDistance = abs(entryPrice - stopPrice)`
+
+`zoneSize = abs(zone.high - zone.low)`
+
+### Files Modified
+
+- `src/ict/tradeCandidateTypes.ts`
+- `src/ict/tradeSelectionEngine.ts`
+- `src/ict/ictSignalAuditLog.ts`
+- `src/bot.ts`
+- `src/types.ts`
+- `src/state.ts`
+- `src/sessionStats.ts`
+- `src/journal/types.ts`
+- `src/journal/tradeJournal.ts`
+- `src/analytics/scoreAttributionTypes.ts`
+- `src/analytics/tradeOutcomeAnalytics.ts`
+- `src/ict/testTradeSelectionEngine.ts`
+- `src/analytics/testScoreAttribution.ts`
+- `src/analytics/testAttributionPipeline.ts`
+- `src/ict/testCandleBufferGap.ts`
+- `src/testPositionExitManager.ts`
+- `docs/DEVLOG.md`
+
+### Outputs Updated
+
+- Candidate/session stats: selected and all candidates now include stop attribution fields.
+- ICT signal audit CSV/JSON: includes `entryPrice`, `stopPrice`, `riskDistance`, `zoneSize`, `stopSource`.
+- Trade journal CSV/events: includes explicit stop attribution fields.
+- Completed trades JSON: includes stop attribution fields.
+- Score attribution analytics outcomes and HTML report: include stop attribution.
+
+### Tests Added
+
+- Candidate stop attribution fields are emitted by trade selection.
+- Stop attribution survives into score attribution analytics outcomes.
+
 ## Phase 6A - ICT Sweep Rewrite + True Price RR Targets
 
 ### Objective

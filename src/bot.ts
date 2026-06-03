@@ -35,7 +35,8 @@ import { evaluateReaction } from './ict/reactionEngine';
 import { createIctSignal } from './ict/ictSignalEngine';
 import { IctSignalResult, IctSignalZone } from './ict/ictSignalTypes';
 import { selectTradeCandidate } from './ict/tradeSelectionEngine';
-import { TradeCandidate, TradeSelectionResult } from './ict/tradeCandidateTypes';
+import { StopSource, TradeCandidate, TradeSelectionResult } from './ict/tradeCandidateTypes';
+import { resolveStopAttribution } from './ict/stopAttribution';
 import {
   IctSignalAuditLog,
   makeIctSignalAuditRecord,
@@ -59,6 +60,9 @@ interface EntryTrigger {
   managedTarget?: ManagedTarget;
   sizing?: PositionSizingResult;
   scoreAttribution?: ScoreAttribution;
+  stopSource?: StopSource | null;
+  stopRiskDistance?: number | null;
+  stopZoneSize?: number | null;
 }
 
 interface IctEvaluation {
@@ -67,6 +71,7 @@ interface IctEvaluation {
   reaction: ReturnType<typeof evaluateReaction>;
   targetSelection: TargetSelectionResult | null;
   stopPrice: number | null;
+  stopSource: StopSource | null;
 }
 
 const MAX_ICT_CANDLE_BUFFER = 500;
@@ -369,6 +374,9 @@ export class BotEngine {
       managedTarget: { ...managedTarget, price: sizing.resolvedTargetPrice },
       sizing,
       scoreAttribution,
+      stopSource: selectedCandidate.stopSource,
+      stopRiskDistance: selectedCandidate.riskDistance,
+      stopZoneSize: selectedCandidate.zoneSize,
     });
   }
 
@@ -438,13 +446,23 @@ export class BotEngine {
 
       let targetSelection: TargetSelectionResult | null = null;
       let stopPrice: number | null = null;
+      let stopSource: StopSource | null = null;
       if (signal.signal === 'BUY' || signal.signal === 'SELL') {
         const side: TradeSide = signal.signal === 'BUY' ? 'LONG' : 'SHORT';
-        stopPrice = side === 'LONG' ? zone.low : zone.high;
-        targetSelection = this.runTargetSelection(side, this.lastPrice, stopPrice);
+        const stop = resolveStopAttribution({
+          zone,
+          signal: signal.signal,
+          entryPrice: this.lastPrice,
+          candles: this.ictCandleBuffer,
+        });
+        stopPrice = stop.stopPrice;
+        stopSource = stop.stopSource;
+        if (stopPrice !== null) {
+          targetSelection = this.runTargetSelection(side, this.lastPrice, stopPrice);
+        }
       }
 
-      return { zone, signal, reaction, targetSelection, stopPrice };
+      return { zone, signal, reaction, targetSelection, stopPrice, stopSource };
     });
 
     const tradeSelection = selectTradeCandidate({
@@ -719,6 +737,10 @@ export class BotEngine {
         sizingMode: trigger.sizing?.sizingMode ?? position.sizingMode,
         hardStopPrice: trigger.sizing?.hardStopPrice ?? position.hardStopPrice,
         hardStopEnabled: trigger.sizing ? this.config.hardStopEnabled : position.hardStopEnabled,
+        stopPrice: trigger.sizing?.hardStopPrice ?? position.stopPrice,
+        stopSource: trigger.stopSource ?? position.stopSource,
+        stopRiskDistance: trigger.stopRiskDistance ?? position.stopRiskDistance,
+        stopZoneSize: trigger.stopZoneSize ?? position.stopZoneSize,
         riskUtilizationPercent: trigger.sizing?.riskUtilizationPercent ?? position.riskUtilizationPercent,
         riskUtilizationWarning: trigger.sizing?.riskUtilizationWarning ?? position.riskUtilizationWarning,
         targetRMultiple: trigger.sizing?.targetRMultiple ?? position.targetRMultiple,
@@ -1127,6 +1149,11 @@ export class BotEngine {
       positionSizeUsd: position.positionSizeUsd,
       sizingMode: position.sizingMode ?? undefined,
       hardStopPrice: position.hardStopPrice ?? undefined,
+      entryPrice: position.averageEntryPrice,
+      stopPrice: position.stopPrice ?? position.hardStopPrice ?? undefined,
+      stopSource: position.stopSource ?? undefined,
+      riskDistance: position.stopRiskDistance ?? undefined,
+      zoneSize: position.stopZoneSize ?? undefined,
       expectedProfitUsd: position.expectedProfitUsd ?? undefined,
       expectedLossUsd: position.expectedLossUsd ?? undefined,
       riskRewardRatio: position.riskRewardRatio ?? undefined,
@@ -1267,6 +1294,10 @@ export class BotEngine {
       stopMovedToBreakevenAt: null,
       hardStopPrice: null,
       hardStopEnabled: activePositions.some(position => position.hardStopEnabled),
+      stopPrice: null,
+      stopSource: null,
+      stopRiskDistance: null,
+      stopZoneSize: null,
       positionSizeUsd: totalUsd,
       expectedProfitUsd: activePositions.reduce((sum, position) => sum + (position.expectedProfitUsd ?? 0), 0),
       expectedLossUsd: activePositions.reduce((sum, position) => sum + (position.expectedLossUsd ?? 0), 0),

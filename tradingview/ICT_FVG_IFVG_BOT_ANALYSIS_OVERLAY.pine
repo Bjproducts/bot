@@ -1,5 +1,5 @@
 //@version=6
-indicator("Nado ICT FVG/IFVG Bot Analysis Overlay", overlay = true, max_boxes_count = 500, max_labels_count = 500, max_lines_count = 500)
+indicator("Nado ICT FVG/IFVG Bot Analysis Overlay", overlay = true, max_boxes_count = 160, max_labels_count = 120, max_lines_count = 160)
 
 // This indicator mirrors the bot's current research rules as closely as Pine allows.
 // It is visual-only: no strategy orders, broker execution, alerts, or wallet logic.
@@ -36,21 +36,23 @@ exitTargetMode = input.string("HYBRID", "EXIT_TARGET_MODE", options = ["STRUCTUR
 targetSwingLeft = input.int(3, "Target swing left bars", minval = 1)
 targetSwingRight = input.int(3, "Target swing right bars", minval = 1)
 targetFallbackLookback = input.int(50, "Target fallback high/low lookback", minval = 1)
+maxTrackedZones = input.int(80, "Max tracked zones", minval = 20, maxval = 150)
+maxEvaluatedZones = input.int(60, "Max evaluated zones per bar", minval = 10, maxval = 150)
 activePreviewBars = input.int(3, "Active zone preview bars", minval = 0)
 minVisibleZoneBars = input.int(6, "Minimum visible zone bars", minval = 1)
 stopZonesAtReaction = input.bool(true, "Stop zones at first reaction")
 uiMode = input.string("NORMAL", "UI_MODE", options = ["MINIMAL", "NORMAL", "DEBUG"])
 showRawZones = input.bool(true, "SHOW_RAW_ZONES")
 showRejectedZones = input.bool(false, "SHOW_REJECTED_ZONES")
-showSkips = input.bool(true, "SHOW_SKIPS")
+showSkips = input.bool(false, "SHOW_SKIPS")
 showSelected = input.bool(false, "SHOW_SELECTED")
 showScoreBreakdown = input.bool(false, "SHOW_SCORE_BREAKDOWN")
 showEntryHighlight = input.bool(true, "SHOW_ENTRY_HIGHLIGHT")
 showRejectedRawFvgs = input.bool(false, "Show rejected raw FVG markers")
-zoneTextMode = input.string("Compact", "Zone text", options = ["Off", "Compact", "Full"])
+zoneTextMode = input.string("Off", "Zone text", options = ["Off", "Compact", "Full"])
 showLabels = input.bool(true, "Show labels")
 showTradeManagement = input.bool(true, "Show targets and BE stop")
-keepHistoricalTradeLines = input.bool(true, "Keep historical trade lines")
+keepHistoricalTradeLines = input.bool(false, "Keep historical trade lines")
 showTable = input.bool(true, "Show latest analysis table")
 
 bool uiMinimal = uiMode == "MINIMAL"
@@ -213,7 +215,8 @@ findOpposingTarget(string signal, float entryPrice) =>
     int selectedIndex = na
     int targetZoneCount = array.size(zoneHighs)
     if targetZoneCount > 0
-        for targetIndex = 0 to targetZoneCount - 1
+        int firstTargetIndex = math.max(0, targetZoneCount - maxEvaluatedZones)
+        for targetIndex = firstTargetIndex to targetZoneCount - 1
             bool targetInvalidated = array.get(zoneInvalidated, targetIndex)
             string targetDirection = array.get(zoneDirections, targetIndex)
             float targetHigh = array.get(zoneHighs, targetIndex)
@@ -344,7 +347,29 @@ drawTradeManagement(string signal, float entryPrice, float targetPrice, float st
     label tradeLabel = uiDebug ? label.new(bar_index, targetPrice, labelText, style = signal == "BUY" ? label.style_label_down : label.style_label_up, color = color.new(tradeColor, 0), textcolor = color.white, size = size.tiny) : na
     [entryLine, targetLine, stopLine, tradeLabel]
 
+pruneOldestZone() =>
+    box oldBox = array.shift(zoneBoxes)
+    if not na(oldBox)
+        box.delete(oldBox)
+    line oldMidLine = array.shift(midpointLines)
+    if not na(oldMidLine)
+        line.delete(oldMidLine)
+    array.shift(zoneHighs)
+    array.shift(zoneLows)
+    array.shift(zoneMidpoints)
+    array.shift(zoneDirections)
+    array.shift(zoneTypes)
+    array.shift(zoneIds)
+    array.shift(zoneRangeMultiples)
+    array.shift(zoneCreatedBars)
+    array.shift(zoneInvalidated)
+    array.shift(zoneFilled)
+    array.shift(zoneFlipped)
+    array.shift(zoneReacted)
+
 addZone(string zoneType, string direction, float zoneLow, float zoneHigh, int leftBar, string reasonText, float zoneRangeMultiple) =>
+    while array.size(zoneHighs) >= maxTrackedZones
+        pruneOldestZone()
     float midpoint = (zoneLow + zoneHigh) / 2
     string zoneId = zoneType + ":" + direction + ":" + str.tostring(leftBar) + ":" + str.tostring(zoneLow, format.mintick) + ":" + str.tostring(zoneHigh, format.mintick)
     string boxText = zoneBoxText(zoneType, direction, zoneLow, zoneHigh, midpoint, reasonText)
@@ -357,7 +382,7 @@ addZone(string zoneType, string direction, float zoneLow, float zoneHigh, int le
         box.set_text_size(zoneBox, size.tiny)
         box.set_text_halign(zoneBox, text.align_left)
         box.set_text_valign(zoneBox, text.align_center)
-    line midLine = line.new(x1 = leftBar, y1 = midpoint, x2 = bar_index + activePreviewBars, y2 = midpoint, color = showRawZones ? color.new(borderColor, 25) : color.new(borderColor, 100), style = line.style_dashed)
+    line midLine = uiDebug ? line.new(x1 = leftBar, y1 = midpoint, x2 = bar_index + activePreviewBars, y2 = midpoint, color = showRawZones ? color.new(borderColor, 25) : color.new(borderColor, 100), style = line.style_dashed) : na
     array.push(zoneBoxes, zoneBox)
     array.push(midpointLines, midLine)
     array.push(zoneHighs, zoneHigh)
@@ -430,7 +455,8 @@ string runnerUpText = "--"
 
 int zoneCount = array.size(zoneHighs)
 if zoneCount > 0
-    for i = 0 to zoneCount - 1
+    int firstZoneIndex = math.max(0, zoneCount - maxEvaluatedZones)
+    for i = firstZoneIndex to zoneCount - 1
         float zHigh = array.get(zoneHighs, i)
         float zLow = array.get(zoneLows, i)
         float zMid = array.get(zoneMidpoints, i)
@@ -467,7 +493,8 @@ if zoneCount > 0
             int visibleRightBar = math.max(bar_index, zCreatedBar + minVisibleZoneBars)
             int rightBar = stopZonesAtReaction and reactionConfirmed ? visibleRightBar : bar_index + activePreviewBars
             box.set_right(zBox, rightBar)
-            line.set_x2(zMidLine, rightBar)
+            if not na(zMidLine)
+                line.set_x2(zMidLine, rightBar)
 
         if stopZonesAtReaction and reactionConfirmed and not reacted
             array.set(zoneReacted, i, true)
@@ -487,11 +514,13 @@ if zoneCount > 0
             if not reacted
                 int invalidatedRightBar = math.max(bar_index, zCreatedBar + minVisibleZoneBars)
                 box.set_right(zBox, invalidatedRightBar)
-                line.set_x2(zMidLine, invalidatedRightBar)
+                if not na(zMidLine)
+                    line.set_x2(zMidLine, invalidatedRightBar)
             if zoneTextMode != "Off"
                 box.set_text(zBox, zType + " " + zDirection + "\nINVALIDATED\nH: " + str.tostring(zHigh, format.mintick) + "\nL: " + str.tostring(zLow, format.mintick) + "\nM: " + str.tostring(zMid, format.mintick))
                 box.set_text_color(zBox, color.new(color.white, 10))
-            line.set_color(zMidLine, color.new(color.gray, 25))
+            if not na(zMidLine)
+                line.set_color(zMidLine, color.new(color.gray, 25))
 
             if zType == "FVG" and not flipped
                 array.set(zoneFlipped, i, true)

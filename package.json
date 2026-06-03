@@ -16,6 +16,7 @@
     "ict:validated-fvg-test": "ts-node src/ict/testValidatedFvgDetector.ts",
     "ict:fvg-rejection-test": "ts-node src/ict/testValidatedFvgRejectionLog.ts",
     "ict:gap-test": "ts-node src/ict/testCandleBufferGap.ts",
+    "ict:stop-test": "ts-node src/ict/testStopAttribution.ts",
     "market:real-public-test": "ts-node src/marketData/testRealPublicSource.ts",
     "ict:paper-sim": "ts-node src/ict/testPaperTradingIntegration.ts",
     "position:exit-test": "ts-node src/testPositionExitManager.ts",

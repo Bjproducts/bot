@@ -60,8 +60,10 @@ function buildCandidate(evaluation, input, options) {
     // Real target context (when bot passed it).
     const target = evaluation.targetSelection?.selectedTarget ?? null;
     const stopPrice = evaluation.stopPrice ?? null;
+    const stopSource = evaluation.stopSource ?? null;
     const realRewardDistance = target ? Math.abs(target.price - input.currentPrice) : 0;
     const realRiskDistance = stopPrice !== null ? Math.abs(input.currentPrice - stopPrice) : 0;
+    const zoneSize = Math.abs(evaluation.zone.high - evaluation.zone.low);
     const realRiskRewardRatio = realRiskDistance > 0 && target
         ? realRewardDistance / realRiskDistance
         : null;
@@ -135,7 +137,11 @@ function buildCandidate(evaluation, input, options) {
         targetDistancePenalty,
         targetSelection: evaluation.targetSelection ?? null,
         managedTarget: target,
+        entryPrice: input.currentPrice,
         stopPrice,
+        stopSource,
+        riskDistance: stopPrice !== null ? roundMoney(realRiskDistance) : null,
+        zoneSize: roundMoney(zoneSize),
         realExpectedProfitUsd,
         realExpectedLossUsd,
         realRiskRewardRatio: realRiskRewardRatio === null ? null : roundScore(realRiskRewardRatio),

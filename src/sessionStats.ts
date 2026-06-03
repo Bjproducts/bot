@@ -220,6 +220,11 @@ export function printDashboard(
     console.log(line(`ICT Rejected    ${stats.ictRejected}`));
     console.log(line(`Candidates Eval ${tradeSelection?.candidatesEvaluated ?? 0}`));
     console.log(line(`Selected Cand.  ${selectedCandidate ? `${selectedCandidate.signalDirection} ${selectedCandidate.zoneType} ${shorten(selectedCandidate.zoneId, 18)}` : 'NONE'}`));
+    console.log(line(`Cand Entry      ${selectedCandidate ? '$' + fp(selectedCandidate.entryPrice) : '--'}`));
+    console.log(line(`Cand Stop       ${selectedCandidate && selectedCandidate.stopPrice !== null ? '$' + fp(selectedCandidate.stopPrice) : '--'}`));
+    console.log(line(`Stop Source     ${selectedCandidate?.stopSource ?? '--'}`));
+    console.log(line(`Risk Distance   ${selectedCandidate && selectedCandidate.riskDistance !== null ? selectedCandidate.riskDistance.toFixed(4) : '--'}`));
+    console.log(line(`Zone Size       ${selectedCandidate ? selectedCandidate.zoneSize.toFixed(4) : '--'}`));
     console.log(line(`Expected TP PnL ${selectedCandidate ? '$' + selectedCandidate.expectedProfitAtTPUsd.toFixed(2) : '--'}`));
     if (selectedAttribution) {
       console.log(line(`Score Final     ${selectedAttribution.finalScore.toFixed(2)}`));
@@ -272,6 +277,9 @@ export function printDashboard(
     console.log(line(`Sizing Mode     ${position.sizingMode ?? '--'}`));
     console.log(line(`Risk Used       ${position.riskUtilizationPercent !== null ? position.riskUtilizationPercent.toFixed(2) + '%' : '--'}`));
     console.log(line(`Hard Stop       ${position.hardStopPrice !== null ? '$' + fp(position.hardStopPrice) : '--'}`));
+    console.log(line(`Stop Source     ${position.stopSource ?? '--'}`));
+    console.log(line(`Risk Distance   ${position.stopRiskDistance !== null ? position.stopRiskDistance.toFixed(4) : '--'}`));
+    console.log(line(`Zone Size       ${position.stopZoneSize !== null ? position.stopZoneSize.toFixed(4) : '--'}`));
     console.log(line(`Target R        ${position.targetRMultiple !== null ? position.targetRMultiple.toFixed(2) : '--'}`));
     console.log(line(`Stop State      ${position.stopAtBreakeven ? 'BE' : 'Initial'}`));
     console.log(line(`Quick Target    $${config.profitTargetUsdMin.toFixed(2)}-$${config.profitTargetUsdMax.toFixed(2)}`));

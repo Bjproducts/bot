@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T15:25:33.257Z",
+  "generatedAt": "2026-06-03T16:01:55.161Z",
   "totalTrades": 2,
   "factors": [
     {
@@ -267,7 +267,12 @@
       "realizedPnlUsd": 1,
       "tradeDurationMinutes": 5,
       "exitReason": "MANAGED_TARGET_EXIT",
-      "targetReachProbability": 91
+      "targetReachProbability": 91,
+      "entryPrice": 100,
+      "stopPrice": 99,
+      "riskDistance": 1,
+      "zoneSize": 2,
+      "stopSource": "zoneLow"
     },
     {
       "tradeId": "loss",
@@ -298,7 +303,12 @@
       "realizedPnlUsd": -1,
       "tradeDurationMinutes": 5,
       "exitReason": "RISK_EXIT",
-      "targetReachProbability": 91
+      "targetReachProbability": 91,
+      "entryPrice": 100,
+      "stopPrice": 99,
+      "riskDistance": 1,
+      "zoneSize": 2,
+      "stopSource": "zoneLow"
     }
   ],
   "probabilityBuckets": [

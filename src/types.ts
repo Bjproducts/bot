@@ -6,6 +6,7 @@ import { PositionSizingResult } from './risk/positionSizingTypes';
 import { ScoreAttribution } from './analytics/scoreAttributionTypes';
 import { ExitTargetMode, ManagedTargetSource, TargetSelectionResult } from './risk/targetSelection';
 import { ValidatedFvgRejectionSummary } from './ict/validatedFvgRejectionLog';
+import { StopSource } from './ict/tradeCandidateTypes';
 
 // ─── Re-export Candle so the rest of the app imports from one place ───────────
 export type { Candle } from './signals/types';
@@ -48,6 +49,10 @@ export interface PositionState {
   stopMovedToBreakevenAt: string | null;
   hardStopPrice:      number | null;
   hardStopEnabled:    boolean;
+  stopPrice:          number | null;
+  stopSource:         StopSource | null;
+  stopRiskDistance:   number | null;
+  stopZoneSize:       number | null;
   positionSizeUsd:    number | null;
   expectedProfitUsd:  number | null;
   expectedLossUsd:    number | null;

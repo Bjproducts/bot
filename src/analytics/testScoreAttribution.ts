@@ -22,6 +22,7 @@ const tests: TestResult[] = [
   testCompletedTradesLinked(),
   testAnalyticsGenerated(),
   testProbabilityBucketsGenerated(),
+  testStopAttributionInOutcome(),
   testReportGeneration(),
 ];
 
@@ -111,6 +112,24 @@ function testProbabilityBucketsGenerated(): TestResult {
   };
 }
 
+function testStopAttributionInOutcome(): TestResult {
+  const report = createScoreAttributionReport(trades());
+  const outcome = report.outcomes[0];
+  const passed = outcome?.entryPrice === 100
+    && outcome.stopPrice === 99
+    && outcome.riskDistance === 1
+    && outcome.zoneSize === 2
+    && outcome.stopSource === 'zoneLow';
+  return {
+    name: 'stop attribution copied to analytics outcome',
+    expected: 'entry=100 stop=99 riskDistance=1 zoneSize=2 stopSource=zoneLow',
+    actual: outcome
+      ? `entry=${outcome.entryPrice} stop=${outcome.stopPrice} risk=${outcome.riskDistance} zone=${outcome.zoneSize} source=${outcome.stopSource}`
+      : 'missing outcome',
+    passed,
+  };
+}
+
 function testReportGeneration(): TestResult {
   if (fs.existsSync(tmpLogsDir)) fs.rmSync(tmpLogsDir, { recursive: true, force: true });
   const report = createScoreAttributionReport(completedTrades);
@@ -197,7 +216,11 @@ function candidate(): TradeCandidate {
     targetDistancePenalty: 7,
     targetSelection: null,
     managedTarget: null,
+    entryPrice: 101,
     stopPrice: 100,
+    stopSource: 'zoneLow',
+    riskDistance: 1,
+    zoneSize: 2,
     realExpectedProfitUsd: null,
     realExpectedLossUsd: null,
     realRiskRewardRatio: null,
@@ -222,6 +245,10 @@ function trades(): CompletedTrade[] {
     scoreBreakdown: attribution.breakdown,
     scoreFinal: attribution.finalScore,
     targetReachProbability: attribution.breakdown.targetReachProbability,
+    stopPrice: 99,
+    riskDistance: 1,
+    zoneSize: 2,
+    stopSource: 'zoneLow' as const,
   };
 
   return [

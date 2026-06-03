@@ -23,6 +23,11 @@ export interface IctSignalAuditRecord {
   marketDataSource: string;
   tradeSelectionStatus: string;
   tradeSelectionReason: string;
+  entryPrice: number | null;
+  stopPrice: number | null;
+  riskDistance: number | null;
+  zoneSize: number | null;
+  stopSource: string;
   expectedProfitAtTPUsd: number | null;
   tradeSelectionScore: number | null;
 }
@@ -57,6 +62,11 @@ const CSV_HEADER = [
   'marketDataSource',
   'tradeSelectionStatus',
   'tradeSelectionReason',
+  'entryPrice',
+  'stopPrice',
+  'riskDistance',
+  'zoneSize',
+  'stopSource',
   'expectedProfitAtTPUsd',
   'tradeSelectionScore',
 ].join(',');
@@ -127,6 +137,11 @@ export function makeIctSignalAuditRecord(input: {
     marketDataSource: input.marketDataSource,
     tradeSelectionStatus: candidate?.status ?? (accepted ? 'NOT_EVALUATED' : 'NOT_CANDIDATE'),
     tradeSelectionReason: candidate?.rejectionReason ?? '',
+    entryPrice: candidate?.entryPrice ?? null,
+    stopPrice: candidate?.stopPrice ?? null,
+    riskDistance: candidate?.riskDistance ?? null,
+    zoneSize: candidate?.zoneSize ?? null,
+    stopSource: candidate?.stopSource ?? '',
     expectedProfitAtTPUsd: candidate?.expectedProfitAtTPUsd ?? null,
     tradeSelectionScore: candidate?.score ?? null,
   };
@@ -210,6 +225,11 @@ function toCsvRow(record: IctSignalAuditRecord): string {
     csv(record.marketDataSource),
     record.tradeSelectionStatus,
     csv(record.tradeSelectionReason),
+    record.entryPrice === null ? '' : record.entryPrice.toFixed(2),
+    record.stopPrice === null ? '' : record.stopPrice.toFixed(2),
+    record.riskDistance === null ? '' : record.riskDistance.toFixed(4),
+    record.zoneSize === null ? '' : record.zoneSize.toFixed(4),
+    record.stopSource,
     record.expectedProfitAtTPUsd === null ? '' : record.expectedProfitAtTPUsd.toFixed(4),
     record.tradeSelectionScore === null ? '' : record.tradeSelectionScore.toFixed(2),
   ].join(',');

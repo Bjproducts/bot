@@ -1,4 +1,5 @@
 import { PositionCloseReason } from '../positionExitTypes';
+import { StopSource } from '../ict/tradeCandidateTypes';
 
 export type ScoreComponentKey =
   | 'liquiditySweepScore'
@@ -68,6 +69,11 @@ export interface ScoreOutcomeRecord {
   tradeDurationMinutes: number;
   exitReason: PositionCloseReason;
   targetReachProbability: number;
+  entryPrice: number;
+  stopPrice: number | null;
+  riskDistance: number | null;
+  zoneSize: number | null;
+  stopSource: StopSource | null;
 }
 
 // Phase 5h: win-rate / PnL grouped by predicted probability buckets so we

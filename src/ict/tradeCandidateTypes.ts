@@ -4,6 +4,15 @@ import type { ExitTargetMode, ManagedTarget, TargetSelectionResult } from '../ri
 
 export type TradeCandidateTargetFit = 'BELOW_MINIMUM' | 'PREFERRED_RANGE' | 'EXTENDED_TARGET';
 export type TradeCandidateStatus = 'SELECTED' | 'QUALIFIED' | 'REJECTED';
+export type StopSource =
+  | 'zoneLow'
+  | 'zoneHigh'
+  | 'firstCandleLow'
+  | 'firstCandleHigh'
+  | 'displacementOrigin'
+  | 'IFVGOrigin'
+  | 'swingLow'
+  | 'swingHigh';
 
 export interface TradeSelectionEvaluationInput {
   zone: IctSignalZone;
@@ -14,6 +23,7 @@ export interface TradeSelectionEvaluationInput {
   // real RR / expected profit / distance penalty.
   targetSelection?: TargetSelectionResult | null;
   stopPrice?: number | null;
+  stopSource?: StopSource | null;
 }
 
 export interface TradeSelectionOptions {
@@ -70,7 +80,11 @@ export interface TradeCandidate {
   // Phase 5h: real-target context (when targetSelection was provided).
   targetSelection: TargetSelectionResult | null;
   managedTarget: ManagedTarget | null;
+  entryPrice: number;
   stopPrice: number | null;
+  stopSource: StopSource | null;
+  riskDistance: number | null;
+  zoneSize: number;
   realExpectedProfitUsd: number | null;
   realExpectedLossUsd: number | null;
   realRiskRewardRatio: number | null;

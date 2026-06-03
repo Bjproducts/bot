@@ -183,7 +183,9 @@ function buildCandidateStub(id: string): TradeCandidate {
     targetReachProbability: 70, expectedTimeToTargetEstimate: 5,
     reactionTierScore: 22, displacementScore: 10, rrFitScore: 20,
     scalpTargetFitScore: 25, zoneFreshnessScore: 10, targetDistancePenalty: 0,
-    targetSelection: null, managedTarget: null, stopPrice: null,
+    targetSelection: null, managedTarget: null,
+    entryPrice: 101, stopPrice: 100, stopSource: 'zoneLow',
+    riskDistance: 1, zoneSize: 2,
     realExpectedProfitUsd: null, realExpectedLossUsd: null, realRiskRewardRatio: null,
   };
 }

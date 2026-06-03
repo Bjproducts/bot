@@ -91,6 +91,11 @@ function toOutcomeRecord(trade: CompletedTrade): ScoreOutcomeRecord {
     targetReachProbability: trade.targetReachProbability
       ?? trade.scoreBreakdown?.targetReachProbability
       ?? 0,
+    entryPrice: trade.entryPrice,
+    stopPrice: trade.stopPrice ?? trade.hardStopPrice ?? null,
+    riskDistance: trade.riskDistance ?? null,
+    zoneSize: trade.zoneSize ?? null,
+    stopSource: trade.stopSource ?? null,
   };
 }
 
@@ -168,6 +173,17 @@ function renderHtml(report: ScoreAttributionReport): string {
       <td>$${b.avgPnlUsd.toFixed(4)}</td>
       <td>${b.avgProbability.toFixed(2)}</td>
     </tr>`).join('');
+  const outcomeRows = report.outcomes.map(outcome => `
+    <tr>
+      <td>${escapeHtml(outcome.tradeId)}</td>
+      <td>${escapeHtml(outcome.side)}</td>
+      <td>${outcome.entryPrice.toFixed(2)}</td>
+      <td>${outcome.stopPrice === null ? '--' : outcome.stopPrice.toFixed(2)}</td>
+      <td>${outcome.riskDistance === null ? '--' : outcome.riskDistance.toFixed(4)}</td>
+      <td>${outcome.zoneSize === null ? '--' : outcome.zoneSize.toFixed(4)}</td>
+      <td>${escapeHtml(outcome.stopSource ?? '--')}</td>
+      <td>$${outcome.realizedPnlUsd.toFixed(4)}</td>
+    </tr>`).join('');
 
   return `<!doctype html>
 <html>
@@ -200,6 +216,13 @@ function renderHtml(report: ScoreAttributionReport): string {
       <tr><th>Bucket</th><th>Trades</th><th>Wins</th><th>Losses</th><th>Win Rate</th><th>Avg PnL</th><th>Avg Probability</th></tr>
     </thead>
     <tbody>${probabilityRows}</tbody>
+  </table>
+  <h2>Stop Attribution Outcomes</h2>
+  <table>
+    <thead>
+      <tr><th>Trade</th><th>Side</th><th>Entry</th><th>Stop</th><th>Risk Distance</th><th>Zone Size</th><th>Stop Source</th><th>PnL</th></tr>
+    </thead>
+    <tbody>${outcomeRows}</tbody>
   </table>
 </body>
 </html>`;

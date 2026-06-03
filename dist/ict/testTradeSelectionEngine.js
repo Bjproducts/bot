@@ -112,6 +112,7 @@ const results = fixtures.map((fixture) => {
         passed: stableJson(actual) === stableJson(fixture.expected),
     };
 });
+results.push(testStopAttributionFields());
 for (const result of results) {
     console.log(`Test: ${result.name}`);
     console.log(`Expected: ${stableJson(result.expected)}`);
@@ -140,6 +141,44 @@ function evaluation(zone, action, confidence, volumeConfirmed, options = {}) {
         reaction: reaction(zone, action, confidence, volumeConfirmed, options.reactionType),
         targetSelection: options.targetSelection,
         stopPrice: options.stopPrice,
+        stopSource: options.stopSource,
+    };
+}
+function testStopAttributionFields() {
+    const selection = (0, tradeSelectionEngine_1.selectTradeCandidate)({
+        evaluations: [
+            evaluation(fvgZone('stop-attribution-fvg', 'BULLISH'), 'BUY', 90, true, {
+                targetSelection: targetSelection(103, 'SCALP'),
+                stopPrice: 98,
+                stopSource: 'zoneLow',
+            }),
+        ],
+        currentPrice: 100,
+        orderSizeUsd: 100,
+        takeProfitPct: 0.006,
+        options: { minConfidence: 75 },
+        evaluatedAt: '2026-06-01T00:10:00.000Z',
+    });
+    const candidate = selection.selectedCandidate;
+    const actual = {
+        entryPrice: candidate?.entryPrice,
+        stopPrice: candidate?.stopPrice,
+        riskDistance: candidate?.riskDistance,
+        zoneSize: candidate?.zoneSize,
+        stopSource: candidate?.stopSource,
+    };
+    const expected = {
+        entryPrice: 100,
+        stopPrice: 98,
+        riskDistance: 2,
+        zoneSize: 4,
+        stopSource: 'zoneLow',
+    };
+    return {
+        name: 'candidate records stop attribution fields',
+        expected,
+        actual,
+        passed: stableJson(actual) === stableJson(expected),
     };
 }
 function signal(zone, action, confidence) {

@@ -1,6 +1,7 @@
 import { PositionCloseReason } from '../positionExitTypes';
 import { EntryZoneDirection, EntryZoneType } from '../types';
 import { ScoreBreakdown } from '../analytics/scoreAttributionTypes';
+import { StopSource } from '../ict/tradeCandidateTypes';
 
 export type TradeAction = 'ENTRY' | 'DCA' | PositionCloseReason;
 
@@ -38,6 +39,11 @@ export interface TradeEvent {
   positionSizeUsd?: number;
   sizingMode?: string;
   hardStopPrice?: number;
+  entryPrice?: number;
+  stopPrice?: number;
+  riskDistance?: number;
+  zoneSize?: number;
+  stopSource?: StopSource;
   expectedProfitUsd?: number;
   expectedLossUsd?: number;
   riskRewardRatio?: number;
@@ -85,6 +91,10 @@ export interface CompletedTrade {
   positionSizeUsd?: number;
   sizingMode?: string;
   hardStopPrice?: number;
+  stopPrice?: number;
+  riskDistance?: number;
+  zoneSize?: number;
+  stopSource?: StopSource;
   expectedProfitUsd?: number;
   expectedLossUsd?: number;
   riskRewardRatio?: number;
@@ -134,6 +144,11 @@ export const CSV_HEADER = [
   'positionSizeUsd',
   'sizingMode',
   'hardStopPrice',
+  'entryPrice',
+  'stopPrice',
+  'riskDistance',
+  'zoneSize',
+  'stopSource',
   'expectedProfitUsd',
   'expectedLossUsd',
   'riskRewardRatio',

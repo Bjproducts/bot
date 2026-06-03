@@ -1,5 +1,5 @@
 import { selectTradeCandidate } from './tradeSelectionEngine';
-import { TradeSelectionResult } from './tradeCandidateTypes';
+import { StopSource, TradeSelectionResult } from './tradeCandidateTypes';
 import { IctReactionResult } from './reactionTypes';
 import { IctSignalResult } from './ictSignalTypes';
 import { FVGZone, IFVGZone } from './types';
@@ -22,6 +22,13 @@ interface TradeSelectionFixture {
   orderSizeUsd: number;
   takeProfitPct: number;
   expected: ExpectedSelection;
+}
+
+interface TestResult {
+  name: string;
+  expected: unknown;
+  actual: unknown;
+  passed: boolean;
 }
 
 const fixtures: TradeSelectionFixture[] = [
@@ -129,7 +136,7 @@ const fixtures: TradeSelectionFixture[] = [
   },
 ];
 
-const results = fixtures.map((fixture) => {
+const results: TestResult[] = fixtures.map((fixture) => {
   const selection = selectTradeCandidate({
     evaluations: fixture.evaluations,
     currentPrice: 100,
@@ -149,6 +156,7 @@ const results = fixtures.map((fixture) => {
     passed: stableJson(actual) === stableJson(fixture.expected),
   };
 });
+results.push(testStopAttributionFields());
 
 for (const result of results) {
   console.log(`Test: ${result.name}`);
@@ -184,6 +192,7 @@ function evaluation(
     reactionType?: IctReactionResult['reactionType'];
     targetSelection?: TargetSelectionResult;
     stopPrice?: number;
+    stopSource?: StopSource;
   } = {},
 ): {
   zone: FVGZone | IFVGZone;
@@ -191,6 +200,7 @@ function evaluation(
   reaction: IctReactionResult;
   targetSelection?: TargetSelectionResult;
   stopPrice?: number;
+  stopSource?: StopSource;
 } {
   return {
     zone,
@@ -198,6 +208,50 @@ function evaluation(
     reaction: reaction(zone, action, confidence, volumeConfirmed, options.reactionType),
     targetSelection: options.targetSelection,
     stopPrice: options.stopPrice,
+    stopSource: options.stopSource,
+  };
+}
+
+function testStopAttributionFields(): {
+  name: string;
+  expected: unknown;
+  actual: unknown;
+  passed: boolean;
+} {
+  const selection = selectTradeCandidate({
+    evaluations: [
+      evaluation(fvgZone('stop-attribution-fvg', 'BULLISH'), 'BUY', 90, true, {
+        targetSelection: targetSelection(103, 'SCALP'),
+        stopPrice: 98,
+        stopSource: 'zoneLow',
+      }),
+    ],
+    currentPrice: 100,
+    orderSizeUsd: 100,
+    takeProfitPct: 0.006,
+    options: { minConfidence: 75 },
+    evaluatedAt: '2026-06-01T00:10:00.000Z',
+  });
+  const candidate = selection.selectedCandidate;
+  const actual = {
+    entryPrice: candidate?.entryPrice,
+    stopPrice: candidate?.stopPrice,
+    riskDistance: candidate?.riskDistance,
+    zoneSize: candidate?.zoneSize,
+    stopSource: candidate?.stopSource,
+  };
+  const expected = {
+    entryPrice: 100,
+    stopPrice: 98,
+    riskDistance: 2,
+    zoneSize: 4,
+    stopSource: 'zoneLow',
+  };
+  return {
+    name: 'candidate records stop attribution fields',
+    expected,
+    actual,
+    passed: stableJson(actual) === stableJson(expected),
   };
 }
 
