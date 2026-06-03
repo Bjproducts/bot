@@ -1,0 +1,385 @@
+
+> nado-trading-bot@1.0.0 dev
+> ts-node src/index.ts
+
+
+  +------------------------------------------------+
+  |        NADO TRADING BOT - SIMULATION  |
+  +------------------------------------------------+
+  Bot Mode    : simulation
+  Data source : REAL_PUBLIC (Binance)
+  Symbol      : BTC
+  Side        : LONG
+  Signal Source: ICT
+  Entry size  : $100 x max 5 levels
+  Take profit : 0.60%
+  DCA step    : 1.50% adverse move
+  Signal      : ICT minConfidence=75
+  Tick rate   : every 2000ms
+  Dashboard   : every 30s
+  Journal     : logs/trades.csv + events.log + completed-trades.json
+  Live trading: disabled
+  Exchange    : NONE
+  Live armed  : NO
+  Live journal: logs/live-orders.csv + live-orders.json
+
+  REAL_PUBLIC: candles arrive about once per minute.
+  No API key, wallet, private key, or exchange order path is used.
+
+  Events print instantly. Dashboard every 30s. Ctrl+C to stop.
+
+  ICT_PIPELINE [2026-06-03T06:02:54.278Z] stage=INSUFFICIENT_CANDLES tick=1 candleCount=1 latestCandle=2026-06-03T06:01:00.000Z latestCandleAgeSec=114 rawFVG=0 validatedFVG=0 IFVG=0 zonesToReaction=0 reactionEvaluations=0 signalEvaluations=0 candidates=0 sizingEvaluations=0
+
+  + DASHBOARD  00:02:54  [2s]  BTC LONG --------------------------------------+
+  |  Data Source     REAL_PUBLIC (Binance)                            |
+  |  TradingView     BINANCE:BTCUSDT  1m                              |
+  |  BOT_MODE        simulation                                       |
+  |  Price           $67,298.80                                       |
+  |  Signal Source   ICT                                              |
+  |  Live Trading    disabled                                         |
+  |  Exchange        NONE                                             |
+  |  Live Armed      NO                                               |
+  |  Live Trades     0/5                                              |
+  |  Live PnL        +$0.00                                           |
+  |  Max Live Loss   $5.00                                            |
+  |  Last Live Order NONE                                             |
+  |  ICT Signal      NONE  confidence=--  zone=--  id=--  reason=--  (fired: 0)|
+  |  ICT Evaluations 0                                                |
+  |  ICT Accepted    0                                                |
+  |  ICT Rejected    0                                                |
+  |  Candidates Eval 0                                                |
+  |  Selected Cand.  NONE                                             |
+  |  Expected TP PnL --                                               |
+  |  Selection Score --                                               |
+  |  Target Profit   $1.00-$1.50                                      |
+  |  Sizing Mode     RISK_FIRST                                       |
+  |  Target R        1.50                                             |
+  |  Expected Profit --                                               |
+  |  Expected Loss   --                                               |
+  |  Risk Used       --                                               |
+  |  Hard Stop       --                                               |
+  |  Target Price    --                                               |
+  |  Position Size   --                                               |
+  |  Risk Reward     --                                               |
+  |  Selection Reject No candidates provided                          |
+  |  Position        NONE - waiting for ICT signal                    |
+  |  Last Close      NONE                                             |
+  |                  minConfidence=75                                 |
+  |                                                                   |
+  |                                                                   |
+  |                                                                   |
+  +--------------------------------------------------------------------+
+  |  Today           +$0.00  (0 trades)                               |
+  |  Trades  0      Wins 0     Losses 0     WR N/A                    |
+  |  Realized PnL    +$0.00                                           |
+  |  Avg Size        --  Avg TP --  Avg Risk --                       |
+  |  Size Dist       S:0 M:0 L:0                                      |
+  |  Top Factors     --                                               |
+  |  Session Equity  $10,000.00                                       |
+  |  Max Cap Used    $0.00  Max Drawdown $0.00                        |
+  |  Ticks           1                                                |
+  +--------------------------------------------------------------------+
+  ICT_PIPELINE [2026-06-03T06:03:00.860Z] stage=INSUFFICIENT_CANDLES tick=4 candleCount=2 latestCandle=2026-06-03T06:02:00.000Z latestCandleAgeSec=61 rawFVG=0 validatedFVG=0 IFVG=0 zonesToReaction=0 reactionEvaluations=0 signalEvaluations=0 candidates=0 sizingEvaluations=0
+
+  + DASHBOARD  00:03:21  [26s]  BTC LONG -------------------------------------+
+  |  Data Source     REAL_PUBLIC (Binance)                            |
+  |  TradingView     BINANCE:BTCUSDT  1m                              |
+  |  BOT_MODE        simulation                                       |
+  |  Price           $67,299.99                                       |
+  |  Signal Source   ICT                                              |
+  |  Live Trading    disabled                                         |
+  |  Exchange        NONE                                             |
+  |  Live Armed      NO                                               |
+  |  Live Trades     0/5                                              |
+  |  Live PnL        +$0.00                                           |
+  |  Max Live Loss   $5.00                                            |
+  |  Last Live Order NONE                                             |
+  |  ICT Signal      NONE  confidence=--  zone=--  id=--  reason=--  (fired: 0)|
+  |  ICT Evaluations 0                                                |
+  |  ICT Accepted    0                                                |
+  |  ICT Rejected    0                                                |
+  |  Candidates Eval 0                                                |
+  |  Selected Cand.  NONE                                             |
+  |  Expected TP PnL --                                               |
+  |  Selection Score --                                               |
+  |  Target Profit   $1.00-$1.50                                      |
+  |  Sizing Mode     RISK_FIRST                                       |
+  |  Target R        1.50                                             |
+  |  Expected Profit --                                               |
+  |  Expected Loss   --                                               |
+  |  Risk Used       --                                               |
+  |  Hard Stop       --                                               |
+  |  Target Price    --                                               |
+  |  Position Size   --                                               |
+  |  Risk Reward     --                                               |
+  |  Selection Reject No candidates provided                          |
+  |  Position        NONE - waiting for ICT signal                    |
+  |  Last Close      NONE                                             |
+  |                  minConfidence=75                                 |
+  |                                                                   |
+  |                                                                   |
+  |                                                                   |
+  +--------------------------------------------------------------------+
+  |  Today           +$0.00  (0 trades)                               |
+  |  Trades  0      Wins 0     Losses 0     WR N/A                    |
+  |  Realized PnL    +$0.00                                           |
+  |  Avg Size        --  Avg TP --  Avg Risk --                       |
+  |  Size Dist       S:0 M:0 L:0                                      |
+  |  Top Factors     --                                               |
+  |  Session Equity  $10,000.00                                       |
+  |  Max Cap Used    $0.00  Max Drawdown $0.00                        |
+  |  Ticks           13                                               |
+  +--------------------------------------------------------------------+
+
+  + DASHBOARD  00:03:51  [54s]  BTC LONG -------------------------------------+
+  |  Data Source     REAL_PUBLIC (Binance)                            |
+  |  TradingView     BINANCE:BTCUSDT  1m                              |
+  |  BOT_MODE        simulation                                       |
+  |  Price           $67,299.99                                       |
+  |  Signal Source   ICT                                              |
+  |  Live Trading    disabled                                         |
+  |  Exchange        NONE                                             |
+  |  Live Armed      NO                                               |
+  |  Live Trades     0/5                                              |
+  |  Live PnL        +$0.00                                           |
+  |  Max Live Loss   $5.00                                            |
+  |  Last Live Order NONE                                             |
+  |  ICT Signal      NONE  confidence=--  zone=--  id=--  reason=--  (fired: 0)|
+  |  ICT Evaluations 0                                                |
+  |  ICT Accepted    0                                                |
+  |  ICT Rejected    0                                                |
+  |  Candidates Eval 0                                                |
+  |  Selected Cand.  NONE                                             |
+  |  Expected TP PnL --                                               |
+  |  Selection Score --                                               |
+  |  Target Profit   $1.00-$1.50                                      |
+  |  Sizing Mode     RISK_FIRST                                       |
+  |  Target R        1.50                                             |
+  |  Expected Profit --                                               |
+  |  Expected Loss   --                                               |
+  |  Risk Used       --                                               |
+  |  Hard Stop       --                                               |
+  |  Target Price    --                                               |
+  |  Position Size   --                                               |
+  |  Risk Reward     --                                               |
+  |  Selection Reject No candidates provided                          |
+  |  Position        NONE - waiting for ICT signal                    |
+  |  Last Close      NONE                                             |
+  |                  minConfidence=75                                 |
+  |                                                                   |
+  |                                                                   |
+  |                                                                   |
+  +--------------------------------------------------------------------+
+  |  Today           +$0.00  (0 trades)                               |
+  |  Trades  0      Wins 0     Losses 0     WR N/A                    |
+  |  Realized PnL    +$0.00                                           |
+  |  Avg Size        --  Avg TP --  Avg Risk --                       |
+  |  Size Dist       S:0 M:0 L:0                                      |
+  |  Top Factors     --                                               |
+  |  Session Equity  $10,000.00                                       |
+  |  Max Cap Used    $0.00  Max Drawdown $0.00                        |
+  |  Ticks           27                                               |
+  +--------------------------------------------------------------------+
+  ICT_PIPELINE [2026-06-03T06:04:02.411Z] stage=ICT_EVALUATED tick=32 candleCount=3 latestCandle=2026-06-03T06:03:00.000Z latestCandleAgeSec=62 rawFVG=0 validatedFVG=0 IFVG=0 zonesToReaction=0 reactionEvaluations=0 signalEvaluations=0 candidates=0 sizingEvaluations=0
+
+  + DASHBOARD  00:04:21  [1m 20s]  BTC LONG ----------------------------------+
+  |  Data Source     REAL_PUBLIC (Binance)                            |
+  |  TradingView     BINANCE:BTCUSDT  1m                              |
+  |  BOT_MODE        simulation                                       |
+  |  Price           $67,242.00                                       |
+  |  Signal Source   ICT                                              |
+  |  Live Trading    disabled                                         |
+  |  Exchange        NONE                                             |
+  |  Live Armed      NO                                               |
+  |  Live Trades     0/5                                              |
+  |  Live PnL        +$0.00                                           |
+  |  Max Live Loss   $5.00                                            |
+  |  Last Live Order NONE                                             |
+  |  ICT Signal      NONE  confidence=--  zone=--  id=--  reason=--  (fired: 0)|
+  |  ICT Evaluations 0                                                |
+  |  ICT Accepted    0                                                |
+  |  ICT Rejected    0                                                |
+  |  Candidates Eval 0                                                |
+  |  Selected Cand.  NONE                                             |
+  |  Expected TP PnL --                                               |
+  |  Selection Score --                                               |
+  |  Target Profit   $1.00-$1.50                                      |
+  |  Sizing Mode     RISK_FIRST                                       |
+  |  Target R        1.50                                             |
+  |  Expected Profit --                                               |
+  |  Expected Loss   --                                               |
+  |  Risk Used       --                                               |
+  |  Hard Stop       --                                               |
+  |  Target Price    --                                               |
+  |  Position Size   --                                               |
+  |  Risk Reward     --                                               |
+  |  Selection Reject No candidates provided                          |
+  |  Position        NONE - waiting for ICT signal                    |
+  |  Last Close      NONE                                             |
+  |                  minConfidence=75                                 |
+  |                                                                   |
+  |                                                                   |
+  |                                                                   |
+  +--------------------------------------------------------------------+
+  |  Today           +$0.00  (0 trades)                               |
+  |  Trades  0      Wins 0     Losses 0     WR N/A                    |
+  |  Realized PnL    +$0.00                                           |
+  |  Avg Size        --  Avg TP --  Avg Risk --                       |
+  |  Size Dist       S:0 M:0 L:0                                      |
+  |  Top Factors     --                                               |
+  |  Session Equity  $10,000.00                                       |
+  |  Max Cap Used    $0.00  Max Drawdown $0.00                        |
+  |  Ticks           40                                               |
+  +--------------------------------------------------------------------+
+
+  + DASHBOARD  00:04:51  [1m 48s]  BTC LONG ----------------------------------+
+  |  Data Source     REAL_PUBLIC (Binance)                            |
+  |  TradingView     BINANCE:BTCUSDT  1m                              |
+  |  BOT_MODE        simulation                                       |
+  |  Price           $67,242.00                                       |
+  |  Signal Source   ICT                                              |
+  |  Live Trading    disabled                                         |
+  |  Exchange        NONE                                             |
+  |  Live Armed      NO                                               |
+  |  Live Trades     0/5                                              |
+  |  Live PnL        +$0.00                                           |
+  |  Max Live Loss   $5.00                                            |
+  |  Last Live Order NONE                                             |
+  |  ICT Signal      NONE  confidence=--  zone=--  id=--  reason=--  (fired: 0)|
+  |  ICT Evaluations 0                                                |
+  |  ICT Accepted    0                                                |
+  |  ICT Rejected    0                                                |
+  |  Candidates Eval 0                                                |
+  |  Selected Cand.  NONE                                             |
+  |  Expected TP PnL --                                               |
+  |  Selection Score --                                               |
+  |  Target Profit   $1.00-$1.50                                      |
+  |  Sizing Mode     RISK_FIRST                                       |
+  |  Target R        1.50                                             |
+  |  Expected Profit --                                               |
+  |  Expected Loss   --                                               |
+  |  Risk Used       --                                               |
+  |  Hard Stop       --                                               |
+  |  Target Price    --                                               |
+  |  Position Size   --                                               |
+  |  Risk Reward     --                                               |
+  |  Selection Reject No candidates provided                          |
+  |  Position        NONE - waiting for ICT signal                    |
+  |  Last Close      NONE                                             |
+  |                  minConfidence=75                                 |
+  |                                                                   |
+  |                                                                   |
+  |                                                                   |
+  +--------------------------------------------------------------------+
+  |  Today           +$0.00  (0 trades)                               |
+  |  Trades  0      Wins 0     Losses 0     WR N/A                    |
+  |  Realized PnL    +$0.00                                           |
+  |  Avg Size        --  Avg TP --  Avg Risk --                       |
+  |  Size Dist       S:0 M:0 L:0                                      |
+  |  Top Factors     --                                               |
+  |  Session Equity  $10,000.00                                       |
+  |  Max Cap Used    $0.00  Max Drawdown $0.00                        |
+  |  Ticks           54                                               |
+  +--------------------------------------------------------------------+
+  ICT_PIPELINE [2026-06-03T06:05:02.262Z] stage=ICT_EVALUATED tick=59 candleCount=4 latestCandle=2026-06-03T06:04:00.000Z latestCandleAgeSec=62 rawFVG=1 validatedFVG=0 IFVG=0 zonesToReaction=0 reactionEvaluations=0 signalEvaluations=0 candidates=0 sizingEvaluations=0
+
+  + DASHBOARD  00:05:21  [2m 14s]  BTC LONG ----------------------------------+
+  |  Data Source     REAL_PUBLIC (Binance)                            |
+  |  TradingView     BINANCE:BTCUSDT  1m                              |
+  |  BOT_MODE        simulation                                       |
+  |  Price           $67,249.97                                       |
+  |  Signal Source   ICT                                              |
+  |  Live Trading    disabled                                         |
+  |  Exchange        NONE                                             |
+  |  Live Armed      NO                                               |
+  |  Live Trades     0/5                                              |
+  |  Live PnL        +$0.00                                           |
+  |  Max Live Loss   $5.00                                            |
+  |  Last Live Order NONE                                             |
+  |  ICT Signal      NONE  confidence=--  zone=--  id=--  reason=--  (fired: 0)|
+  |  ICT Evaluations 0                                                |
+  |  ICT Accepted    0                                                |
+  |  ICT Rejected    0                                                |
+  |  Candidates Eval 0                                                |
+  |  Selected Cand.  NONE                                             |
+  |  Expected TP PnL --                                               |
+  |  Selection Score --                                               |
+  |  Target Profit   $1.00-$1.50                                      |
+  |  Sizing Mode     RISK_FIRST                                       |
+  |  Target R        1.50                                             |
+  |  Expected Profit --                                               |
+  |  Expected Loss   --                                               |
+  |  Risk Used       --                                               |
+  |  Hard Stop       --                                               |
+  |  Target Price    --                                               |
+  |  Position Size   --                                               |
+  |  Risk Reward     --                                               |
+  |  Selection Reject No candidates provided                          |
+  |  Position        NONE - waiting for ICT signal                    |
+  |  Last Close      NONE                                             |
+  |                  minConfidence=75                                 |
+  |                                                                   |
+  |                                                                   |
+  |                                                                   |
+  +--------------------------------------------------------------------+
+  |  Today           +$0.00  (0 trades)                               |
+  |  Trades  0      Wins 0     Losses 0     WR N/A                    |
+  |  Realized PnL    +$0.00                                           |
+  |  Avg Size        --  Avg TP --  Avg Risk --                       |
+  |  Size Dist       S:0 M:0 L:0                                      |
+  |  Top Factors     --                                               |
+  |  Session Equity  $10,000.00                                       |
+  |  Max Cap Used    $0.00  Max Drawdown $0.00                        |
+  |  Ticks           67                                               |
+  +--------------------------------------------------------------------+
+
+  + DASHBOARD  00:05:51  [2m 42s]  BTC LONG ----------------------------------+
+  |  Data Source     REAL_PUBLIC (Binance)                            |
+  |  TradingView     BINANCE:BTCUSDT  1m                              |
+  |  BOT_MODE        simulation                                       |
+  |  Price           $67,249.97                                       |
+  |  Signal Source   ICT                                              |
+  |  Live Trading    disabled                                         |
+  |  Exchange        NONE                                             |
+  |  Live Armed      NO                                               |
+  |  Live Trades     0/5                                              |
+  |  Live PnL        +$0.00                                           |
+  |  Max Live Loss   $5.00                                            |
+  |  Last Live Order NONE                                             |
+  |  ICT Signal      NONE  confidence=--  zone=--  id=--  reason=--  (fired: 0)|
+  |  ICT Evaluations 0                                                |
+  |  ICT Accepted    0                                                |
+  |  ICT Rejected    0                                                |
+  |  Candidates Eval 0                                                |
+  |  Selected Cand.  NONE                                             |
+  |  Expected TP PnL --                                               |
+  |  Selection Score --                                               |
+  |  Target Profit   $1.00-$1.50                                      |
+  |  Sizing Mode     RISK_FIRST                                       |
+  |  Target R        1.50                                             |
+  |  Expected Profit --                                               |
+  |  Expected Loss   --                                               |
+  |  Risk Used       --                                               |
+  |  Hard Stop       --                                               |
+  |  Target Price    --                                               |
+  |  Position Size   --                                               |
+  |  Risk Reward     --                                               |
+  |  Selection Reject No candidates provided                          |
+  |  Position        NONE - waiting for ICT signal                    |
+  |  Last Close      NONE                                             |
+  |                  minConfidence=75                                 |
+  |                                                                   |
+  |                                                                   |
+  |                                                                   |
+  +--------------------------------------------------------------------+
+  |  Today           +$0.00  (0 trades)                               |
+  |  Trades  0      Wins 0     Losses 0     WR N/A                    |
+  |  Realized PnL    +$0.00                                           |
+  |  Avg Size        --  Avg TP --  Avg Risk --                       |
+  |  Size Dist       S:0 M:0 L:0                                      |
+  |  Top Factors     --                                               |
+  |  Session Equity  $10,000.00                                       |
+  |  Max Cap Used    $0.00  Max Drawdown $0.00                        |
+  |  Ticks           81                                               |
+  +--------------------------------------------------------------------+
+  ICT_PIPELINE [2026-06-03T06:06:01.545Z] stage=ICT_EVALUATED tick=86 candleCount=5 latestCandle=2026-06-03T06:05:00.000Z latestCandleAgeSec=62 rawFVG=1 validatedFVG=0 IFVG=0 zonesToReaction=0 reactionEvaluations=0 signalEvaluations=0 candidates=0 sizingEvaluations=0

@@ -1,0 +1,241 @@
+{
+  "generatedAt": "2026-06-02T19:43:57.682Z",
+  "totalTrades": 0,
+  "factors": [
+    {
+      "factor": "Liquidity Sweep",
+      "componentKey": "liquiditySweepScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Displacement",
+      "componentKey": "displacementScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "MSS",
+      "componentKey": "mssScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "FVG",
+      "componentKey": "fvgQualityScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "IFVG",
+      "componentKey": "ifvgBonus",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Premium/Discount",
+      "componentKey": "premiumDiscountScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Session",
+      "componentKey": "sessionScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Target Fit",
+      "componentKey": "targetFitScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Reaction",
+      "componentKey": "reactionScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Confidence",
+      "componentKey": "confidenceScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    }
+  ],
+  "topPerformingFactors": [
+    {
+      "factor": "Liquidity Sweep",
+      "componentKey": "liquiditySweepScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Displacement",
+      "componentKey": "displacementScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "MSS",
+      "componentKey": "mssScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    }
+  ],
+  "strongestCorrelations": [
+    {
+      "factor": "Liquidity Sweep",
+      "componentKey": "liquiditySweepScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Displacement",
+      "componentKey": "displacementScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "MSS",
+      "componentKey": "mssScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "FVG",
+      "componentKey": "fvgQualityScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "IFVG",
+      "componentKey": "ifvgBonus",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Premium/Discount",
+      "componentKey": "premiumDiscountScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Session",
+      "componentKey": "sessionScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Target Fit",
+      "componentKey": "targetFitScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Reaction",
+      "componentKey": "reactionScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Confidence",
+      "componentKey": "confidenceScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    }
+  ],
+  "outcomes": []
+}

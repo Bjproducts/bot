@@ -1,0 +1,44 @@
+[
+  {
+    "id": "IFVG:BEARISH:FVG:BULLISH:0:1:2:101:103:3",
+    "type": "IFVG",
+    "direction": "BEARISH",
+    "sourceFvgId": "FVG:BULLISH:0:1:2:101:103",
+    "inversionCandleIndex": 3,
+    "high": 103,
+    "low": 101,
+    "midpoint": 102,
+    "createdAt": "2026-06-01T00:03:00.000Z",
+    "invalidated": true,
+    "filled": true,
+    "flipped": true
+  },
+  {
+    "id": "IFVG:BULLISH:FVG:BEARISH:2:3:4:99:103:6",
+    "type": "IFVG",
+    "direction": "BULLISH",
+    "sourceFvgId": "FVG:BEARISH:2:3:4:99:103",
+    "inversionCandleIndex": 6,
+    "high": 103,
+    "low": 99,
+    "midpoint": 101,
+    "createdAt": "2026-06-01T00:06:00.000Z",
+    "invalidated": false,
+    "filled": false,
+    "flipped": false
+  },
+  {
+    "id": "IFVG:BULLISH:FVG:BEARISH:3:4:5:96:97:6",
+    "type": "IFVG",
+    "direction": "BULLISH",
+    "sourceFvgId": "FVG:BEARISH:3:4:5:96:97",
+    "inversionCandleIndex": 6,
+    "high": 97,
+    "low": 96,
+    "midpoint": 96.5,
+    "createdAt": "2026-06-01T00:06:00.000Z",
+    "invalidated": false,
+    "filled": false,
+    "flipped": false
+  }
+]

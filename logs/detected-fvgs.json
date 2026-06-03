@@ -1,0 +1,47 @@
+[
+  {
+    "id": "FVG:BULLISH:0:1:2:101:103",
+    "type": "FVG",
+    "direction": "BULLISH",
+    "high": 103,
+    "low": 101,
+    "midpoint": 102,
+    "createdAt": "2026-06-01T00:02:00.000Z",
+    "invalidated": true,
+    "filled": true,
+    "flipped": true,
+    "candle1Index": 0,
+    "candle2Index": 1,
+    "candle3Index": 2
+  },
+  {
+    "id": "FVG:BEARISH:2:3:4:99:103",
+    "type": "FVG",
+    "direction": "BEARISH",
+    "high": 103,
+    "low": 99,
+    "midpoint": 101,
+    "createdAt": "2026-06-01T00:04:00.000Z",
+    "invalidated": true,
+    "filled": true,
+    "flipped": true,
+    "candle1Index": 2,
+    "candle2Index": 3,
+    "candle3Index": 4
+  },
+  {
+    "id": "FVG:BEARISH:3:4:5:96:97",
+    "type": "FVG",
+    "direction": "BEARISH",
+    "high": 97,
+    "low": 96,
+    "midpoint": 96.5,
+    "createdAt": "2026-06-01T00:05:00.000Z",
+    "invalidated": true,
+    "filled": true,
+    "flipped": true,
+    "candle1Index": 3,
+    "candle2Index": 4,
+    "candle3Index": 5
+  }
+]

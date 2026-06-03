@@ -1,0 +1,2073 @@
+{
+  "generatedAt": "2026-06-01T20:50:42.537Z",
+  "inputPaths": [
+    "C:\\Users\\bjpro\\OneDrive\\Desktop\\nado-trading-bot\\data\\historical\\phase4e-sample.csv",
+    "C:\\Users\\bjpro\\OneDrive\\Desktop\\nado-trading-bot\\data\\historical\\phase5a-sample.csv",
+    "C:\\Users\\bjpro\\OneDrive\\Desktop\\nado-trading-bot\\data\\historical\\phase5d-reaction-sample.csv"
+  ],
+  "outputPath": "C:\\Users\\bjpro\\OneDrive\\Desktop\\nado-trading-bot\\logs\\ict-replay-report.json",
+  "files": [
+    {
+      "inputPath": "C:\\Users\\bjpro\\OneDrive\\Desktop\\nado-trading-bot\\data\\historical\\phase4e-sample.csv",
+      "startedAt": "2026-06-01T00:00:00.000Z",
+      "endedAt": "2026-06-01T00:06:00.000Z",
+      "candleCount": 7,
+      "totalFVGs": 3,
+      "totalIFVGs": 3,
+      "bullishFVGs": 1,
+      "bearishFVGs": 2,
+      "bullishIFVGs": 2,
+      "bearishIFVGs": 1,
+      "filledFVGs": 3,
+      "filledIFVGs": 1,
+      "filledCombined": 4,
+      "flippedFVGs": 3,
+      "flippedIFVGs": 1,
+      "flippedCombined": 4,
+      "fvgFillRate": 100,
+      "ifvgFillRate": 33.33,
+      "combinedFillRate": 66.67,
+      "fvgFlipRate": 100,
+      "ifvgFlipRate": 33.33,
+      "combinedFlipRate": 66.67,
+      "averageFVGLifespanCandles": 1.33,
+      "averageIFVGLifespanCandles": 1,
+      "averageCombinedLifespanCandles": 1.17,
+      "lifespanDistributionCandles": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 3,
+          "min": 0,
+          "max": 3,
+          "average": 1,
+          "median": 0,
+          "p90": 3,
+          "buckets": {
+            "0": 2,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 6,
+          "min": 0,
+          "max": 3,
+          "average": 1.17,
+          "median": 1,
+          "p90": 3,
+          "buckets": {
+            "0": 2,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "lifespanDistributionMinutes": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 3,
+          "min": 0,
+          "max": 3,
+          "average": 1,
+          "median": 0,
+          "p90": 3,
+          "buckets": {
+            "0": 2,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 6,
+          "min": 0,
+          "max": 3,
+          "average": 1.17,
+          "median": 1,
+          "p90": 3,
+          "buckets": {
+            "0": 2,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFillCandles": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 3,
+          "max": 3,
+          "average": 3,
+          "median": 3,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 4,
+          "min": 1,
+          "max": 3,
+          "average": 1.75,
+          "median": 1.5,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFillMinutes": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 3,
+          "max": 3,
+          "average": 3,
+          "median": 3,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 4,
+          "min": 1,
+          "max": 3,
+          "average": 1.75,
+          "median": 1.5,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFlipCandles": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 3,
+          "max": 3,
+          "average": 3,
+          "median": 3,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 4,
+          "min": 1,
+          "max": 3,
+          "average": 1.75,
+          "median": 1.5,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFlipMinutes": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 3,
+          "max": 3,
+          "average": 3,
+          "median": 3,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 4,
+          "min": 1,
+          "max": 3,
+          "average": 1.75,
+          "median": 1.5,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "reactionAnalytics": {
+        "totalZonesEvaluated": 6,
+        "buyReactions": 1,
+        "sellReactions": 0,
+        "noneReactions": 5,
+        "reactionFrequency": 16.67,
+        "averageConfidence": 42.5,
+        "confidenceDistribution": {
+          "count": 6,
+          "min": 0,
+          "max": 90,
+          "average": 42.5,
+          "median": 55,
+          "p90": 90,
+          "buckets": {
+            "0": 2,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 3,
+            "76-100": 1
+          }
+        },
+        "buyConfidenceDistribution": {
+          "count": 1,
+          "min": 90,
+          "max": 90,
+          "average": 90,
+          "median": 90,
+          "p90": 90,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 1
+          }
+        },
+        "sellConfidenceDistribution": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "noneConfidenceDistribution": {
+          "count": 5,
+          "min": 0,
+          "max": 55,
+          "average": 33,
+          "median": 55,
+          "p90": 55,
+          "buckets": {
+            "0": 2,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 3,
+            "76-100": 0
+          }
+        },
+        "volumeConfirmationEnabled": true,
+        "volumeLookback": 20,
+        "volumeMultiplier": 1.5,
+        "volumeEvaluations": 4,
+        "volumeConfirmedReactions": 0,
+        "volumeConfirmedBuyReactions": 0,
+        "volumeConfirmedSellReactions": 0,
+        "volumeConfirmedNoneReactions": 0,
+        "volumeConfirmationPassRate": 0,
+        "volumeConfirmedReactionRate": 0
+      },
+      "signalAnalytics": {
+        "totalZonesEvaluated": 6,
+        "totalBuySignals": 0,
+        "totalSellSignals": 0,
+        "totalNoneSignals": 6,
+        "signalFrequency": 0,
+        "averageSignalConfidence": 0,
+        "confidenceDistribution": {
+          "count": 6,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 6,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "buyConfidenceDistribution": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "sellConfidenceDistribution": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "noneConfidenceDistribution": {
+          "count": 6,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 6,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "signalsByZoneType": {
+          "FVG": {
+            "buy": 0,
+            "sell": 0,
+            "none": 3
+          },
+          "IFVG": {
+            "buy": 0,
+            "sell": 0,
+            "none": 3
+          }
+        },
+        "signalsByFVG": {
+          "buy": 0,
+          "sell": 0,
+          "none": 3
+        },
+        "signalsByIFVG": {
+          "buy": 0,
+          "sell": 0,
+          "none": 3
+        },
+        "rejectedByConfidenceThreshold": 0,
+        "rejectedBecauseZoneInvalidated": 4,
+        "minConfidence": 75
+      }
+    },
+    {
+      "inputPath": "C:\\Users\\bjpro\\OneDrive\\Desktop\\nado-trading-bot\\data\\historical\\phase5a-sample.csv",
+      "startedAt": "2026-06-02T00:00:00.000Z",
+      "endedAt": "2026-06-02T00:06:00.000Z",
+      "candleCount": 7,
+      "totalFVGs": 3,
+      "totalIFVGs": 3,
+      "bullishFVGs": 1,
+      "bearishFVGs": 2,
+      "bullishIFVGs": 2,
+      "bearishIFVGs": 1,
+      "filledFVGs": 3,
+      "filledIFVGs": 1,
+      "filledCombined": 4,
+      "flippedFVGs": 3,
+      "flippedIFVGs": 1,
+      "flippedCombined": 4,
+      "fvgFillRate": 100,
+      "ifvgFillRate": 33.33,
+      "combinedFillRate": 66.67,
+      "fvgFlipRate": 100,
+      "ifvgFlipRate": 33.33,
+      "combinedFlipRate": 66.67,
+      "averageFVGLifespanCandles": 1.33,
+      "averageIFVGLifespanCandles": 1,
+      "averageCombinedLifespanCandles": 1.17,
+      "lifespanDistributionCandles": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 3,
+          "min": 0,
+          "max": 3,
+          "average": 1,
+          "median": 0,
+          "p90": 3,
+          "buckets": {
+            "0": 2,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 6,
+          "min": 0,
+          "max": 3,
+          "average": 1.17,
+          "median": 1,
+          "p90": 3,
+          "buckets": {
+            "0": 2,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "lifespanDistributionMinutes": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 3,
+          "min": 0,
+          "max": 3,
+          "average": 1,
+          "median": 0,
+          "p90": 3,
+          "buckets": {
+            "0": 2,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 6,
+          "min": 0,
+          "max": 3,
+          "average": 1.17,
+          "median": 1,
+          "p90": 3,
+          "buckets": {
+            "0": 2,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFillCandles": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 3,
+          "max": 3,
+          "average": 3,
+          "median": 3,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 4,
+          "min": 1,
+          "max": 3,
+          "average": 1.75,
+          "median": 1.5,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFillMinutes": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 3,
+          "max": 3,
+          "average": 3,
+          "median": 3,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 4,
+          "min": 1,
+          "max": 3,
+          "average": 1.75,
+          "median": 1.5,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFlipCandles": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 3,
+          "max": 3,
+          "average": 3,
+          "median": 3,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 4,
+          "min": 1,
+          "max": 3,
+          "average": 1.75,
+          "median": 1.5,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFlipMinutes": {
+        "fvg": {
+          "count": 3,
+          "min": 1,
+          "max": 2,
+          "average": 1.33,
+          "median": 1,
+          "p90": 2,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 3,
+          "max": 3,
+          "average": 3,
+          "median": 3,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 1,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 4,
+          "min": 1,
+          "max": 3,
+          "average": 1.75,
+          "median": 1.5,
+          "p90": 3,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 2,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "reactionAnalytics": {
+        "totalZonesEvaluated": 6,
+        "buyReactions": 1,
+        "sellReactions": 0,
+        "noneReactions": 5,
+        "reactionFrequency": 16.67,
+        "averageConfidence": 42.5,
+        "confidenceDistribution": {
+          "count": 6,
+          "min": 0,
+          "max": 90,
+          "average": 42.5,
+          "median": 55,
+          "p90": 90,
+          "buckets": {
+            "0": 2,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 3,
+            "76-100": 1
+          }
+        },
+        "buyConfidenceDistribution": {
+          "count": 1,
+          "min": 90,
+          "max": 90,
+          "average": 90,
+          "median": 90,
+          "p90": 90,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 1
+          }
+        },
+        "sellConfidenceDistribution": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "noneConfidenceDistribution": {
+          "count": 5,
+          "min": 0,
+          "max": 55,
+          "average": 33,
+          "median": 55,
+          "p90": 55,
+          "buckets": {
+            "0": 2,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 3,
+            "76-100": 0
+          }
+        },
+        "volumeConfirmationEnabled": true,
+        "volumeLookback": 20,
+        "volumeMultiplier": 1.5,
+        "volumeEvaluations": 4,
+        "volumeConfirmedReactions": 0,
+        "volumeConfirmedBuyReactions": 0,
+        "volumeConfirmedSellReactions": 0,
+        "volumeConfirmedNoneReactions": 0,
+        "volumeConfirmationPassRate": 0,
+        "volumeConfirmedReactionRate": 0
+      },
+      "signalAnalytics": {
+        "totalZonesEvaluated": 6,
+        "totalBuySignals": 0,
+        "totalSellSignals": 0,
+        "totalNoneSignals": 6,
+        "signalFrequency": 0,
+        "averageSignalConfidence": 0,
+        "confidenceDistribution": {
+          "count": 6,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 6,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "buyConfidenceDistribution": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "sellConfidenceDistribution": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "noneConfidenceDistribution": {
+          "count": 6,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 6,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "signalsByZoneType": {
+          "FVG": {
+            "buy": 0,
+            "sell": 0,
+            "none": 3
+          },
+          "IFVG": {
+            "buy": 0,
+            "sell": 0,
+            "none": 3
+          }
+        },
+        "signalsByFVG": {
+          "buy": 0,
+          "sell": 0,
+          "none": 3
+        },
+        "signalsByIFVG": {
+          "buy": 0,
+          "sell": 0,
+          "none": 3
+        },
+        "rejectedByConfidenceThreshold": 0,
+        "rejectedBecauseZoneInvalidated": 4,
+        "minConfidence": 75
+      }
+    },
+    {
+      "inputPath": "C:\\Users\\bjpro\\OneDrive\\Desktop\\nado-trading-bot\\data\\historical\\phase5d-reaction-sample.csv",
+      "startedAt": "2026-06-03T00:00:00.000Z",
+      "endedAt": "2026-06-03T00:07:00.000Z",
+      "candleCount": 8,
+      "totalFVGs": 2,
+      "totalIFVGs": 1,
+      "bullishFVGs": 1,
+      "bearishFVGs": 1,
+      "bullishIFVGs": 0,
+      "bearishIFVGs": 1,
+      "filledFVGs": 2,
+      "filledIFVGs": 0,
+      "filledCombined": 2,
+      "flippedFVGs": 1,
+      "flippedIFVGs": 1,
+      "flippedCombined": 2,
+      "fvgFillRate": 100,
+      "ifvgFillRate": 0,
+      "combinedFillRate": 66.67,
+      "fvgFlipRate": 50,
+      "ifvgFlipRate": 100,
+      "combinedFlipRate": 66.67,
+      "averageFVGLifespanCandles": 1,
+      "averageIFVGLifespanCandles": 1,
+      "averageCombinedLifespanCandles": 1,
+      "lifespanDistributionCandles": {
+        "fvg": {
+          "count": 2,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 1,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 3,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 3,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "lifespanDistributionMinutes": {
+        "fvg": {
+          "count": 2,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 1,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 3,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 3,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFillCandles": {
+        "fvg": {
+          "count": 2,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 2,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFillMinutes": {
+        "fvg": {
+          "count": 2,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 2,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 2,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFlipCandles": {
+        "fvg": {
+          "count": 1,
+          "min": 4,
+          "max": 4,
+          "average": 4,
+          "median": 4,
+          "p90": 4,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 0,
+            "4-10": 1,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 1,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 2,
+          "min": 1,
+          "max": 4,
+          "average": 2.5,
+          "median": 2.5,
+          "p90": 4,
+          "buckets": {
+            "0": 0,
+            "1": 1,
+            "2-3": 0,
+            "4-10": 1,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "timeToFlipMinutes": {
+        "fvg": {
+          "count": 1,
+          "min": 4,
+          "max": 4,
+          "average": 4,
+          "median": 4,
+          "p90": 4,
+          "buckets": {
+            "0": 0,
+            "1": 0,
+            "2-3": 0,
+            "4-10": 1,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "ifvg": {
+          "count": 1,
+          "min": 1,
+          "max": 1,
+          "average": 1,
+          "median": 1,
+          "p90": 1,
+          "buckets": {
+            "0": 0,
+            "1": 1,
+            "2-3": 0,
+            "4-10": 0,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        },
+        "combined": {
+          "count": 2,
+          "min": 1,
+          "max": 4,
+          "average": 2.5,
+          "median": 2.5,
+          "p90": 4,
+          "buckets": {
+            "0": 0,
+            "1": 1,
+            "2-3": 0,
+            "4-10": 1,
+            "11-50": 0,
+            "51-200": 0,
+            "201+": 0
+          }
+        }
+      },
+      "reactionAnalytics": {
+        "totalZonesEvaluated": 3,
+        "buyReactions": 0,
+        "sellReactions": 1,
+        "noneReactions": 2,
+        "reactionFrequency": 33.33,
+        "averageConfidence": 40,
+        "confidenceDistribution": {
+          "count": 3,
+          "min": 10,
+          "max": 100,
+          "average": 40,
+          "median": 10,
+          "p90": 100,
+          "buckets": {
+            "0": 0,
+            "1-25": 2,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 1
+          }
+        },
+        "buyConfidenceDistribution": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "sellConfidenceDistribution": {
+          "count": 1,
+          "min": 100,
+          "max": 100,
+          "average": 100,
+          "median": 100,
+          "p90": 100,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 1
+          }
+        },
+        "noneConfidenceDistribution": {
+          "count": 2,
+          "min": 10,
+          "max": 10,
+          "average": 10,
+          "median": 10,
+          "p90": 10,
+          "buckets": {
+            "0": 0,
+            "1-25": 2,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "volumeConfirmationEnabled": true,
+        "volumeLookback": 20,
+        "volumeMultiplier": 1.5,
+        "volumeEvaluations": 3,
+        "volumeConfirmedReactions": 1,
+        "volumeConfirmedBuyReactions": 0,
+        "volumeConfirmedSellReactions": 1,
+        "volumeConfirmedNoneReactions": 2,
+        "volumeConfirmationPassRate": 100,
+        "volumeConfirmedReactionRate": 100
+      },
+      "signalAnalytics": {
+        "totalZonesEvaluated": 3,
+        "totalBuySignals": 0,
+        "totalSellSignals": 1,
+        "totalNoneSignals": 2,
+        "signalFrequency": 33.33,
+        "averageSignalConfidence": 33.33,
+        "confidenceDistribution": {
+          "count": 3,
+          "min": 0,
+          "max": 100,
+          "average": 33.33,
+          "median": 0,
+          "p90": 100,
+          "buckets": {
+            "0": 2,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 1
+          }
+        },
+        "buyConfidenceDistribution": {
+          "count": 0,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "sellConfidenceDistribution": {
+          "count": 1,
+          "min": 100,
+          "max": 100,
+          "average": 100,
+          "median": 100,
+          "p90": 100,
+          "buckets": {
+            "0": 0,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 1
+          }
+        },
+        "noneConfidenceDistribution": {
+          "count": 2,
+          "min": 0,
+          "max": 0,
+          "average": 0,
+          "median": 0,
+          "p90": 0,
+          "buckets": {
+            "0": 2,
+            "1-25": 0,
+            "26-50": 0,
+            "51-75": 0,
+            "76-100": 0
+          }
+        },
+        "signalsByZoneType": {
+          "FVG": {
+            "buy": 0,
+            "sell": 1,
+            "none": 1
+          },
+          "IFVG": {
+            "buy": 0,
+            "sell": 0,
+            "none": 1
+          }
+        },
+        "signalsByFVG": {
+          "buy": 0,
+          "sell": 1,
+          "none": 1
+        },
+        "signalsByIFVG": {
+          "buy": 0,
+          "sell": 0,
+          "none": 1
+        },
+        "rejectedByConfidenceThreshold": 0,
+        "rejectedBecauseZoneInvalidated": 2,
+        "minConfidence": 75
+      }
+    }
+  ],
+  "totals": {
+    "fileCount": 3,
+    "candleCount": 22,
+    "totalFVGs": 8,
+    "totalIFVGs": 7,
+    "bullishFVGs": 3,
+    "bearishFVGs": 5,
+    "bullishIFVGs": 4,
+    "bearishIFVGs": 3,
+    "filledFVGs": 8,
+    "filledIFVGs": 2,
+    "filledCombined": 10,
+    "flippedFVGs": 7,
+    "flippedIFVGs": 3,
+    "flippedCombined": 10,
+    "fvgFillRate": 100,
+    "ifvgFillRate": 28.57,
+    "combinedFillRate": 66.67,
+    "fvgFlipRate": 87.5,
+    "ifvgFlipRate": 42.86,
+    "combinedFlipRate": 66.67,
+    "averageFVGLifespanCandles": 1.25,
+    "averageIFVGLifespanCandles": 1,
+    "averageCombinedLifespanCandles": 1.13,
+    "lifespanDistributionCandles": {
+      "fvg": {
+        "count": 8,
+        "min": 1,
+        "max": 2,
+        "average": 1.25,
+        "median": 1,
+        "p90": 2,
+        "buckets": {
+          "0": 0,
+          "1": 6,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "ifvg": {
+        "count": 7,
+        "min": 0,
+        "max": 3,
+        "average": 1,
+        "median": 0,
+        "p90": 3,
+        "buckets": {
+          "0": 4,
+          "1": 1,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "combined": {
+        "count": 15,
+        "min": 0,
+        "max": 3,
+        "average": 1.13,
+        "median": 1,
+        "p90": 3,
+        "buckets": {
+          "0": 4,
+          "1": 7,
+          "2-3": 4,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      }
+    },
+    "lifespanDistributionMinutes": {
+      "fvg": {
+        "count": 8,
+        "min": 1,
+        "max": 2,
+        "average": 1.25,
+        "median": 1,
+        "p90": 2,
+        "buckets": {
+          "0": 0,
+          "1": 6,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "ifvg": {
+        "count": 7,
+        "min": 0,
+        "max": 3,
+        "average": 1,
+        "median": 0,
+        "p90": 3,
+        "buckets": {
+          "0": 4,
+          "1": 1,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "combined": {
+        "count": 15,
+        "min": 0,
+        "max": 3,
+        "average": 1.13,
+        "median": 1,
+        "p90": 3,
+        "buckets": {
+          "0": 4,
+          "1": 7,
+          "2-3": 4,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      }
+    },
+    "timeToFillCandles": {
+      "fvg": {
+        "count": 8,
+        "min": 1,
+        "max": 2,
+        "average": 1.25,
+        "median": 1,
+        "p90": 2,
+        "buckets": {
+          "0": 0,
+          "1": 6,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "ifvg": {
+        "count": 2,
+        "min": 3,
+        "max": 3,
+        "average": 3,
+        "median": 3,
+        "p90": 3,
+        "buckets": {
+          "0": 0,
+          "1": 0,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "combined": {
+        "count": 10,
+        "min": 1,
+        "max": 3,
+        "average": 1.6,
+        "median": 1,
+        "p90": 3,
+        "buckets": {
+          "0": 0,
+          "1": 6,
+          "2-3": 4,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      }
+    },
+    "timeToFillMinutes": {
+      "fvg": {
+        "count": 8,
+        "min": 1,
+        "max": 2,
+        "average": 1.25,
+        "median": 1,
+        "p90": 2,
+        "buckets": {
+          "0": 0,
+          "1": 6,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "ifvg": {
+        "count": 2,
+        "min": 3,
+        "max": 3,
+        "average": 3,
+        "median": 3,
+        "p90": 3,
+        "buckets": {
+          "0": 0,
+          "1": 0,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "combined": {
+        "count": 10,
+        "min": 1,
+        "max": 3,
+        "average": 1.6,
+        "median": 1,
+        "p90": 3,
+        "buckets": {
+          "0": 0,
+          "1": 6,
+          "2-3": 4,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      }
+    },
+    "timeToFlipCandles": {
+      "fvg": {
+        "count": 7,
+        "min": 1,
+        "max": 4,
+        "average": 1.71,
+        "median": 1,
+        "p90": 4,
+        "buckets": {
+          "0": 0,
+          "1": 4,
+          "2-3": 2,
+          "4-10": 1,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "ifvg": {
+        "count": 3,
+        "min": 1,
+        "max": 3,
+        "average": 2.33,
+        "median": 3,
+        "p90": 3,
+        "buckets": {
+          "0": 0,
+          "1": 1,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "combined": {
+        "count": 10,
+        "min": 1,
+        "max": 4,
+        "average": 1.9,
+        "median": 1.5,
+        "p90": 3,
+        "buckets": {
+          "0": 0,
+          "1": 5,
+          "2-3": 4,
+          "4-10": 1,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      }
+    },
+    "timeToFlipMinutes": {
+      "fvg": {
+        "count": 7,
+        "min": 1,
+        "max": 4,
+        "average": 1.71,
+        "median": 1,
+        "p90": 4,
+        "buckets": {
+          "0": 0,
+          "1": 4,
+          "2-3": 2,
+          "4-10": 1,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "ifvg": {
+        "count": 3,
+        "min": 1,
+        "max": 3,
+        "average": 2.33,
+        "median": 3,
+        "p90": 3,
+        "buckets": {
+          "0": 0,
+          "1": 1,
+          "2-3": 2,
+          "4-10": 0,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      },
+      "combined": {
+        "count": 10,
+        "min": 1,
+        "max": 4,
+        "average": 1.9,
+        "median": 1.5,
+        "p90": 3,
+        "buckets": {
+          "0": 0,
+          "1": 5,
+          "2-3": 4,
+          "4-10": 1,
+          "11-50": 0,
+          "51-200": 0,
+          "201+": 0
+        }
+      }
+    },
+    "reactionAnalytics": {
+      "totalZonesEvaluated": 15,
+      "buyReactions": 2,
+      "sellReactions": 1,
+      "noneReactions": 12,
+      "reactionFrequency": 20,
+      "averageConfidence": 42,
+      "confidenceDistribution": {
+        "count": 15,
+        "min": 0,
+        "max": 100,
+        "average": 42,
+        "median": 55,
+        "p90": 90,
+        "buckets": {
+          "0": 4,
+          "1-25": 2,
+          "26-50": 0,
+          "51-75": 6,
+          "76-100": 3
+        }
+      },
+      "buyConfidenceDistribution": {
+        "count": 2,
+        "min": 90,
+        "max": 90,
+        "average": 90,
+        "median": 90,
+        "p90": 90,
+        "buckets": {
+          "0": 0,
+          "1-25": 0,
+          "26-50": 0,
+          "51-75": 0,
+          "76-100": 2
+        }
+      },
+      "sellConfidenceDistribution": {
+        "count": 1,
+        "min": 100,
+        "max": 100,
+        "average": 100,
+        "median": 100,
+        "p90": 100,
+        "buckets": {
+          "0": 0,
+          "1-25": 0,
+          "26-50": 0,
+          "51-75": 0,
+          "76-100": 1
+        }
+      },
+      "noneConfidenceDistribution": {
+        "count": 12,
+        "min": 0,
+        "max": 55,
+        "average": 29.17,
+        "median": 32.5,
+        "p90": 55,
+        "buckets": {
+          "0": 4,
+          "1-25": 2,
+          "26-50": 0,
+          "51-75": 6,
+          "76-100": 0
+        }
+      },
+      "volumeConfirmationEnabled": true,
+      "volumeLookback": 20,
+      "volumeMultiplier": 1.5,
+      "volumeEvaluations": 11,
+      "volumeConfirmedReactions": 1,
+      "volumeConfirmedBuyReactions": 0,
+      "volumeConfirmedSellReactions": 1,
+      "volumeConfirmedNoneReactions": 2,
+      "volumeConfirmationPassRate": 27.27,
+      "volumeConfirmedReactionRate": 33.33
+    },
+    "signalAnalytics": {
+      "totalZonesEvaluated": 15,
+      "totalBuySignals": 0,
+      "totalSellSignals": 1,
+      "totalNoneSignals": 14,
+      "signalFrequency": 6.67,
+      "averageSignalConfidence": 6.67,
+      "confidenceDistribution": {
+        "count": 15,
+        "min": 0,
+        "max": 100,
+        "average": 6.67,
+        "median": 0,
+        "p90": 0,
+        "buckets": {
+          "0": 14,
+          "1-25": 0,
+          "26-50": 0,
+          "51-75": 0,
+          "76-100": 1
+        }
+      },
+      "buyConfidenceDistribution": {
+        "count": 0,
+        "min": 0,
+        "max": 0,
+        "average": 0,
+        "median": 0,
+        "p90": 0,
+        "buckets": {
+          "0": 0,
+          "1-25": 0,
+          "26-50": 0,
+          "51-75": 0,
+          "76-100": 0
+        }
+      },
+      "sellConfidenceDistribution": {
+        "count": 1,
+        "min": 100,
+        "max": 100,
+        "average": 100,
+        "median": 100,
+        "p90": 100,
+        "buckets": {
+          "0": 0,
+          "1-25": 0,
+          "26-50": 0,
+          "51-75": 0,
+          "76-100": 1
+        }
+      },
+      "noneConfidenceDistribution": {
+        "count": 14,
+        "min": 0,
+        "max": 0,
+        "average": 0,
+        "median": 0,
+        "p90": 0,
+        "buckets": {
+          "0": 14,
+          "1-25": 0,
+          "26-50": 0,
+          "51-75": 0,
+          "76-100": 0
+        }
+      },
+      "signalsByZoneType": {
+        "FVG": {
+          "buy": 0,
+          "sell": 1,
+          "none": 7
+        },
+        "IFVG": {
+          "buy": 0,
+          "sell": 0,
+          "none": 7
+        }
+      },
+      "signalsByFVG": {
+        "buy": 0,
+        "sell": 1,
+        "none": 7
+      },
+      "signalsByIFVG": {
+        "buy": 0,
+        "sell": 0,
+        "none": 7
+      },
+      "rejectedByConfidenceThreshold": 0,
+      "rejectedBecauseZoneInvalidated": 10,
+      "minConfidence": 75
+    }
+  }
+}

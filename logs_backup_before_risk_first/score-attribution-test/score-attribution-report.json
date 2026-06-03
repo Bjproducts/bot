@@ -1,0 +1,358 @@
+{
+  "generatedAt": "2026-06-03T03:00:23.868Z",
+  "totalTrades": 2,
+  "factors": [
+    {
+      "factor": "Liquidity Sweep",
+      "componentKey": "liquiditySweepScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 16.63
+    },
+    {
+      "factor": "Displacement",
+      "componentKey": "displacementScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 11.08
+    },
+    {
+      "factor": "MSS",
+      "componentKey": "mssScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 11.08
+    },
+    {
+      "factor": "FVG",
+      "componentKey": "fvgQualityScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 5.54
+    },
+    {
+      "factor": "IFVG",
+      "componentKey": "ifvgBonus",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 2.22
+    },
+    {
+      "factor": "Premium/Discount",
+      "componentKey": "premiumDiscountScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Session",
+      "componentKey": "sessionScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Target Fit",
+      "componentKey": "targetFitScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 13.86
+    },
+    {
+      "factor": "Reaction",
+      "componentKey": "reactionScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 6.65
+    },
+    {
+      "factor": "Confidence",
+      "componentKey": "confidenceScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 24.94
+    }
+  ],
+  "topPerformingFactors": [
+    {
+      "factor": "Liquidity Sweep",
+      "componentKey": "liquiditySweepScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 16.63
+    },
+    {
+      "factor": "Displacement",
+      "componentKey": "displacementScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 11.08
+    },
+    {
+      "factor": "MSS",
+      "componentKey": "mssScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 11.08
+    }
+  ],
+  "strongestCorrelations": [
+    {
+      "factor": "Liquidity Sweep",
+      "componentKey": "liquiditySweepScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 16.63
+    },
+    {
+      "factor": "Displacement",
+      "componentKey": "displacementScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 11.08
+    },
+    {
+      "factor": "MSS",
+      "componentKey": "mssScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 11.08
+    },
+    {
+      "factor": "FVG",
+      "componentKey": "fvgQualityScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 5.54
+    },
+    {
+      "factor": "IFVG",
+      "componentKey": "ifvgBonus",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 2.22
+    },
+    {
+      "factor": "Target Fit",
+      "componentKey": "targetFitScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 13.86
+    },
+    {
+      "factor": "Reaction",
+      "componentKey": "reactionScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 6.65
+    },
+    {
+      "factor": "Confidence",
+      "componentKey": "confidenceScore",
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgScore": 24.94
+    },
+    {
+      "factor": "Premium/Discount",
+      "componentKey": "premiumDiscountScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    },
+    {
+      "factor": "Session",
+      "componentKey": "sessionScore",
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgScore": 0
+    }
+  ],
+  "outcomes": [
+    {
+      "tradeId": "win",
+      "symbol": "BTC",
+      "side": "LONG",
+      "entryTimestamp": "2026-06-02T00:00:00.000Z",
+      "exitTimestamp": "2026-06-02T00:05:00.000Z",
+      "finalScore": 92,
+      "scoreBreakdown": {
+        "liquiditySweepScore": 16.63,
+        "displacementScore": 11.08,
+        "mssScore": 11.08,
+        "fvgQualityScore": 5.54,
+        "ifvgBonus": 2.22,
+        "targetFitScore": 13.86,
+        "reactionScore": 6.65,
+        "premiumDiscountScore": 0,
+        "sessionScore": 0,
+        "confidenceScore": 24.94,
+        "targetReachProbability": 91,
+        "reactionTierScore": 30,
+        "rrFitScore": 18,
+        "scalpTargetFitScore": 25,
+        "targetDistancePenalty": 7,
+        "zoneFreshnessScore": 15
+      },
+      "win": true,
+      "realizedPnlUsd": 1,
+      "tradeDurationMinutes": 5,
+      "exitReason": "MANAGED_TARGET_EXIT",
+      "targetReachProbability": 91
+    },
+    {
+      "tradeId": "loss",
+      "symbol": "BTC",
+      "side": "LONG",
+      "entryTimestamp": "2026-06-02T00:00:00.000Z",
+      "exitTimestamp": "2026-06-02T00:05:00.000Z",
+      "finalScore": 92,
+      "scoreBreakdown": {
+        "liquiditySweepScore": 16.63,
+        "displacementScore": 11.08,
+        "mssScore": 11.08,
+        "fvgQualityScore": 5.54,
+        "ifvgBonus": 2.22,
+        "targetFitScore": 13.86,
+        "reactionScore": 6.65,
+        "premiumDiscountScore": 0,
+        "sessionScore": 0,
+        "confidenceScore": 24.94,
+        "targetReachProbability": 91,
+        "reactionTierScore": 30,
+        "rrFitScore": 18,
+        "scalpTargetFitScore": 25,
+        "targetDistancePenalty": 7,
+        "zoneFreshnessScore": 15
+      },
+      "win": false,
+      "realizedPnlUsd": -1,
+      "tradeDurationMinutes": 5,
+      "exitReason": "RISK_EXIT",
+      "targetReachProbability": 91
+    }
+  ],
+  "probabilityBuckets": [
+    {
+      "bucket": "0-49",
+      "range": [
+        0,
+        49
+      ],
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgProbability": 0
+    },
+    {
+      "bucket": "50-69",
+      "range": [
+        50,
+        69
+      ],
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgProbability": 0
+    },
+    {
+      "bucket": "70-84",
+      "range": [
+        70,
+        84
+      ],
+      "trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "winRate": 0,
+      "avgPnlUsd": 0,
+      "avgProbability": 0
+    },
+    {
+      "bucket": "85-100",
+      "range": [
+        85,
+        100
+      ],
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "winRate": 50,
+      "avgPnlUsd": 0,
+      "avgProbability": 91
+    }
+  ]
+}

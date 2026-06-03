@@ -1,0 +1,39 @@
+{
+  "name": "nado-trading-bot",
+  "version": "1.0.0",
+  "description": "Paper trading simulation bot — Nado DEX DCA + Volume Spike Reversal strategy",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev":      "ts-node src/index.ts",
+    "backtest": "ts-node -e \"require('./src/backtester').runScenarios()\"",
+    "report":   "ts-node src/report.ts",
+    "logs:view": "ts-node src/reports/logViewer.ts",
+    "ict:visualize": "ts-node src/ict/visualValidation.ts",
+    "ict:test": "ts-node src/ict/testFvgIfvg.ts",
+    "ict:reaction-test": "ts-node src/ict/testReactionEngine.ts",
+    "ict:signal-test": "ts-node src/ict/testIctSignalEngine.ts",
+    "ict:trade-selection-test": "ts-node src/ict/testTradeSelectionEngine.ts",
+    "ict:validated-fvg-test": "ts-node src/ict/testValidatedFvgDetector.ts",
+    "ict:fvg-rejection-test": "ts-node src/ict/testValidatedFvgRejectionLog.ts",
+    "ict:gap-test": "ts-node src/ict/testCandleBufferGap.ts",
+    "ict:paper-sim": "ts-node src/ict/testPaperTradingIntegration.ts",
+    "position:exit-test": "ts-node src/testPositionExitManager.ts",
+    "position:sizing-test": "ts-node src/risk/testPositionSizing.ts",
+    "risk:target-modes-test": "ts-node src/risk/testTargetModes.ts",
+    "analytics:test": "ts-node src/analytics/testScoreAttribution.ts",
+    "analytics:pipeline-test": "ts-node src/analytics/testAttributionPipeline.ts",
+    "live:execution-test": "ts-node src/execution/testLiveExecutionManager.ts",
+    "ict:replay": "ts-node src/ict/historicalReplay.ts",
+    "build":    "tsc",
+    "start":    "node dist/index.js"
+  },
+  "dependencies": {
+    "bignumber.js": "11.1.1",
+    "dotenv":       "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "ts-node":     "^10.9.2",
+    "typescript":  "^5.4.5"
+  }
+}

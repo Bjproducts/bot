@@ -1,0 +1,4576 @@
+[
+  {
+    "timestamp": "2026-06-03T11:37:29.325Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:38:02.359Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:38:02.359Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:39:01.672Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:39:01.672Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:40:01.032Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:40:01.032Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:49:17.468Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:49:17.468Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:49:17.468Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:50:01.681Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:50:01.681Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:50:01.681Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:50:01.681Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:51:03.188Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:51:03.188Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:51:03.188Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:51:03.188Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:52:02.679Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:52:02.679Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:52:02.679Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:52:02.679Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:53:56.854Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:53:56.854Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:53:56.854Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:53:56.854Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:54:01.246Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:54:01.246Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:54:01.246Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:54:01.246Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:55:02.971Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:55:02.971Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:55:02.971Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:55:02.971Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:56:02.317Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:56:02.317Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:56:02.317Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T11:56:02.317Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:16:15.845Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:16:15.845Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:16:15.845Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:16:15.845Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:16:15.845Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:17:01.936Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:17:01.936Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:17:01.936Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:17:01.936Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:17:01.936Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:17:01.936Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:18:01.144Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:18:01.144Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:18:01.144Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:18:01.144Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:18:01.144Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:18:01.144Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:19:02.663Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:19:02.663Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:19:02.663Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:19:02.663Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:19:02.663Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:19:02.663Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:20:02.414Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:20:02.414Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:20:02.414Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:20:02.414Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:20:02.414Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:20:02.414Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:21:01.898Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:21:01.898Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:21:01.898Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:21:01.898Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:21:01.898Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:21:01.898Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:24:02.807Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:24:02.807Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:24:02.807Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:24:02.807Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:24:02.807Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:24:02.807Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:24:02.807Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:23:24:25:66846:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66846,
+    "zoneMidpoint": 66867,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 28.48,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.02,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:25:02.619Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:25:02.619Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:25:02.619Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:25:02.619Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:25:02.619Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:25:02.619Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:25:02.619Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:23:24:25:66846:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66846,
+    "zoneMidpoint": 66867,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 28.48,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.02,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:25:02.619Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:24:25:26:66843.99:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66843.99,
+    "zoneMidpoint": 66865.995,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 72.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.29,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:26:01.972Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:26:01.972Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:26:01.972Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:26:01.972Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:26:01.972Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:26:01.972Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:26:01.972Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:23:24:25:66846:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66846,
+    "zoneMidpoint": 66867,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 28.48,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.02,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:26:01.972Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:24:25:26:66843.99:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66843.99,
+    "zoneMidpoint": 66865.995,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 72.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.29,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:27:01.524Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:27:01.524Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:27:01.524Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:27:01.524Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:27:01.524Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:27:01.524Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:27:01.524Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:23:24:25:66846:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66846,
+    "zoneMidpoint": 66867,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 28.48,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.02,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:27:01.524Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:24:25:26:66843.99:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66843.99,
+    "zoneMidpoint": 66865.995,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 72.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.29,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:27:01.524Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:26:27:28:66908.52:66961.12",
+    "zoneHigh": 66961.12,
+    "zoneLow": 66908.52,
+    "zoneMidpoint": 66934.82,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 87.35,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:23:24:25:66846:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66846,
+    "zoneMidpoint": 66867,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 28.48,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.02,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:24:25:26:66843.99:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66843.99,
+    "zoneMidpoint": 66865.995,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 72.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.29,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:26:27:28:66908.52:66961.12",
+    "zoneHigh": 66961.12,
+    "zoneLow": 66908.52,
+    "zoneMidpoint": 66934.82,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 87.35,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:28:03.007Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:27:28:29:66961.13:66972.31",
+    "zoneHigh": 66972.31,
+    "zoneLow": 66961.13,
+    "zoneMidpoint": 66966.72,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 43.1,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.43,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:23:24:25:66846:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66846,
+    "zoneMidpoint": 66867,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 28.48,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.02,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:24:25:26:66843.99:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66843.99,
+    "zoneMidpoint": 66865.995,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 72.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.29,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:26:27:28:66908.52:66961.12",
+    "zoneHigh": 66961.12,
+    "zoneLow": 66908.52,
+    "zoneMidpoint": 66934.82,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 87.35,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:29:02.380Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:27:28:29:66961.13:66972.31",
+    "zoneHigh": 66972.31,
+    "zoneLow": 66961.13,
+    "zoneMidpoint": 66966.72,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 43.1,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.43,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:23:24:25:66846:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66846,
+    "zoneMidpoint": 66867,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 28.48,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.02,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:24:25:26:66843.99:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66843.99,
+    "zoneMidpoint": 66865.995,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 72.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.29,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:26:27:28:66908.52:66961.12",
+    "zoneHigh": 66961.12,
+    "zoneLow": 66908.52,
+    "zoneMidpoint": 66934.82,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 87.35,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:30:02.359Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:27:28:29:66961.13:66972.31",
+    "zoneHigh": 66972.31,
+    "zoneLow": 66961.13,
+    "zoneMidpoint": 66966.72,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 43.1,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.43,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:23:24:25:66846:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66846,
+    "zoneMidpoint": 66867,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 28.48,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.02,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:24:25:26:66843.99:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66843.99,
+    "zoneMidpoint": 66865.995,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 72.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.29,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:26:27:28:66908.52:66961.12",
+    "zoneHigh": 66961.12,
+    "zoneLow": 66908.52,
+    "zoneMidpoint": 66934.82,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 87.35,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:31:01.606Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:27:28:29:66961.13:66972.31",
+    "zoneHigh": 66972.31,
+    "zoneLow": 66961.13,
+    "zoneMidpoint": 66966.72,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 43.1,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.43,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:5:6:7:67165.99:67447.35",
+    "zoneHigh": 67447.35,
+    "zoneLow": 67165.99,
+    "zoneMidpoint": 67306.67000000001,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 6.46,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:6:7:8:67130:67450",
+    "zoneHigh": 67450,
+    "zoneLow": 67130,
+    "zoneMidpoint": 67290,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 57.06,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.91,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:9:10:11:67082:67117.05",
+    "zoneHigh": 67117.05,
+    "zoneLow": 67082,
+    "zoneMidpoint": 67099.525,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 94.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.85,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:10:11:12:67095.06:67122",
+    "zoneHigh": 67122,
+    "zoneLow": 67095.06,
+    "zoneMidpoint": 67108.53,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 3.27,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.38,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:17:18:19:66972.76:67068.52",
+    "zoneHigh": 67068.52,
+    "zoneLow": 66972.76,
+    "zoneMidpoint": 67020.64,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.95,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 0.99,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first",
+      "FVG lacks required bearish displacement"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BEARISH",
+    "rawFvgId": "FVG:BEARISH:18:19:20:66864:67078",
+    "zoneHigh": 67078,
+    "zoneLow": 66864,
+    "zoneMidpoint": 66971,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 99.99,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 7.3,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bearish FVG did not sweep buy-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:23:24:25:66846:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66846,
+    "zoneMidpoint": 66867,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 28.48,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.02,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:24:25:26:66843.99:66888",
+    "zoneHigh": 66888,
+    "zoneLow": 66843.99,
+    "zoneMidpoint": 66865.995,
+    "liquiditySweepPassed": true,
+    "displacementPassed": false,
+    "mssPassed": false,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 72.82,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.29,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": true,
+    "mssDetected": false,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "displacement",
+      "mss"
+    ],
+    "rejectionReasons": [
+      "FVG lacks required bullish displacement",
+      "Bullish FVG did not close above prior structure high"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:26:27:28:66908.52:66961.12",
+    "zoneHigh": 66961.12,
+    "zoneLow": 66908.52,
+    "zoneMidpoint": 66934.82,
+    "liquiditySweepPassed": false,
+    "displacementPassed": true,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 87.35,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.86,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first"
+    ]
+  },
+  {
+    "timestamp": "2026-06-03T12:32:01.105Z",
+    "symbol": "BTC",
+    "direction": "BULLISH",
+    "rawFvgId": "FVG:BULLISH:27:28:29:66961.13:66972.31",
+    "zoneHigh": 66972.31,
+    "zoneLow": 66961.13,
+    "zoneMidpoint": 66966.72,
+    "liquiditySweepPassed": false,
+    "displacementPassed": false,
+    "mssPassed": true,
+    "premiumDiscountPassed": true,
+    "sessionPassed": true,
+    "bodyToRangePercent": 43.1,
+    "bodyToRangeRequiredPercent": 60,
+    "rangeMultiple": 1.43,
+    "rangeMultipleRequired": 1.2,
+    "sweepDetected": false,
+    "mssDetected": true,
+    "premiumDiscountOk": true,
+    "sessionOk": true,
+    "failedChecks": [
+      "liquiditySweep",
+      "displacement"
+    ],
+    "rejectionReasons": [
+      "Bullish FVG did not sweep sell-side liquidity first",
+      "FVG lacks required bullish displacement"
+    ]
+  }
+]

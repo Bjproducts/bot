@@ -1,0 +1,271 @@
+import * as fs   from 'fs';
+import * as path from 'path';
+import { TradeEvent, CompletedTrade, CSV_HEADER } from './types';
+
+const LOGS_DIR             = path.resolve(__dirname, '../../logs');
+const CSV_PATH             = path.join(LOGS_DIR, 'trades.csv');
+const EVENT_LOG_PATH       = path.join(LOGS_DIR, 'events.log');
+const COMPLETED_TRADES_PATH = path.join(LOGS_DIR, 'completed-trades.json');
+
+export interface TradeJournalOptions {
+  logsDir?: string;
+}
+
+/**
+ * TradeJournal — writes every trade event to three log targets:
+ *
+ *   logs/trades.csv           Append-only CSV, one row per event
+ *   logs/events.log           Human-readable timestamped event log
+ *   logs/completed-trades.json  Array of fully closed trade records
+ *
+ * All writes are synchronous and append-only (safe for long sessions).
+ * The logs/ directory is created on first use if it doesn't exist.
+ */
+export class TradeJournal {
+  private readonly logsDir: string;
+  private readonly csvPath: string;
+  private readonly eventLogPath: string;
+  private readonly completedTradesPath: string;
+
+  constructor(options: TradeJournalOptions = {}) {
+    this.logsDir = options.logsDir ?? LOGS_DIR;
+    this.csvPath = path.join(this.logsDir, 'trades.csv');
+    this.eventLogPath = path.join(this.logsDir, 'events.log');
+    this.completedTradesPath = path.join(this.logsDir, 'completed-trades.json');
+    this.ensureLogsDir();
+    this.ensureCsvHeader();
+    this.ensureCompletedTradesFile();
+  }
+
+  // ─── Public API ────────────────────────────────────────────────────────────
+
+  /** Log an ENTRY or DCA event to CSV + events.log. */
+  logEvent(event: TradeEvent): void {
+    this.appendCsvRow(event);
+    this.appendEventLine(event);
+  }
+
+  /** Log a close event and append a CompletedTrade to the JSON file. */
+  logClose(event: TradeEvent, trade: CompletedTrade): void {
+    this.appendCsvRow(event);
+    this.appendEventLine(event);
+    this.appendCompletedTrade(trade);
+  }
+
+  // ─── CSV ───────────────────────────────────────────────────────────────────
+
+  private appendCsvRow(e: TradeEvent): void {
+    const row = [
+      e.timestamp,
+      e.symbol,
+      csv(e.marketDataSource),
+      e.action,
+      e.side,
+      e.price.toFixed(2),
+      e.size.toFixed(8),
+      e.investedUsd.toFixed(2),
+      e.avgEntry.toFixed(2),
+      e.dcaCount,
+      e.realizedPnlUsd.toFixed(4),
+      e.signalDirection,
+      e.signalSource,
+      e.ictSignal ?? '',
+      e.ictConfidence !== undefined ? e.ictConfidence.toFixed(2) : '',
+      csv(e.ictZoneId ?? ''),
+      e.ictZoneType ?? '',
+      csv(e.ictReason ?? ''),
+      csv(e.entryZoneId ?? ''),
+      e.entryZoneType ?? '',
+      e.entryZoneHigh !== undefined ? e.entryZoneHigh.toFixed(2) : '',
+      e.entryZoneLow !== undefined ? e.entryZoneLow.toFixed(2) : '',
+      e.entryZoneMidpoint !== undefined ? e.entryZoneMidpoint.toFixed(2) : '',
+      e.entryZoneDirection ?? '',
+      e.entryZoneRespected !== undefined ? String(e.entryZoneRespected) : '',
+      e.targetPrice !== undefined ? e.targetPrice.toFixed(2) : '',
+      e.targetSource ?? '',
+      csv(e.targetZoneId ?? ''),
+      e.targetDisrespected !== undefined ? String(e.targetDisrespected) : '',
+      e.stopAtBreakeven !== undefined ? String(e.stopAtBreakeven) : '',
+      e.positionSizeUsd !== undefined ? e.positionSizeUsd.toFixed(2) : '',
+      e.sizingMode ?? '',
+      e.hardStopPrice !== undefined ? e.hardStopPrice.toFixed(2) : '',
+      e.expectedProfitUsd !== undefined ? e.expectedProfitUsd.toFixed(4) : '',
+      e.expectedLossUsd !== undefined ? e.expectedLossUsd.toFixed(4) : '',
+      e.riskRewardRatio !== undefined ? e.riskRewardRatio.toFixed(4) : '',
+      e.riskUtilizationPercent !== undefined ? e.riskUtilizationPercent.toFixed(2) : '',
+      e.targetRMultiple !== undefined ? e.targetRMultiple.toFixed(2) : '',
+      e.selectionScore !== undefined ? e.selectionScore.toFixed(2) : '',
+      csv(e.scoreBreakdown !== undefined ? JSON.stringify(e.scoreBreakdown) : ''),
+      e.scoreFinal !== undefined ? e.scoreFinal.toFixed(2) : '',
+      e.targetReachProbability !== undefined ? e.targetReachProbability.toFixed(2) : '',
+      e.reactionTier ?? '',
+      e.disrespectCandleClose !== undefined ? e.disrespectCandleClose.toFixed(2) : '',
+      e.zoneBoundaryViolated ?? '',
+      e.tradeDurationMinutes !== undefined ? e.tradeDurationMinutes.toFixed(2) : '',
+    ].join(',');
+
+    try {
+      fs.appendFileSync(this.csvPath, row + '\n', 'utf-8');
+    } catch (err) {
+      console.error('  ⚠  Journal: failed to write CSV row:', err);
+    }
+  }
+
+  // ─── Events log ────────────────────────────────────────────────────────────
+
+  private appendEventLine(e: TradeEvent): void {
+    const sign    = e.realizedPnlUsd >= 0 ? '+' : '';
+    const pnlPart = e.realizedPnlUsd !== 0
+      ? `  pnl=${sign}$${e.realizedPnlUsd.toFixed(2)}`
+      : '';
+    const ictPart = e.ictSignal
+      ? `  signalSource=${e.signalSource}` +
+        `  ict=${e.ictSignal}` +
+        `  confidence=${e.ictConfidence !== undefined ? e.ictConfidence.toFixed(2) : '--'}` +
+        `  zone=${e.ictZoneType ?? '--'}:${e.ictZoneId ?? '--'}` +
+        `  reason="${e.ictReason ?? ''}"`
+      : `  signalSource=${e.signalSource}`;
+    const entryZonePart = e.entryZoneId
+      ? `  entryZone=${e.entryZoneType ?? '--'}:${e.entryZoneId}` +
+        `  entryZoneHigh=${moneyOrDash(e.entryZoneHigh)}` +
+        `  entryZoneLow=${moneyOrDash(e.entryZoneLow)}` +
+        `  entryZoneRespected=${e.entryZoneRespected !== undefined ? e.entryZoneRespected : '--'}` +
+        `  disrespectClose=${moneyOrDash(e.disrespectCandleClose)}` +
+        `  boundary=${e.zoneBoundaryViolated ?? '--'}`
+      : '';
+    const durationPart = e.tradeDurationMinutes !== undefined
+      ? `  duration=${e.tradeDurationMinutes.toFixed(2)}m`
+      : '';
+    const targetPart = e.targetPrice !== undefined
+      ? `  target=${e.targetSource ?? '--'}:$${e.targetPrice.toFixed(2)}` +
+        `  targetZone=${e.targetZoneId ?? '--'}` +
+        `  targetDisrespected=${e.targetDisrespected !== undefined ? e.targetDisrespected : '--'}` +
+        `  stopAtBE=${e.stopAtBreakeven !== undefined ? e.stopAtBreakeven : '--'}`
+      : '';
+    const sizingPart = e.positionSizeUsd !== undefined
+      ? `  positionSize=$${e.positionSizeUsd.toFixed(2)}` +
+        `  sizingMode=${e.sizingMode ?? '--'}` +
+        `  hardStop=${moneyOrDash(e.hardStopPrice)}` +
+        `  expectedProfit=$${money(e.expectedProfitUsd)}` +
+        `  expectedLoss=$${money(e.expectedLossUsd)}` +
+        `  rr=${e.riskRewardRatio !== undefined ? e.riskRewardRatio.toFixed(2) : '--'}` +
+        `  riskUtilization=${e.riskUtilizationPercent !== undefined ? e.riskUtilizationPercent.toFixed(2) + '%' : '--'}` +
+        `  targetR=${e.targetRMultiple !== undefined ? e.targetRMultiple.toFixed(2) : '--'}` +
+        `  selectionScore=${e.selectionScore !== undefined ? e.selectionScore.toFixed(2) : '--'}`
+      : '';
+    const scorePart = e.scoreBreakdown !== undefined
+      ? `  scoreFinal=${e.scoreFinal !== undefined ? e.scoreFinal.toFixed(2) : '--'}` +
+        `  targetReachProbability=${e.targetReachProbability !== undefined ? e.targetReachProbability.toFixed(2) : '--'}` +
+        `  reactionTier=${e.reactionTier ?? '--'}` +
+        `  scoreBreakdown=${JSON.stringify(e.scoreBreakdown)}`
+      : '';
+
+    const line =
+      `[${e.timestamp}] ${e.action.padEnd(12)} ${e.side} ${e.symbol}` +
+      `  price=$${e.price.toFixed(2)}` +
+      `  size=${e.size.toFixed(6)}` +
+      `  invested=$${e.investedUsd.toFixed(2)}` +
+      `  avgEntry=$${e.avgEntry.toFixed(2)}` +
+      `  dca=${e.dcaCount}` +
+      `  signal=${e.signalDirection}` +
+      ictPart +
+      entryZonePart +
+      targetPart +
+      sizingPart +
+      scorePart +
+      durationPart +
+      pnlPart +
+      `  src=${e.marketDataSource}` +
+      '\n';
+
+    try {
+      fs.appendFileSync(this.eventLogPath, line, 'utf-8');
+    } catch (err) {
+      console.error('  ⚠  Journal: failed to write event log line:', err);
+    }
+  }
+
+  // ─── Completed trades ──────────────────────────────────────────────────────
+
+  private appendCompletedTrade(trade: CompletedTrade): void {
+    try {
+      const existing = this.readCompletedTrades();
+      existing.push(trade);
+      fs.writeFileSync(
+        this.completedTradesPath,
+        JSON.stringify(existing, null, 2),
+        'utf-8',
+      );
+    } catch (err) {
+      console.error('  ⚠  Journal: failed to save completed trade:', err);
+    }
+  }
+
+  private readCompletedTrades(): CompletedTrade[] {
+    try {
+      const raw = fs.readFileSync(this.completedTradesPath, 'utf-8').trim();
+      return raw ? (JSON.parse(raw) as CompletedTrade[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  // ─── Init ─────────────────────────────────────────────────────────────────
+
+  private ensureLogsDir(): void {
+    if (!fs.existsSync(this.logsDir)) {
+      fs.mkdirSync(this.logsDir, { recursive: true });
+    }
+  }
+
+  private ensureCsvHeader(): void {
+    repairTradesCsvHeader(this.logsDir);
+  }
+
+  private ensureCompletedTradesFile(): void {
+    if (!fs.existsSync(this.completedTradesPath)) {
+      fs.writeFileSync(this.completedTradesPath, '[]', 'utf-8');
+    }
+  }
+}
+
+function csv(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
+
+function moneyOrDash(value: number | undefined): string {
+  return value !== undefined ? `$${value.toFixed(2)}` : '--';
+}
+
+function money(value: number | undefined): string {
+  return value !== undefined ? value.toFixed(2) : '--';
+}
+
+export function repairTradesCsvHeader(logsDir: string = LOGS_DIR): {
+  csvPath: string;
+  repaired: boolean;
+  created: boolean;
+} {
+  if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+  }
+
+  const csvPath = path.join(logsDir, 'trades.csv');
+  if (!fs.existsSync(csvPath) || fs.statSync(csvPath).size === 0) {
+    fs.writeFileSync(csvPath, CSV_HEADER + '\n', 'utf-8');
+    return { csvPath, repaired: false, created: true };
+  }
+
+  const raw = fs.readFileSync(csvPath, 'utf-8');
+  const newline = raw.includes('\r\n') ? '\r\n' : '\n';
+  const lines = raw.split(/\r?\n/);
+  const currentHeader = lines[0] ?? '';
+
+  if (currentHeader === CSV_HEADER) {
+    return { csvPath, repaired: false, created: false };
+  }
+
+  lines[0] = CSV_HEADER;
+  fs.writeFileSync(csvPath, lines.join(newline), 'utf-8');
+  return { csvPath, repaired: true, created: false };
+}

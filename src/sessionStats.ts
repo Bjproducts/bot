@@ -1,0 +1,386 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import { SessionStats, PositionState, BotConfig } from './types';
+import { Signal } from './signals/types';
+import { IctSignalResult } from './ict/ictSignalTypes';
+import { calculateTakeProfitPrice } from './positionExitManager';
+import { LIVE_ARM_CONFIRMATION } from './execution/exchangeTypes';
+import { createScoreAttribution } from './analytics/scoreAttribution';
+import { ScoreAttributionReport } from './analytics/scoreAttributionTypes';
+
+const STATS_FILE = path.resolve(__dirname, '../session-stats.json');
+const SCORE_ATTRIBUTION_REPORT_FILE = path.resolve(__dirname, '../logs/score-attribution-report.json');
+
+export function createSessionStats(config: BotConfig, sourceName: string): SessionStats {
+  const now = new Date().toISOString();
+  return {
+    startedAt: now,
+    updatedAt: now,
+    symbol: config.symbol,
+    side: config.side,
+    dataSource: sourceName,
+    ticks: 0,
+    completedTrades: 0,
+    wins: 0,
+    losses: 0,
+    realizedPnlUsd: 0,
+    unrealizedPnlUsd: 0,
+    currentDrawdownUsd: 0,
+    maxDrawdownUsd: 0,
+    maxCapitalUsed: 0,
+    sessionEquity: config.startingCapital,
+    latestSignal: null,
+    latestIctSignal: null,
+    latestTradeSelection: null,
+    latestPositionExit: null,
+    latestPositionSizing: null,
+    latestTargetSelection: null,
+    latestFvgRejectionSummary: null,
+    latestCloseReason: null,
+    signalsFired: 0,
+    ictEvaluations: 0,
+    ictBuyCount: 0,
+    ictSellCount: 0,
+    ictNoneCount: 0,
+    ictAccepted: 0,
+    ictRejected: 0,
+    gapResets: 0,
+    lastGapSeconds: null,
+    todayDate: todayString(),
+    todayPnlUsd: 0,
+    todayTrades: 0,
+    liveTradingEnabled: config.liveTradingEnabled,
+    exchangeName: config.exchangeName,
+    liveArmed: !config.requireManualArm || config.liveArmConfirm === LIVE_ARM_CONFIRMATION,
+    dailyLiveTrades: 0,
+    dailyLivePnlUsd: 0,
+    maxDailyLossUsd: config.maxDailyLossUsd,
+    lastLiveOrderStatus: null,
+    positionSizingSamples: 0,
+    totalPositionSizeUsd: 0,
+    totalExpectedProfitUsd: 0,
+    totalExpectedLossUsd: 0,
+    positionSizeDistribution: {
+      small: 0,
+      medium: 0,
+      large: 0,
+    },
+  };
+}
+
+export function updateUnrealized(
+  stats: SessionStats,
+  position: PositionState,
+  price: number,
+): SessionStats {
+  if (position.side === 'NONE') {
+    return { ...stats, unrealizedPnlUsd: 0, updatedAt: new Date().toISOString() };
+  }
+
+  const positionValue = position.activePositionSize * price;
+  const costBasis = position.activePositionSize * position.averageEntryPrice;
+  const unrealized = position.side === 'LONG'
+    ? positionValue - costBasis
+    : costBasis - positionValue;
+
+  const equity = stats.sessionEquity + unrealized;
+  const drawdown = Math.max(0, stats.sessionEquity - equity);
+  const maxDrawdown = Math.max(stats.maxDrawdownUsd, drawdown);
+  const maxCap = Math.max(stats.maxCapitalUsed, position.totalUsdInvested);
+
+  return {
+    ...stats,
+    unrealizedPnlUsd: unrealized,
+    currentDrawdownUsd: drawdown,
+    maxDrawdownUsd: maxDrawdown,
+    maxCapitalUsed: maxCap,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function recordClosedTrade(
+  stats: SessionStats,
+  pnlUsd: number,
+  config: BotConfig,
+): SessionStats {
+  const isWin = pnlUsd > 0;
+  const newRealized = stats.realizedPnlUsd + pnlUsd;
+  const newEquity = config.startingCapital + newRealized;
+  const today = todayString();
+  const isSameDay = today === stats.todayDate;
+  const todayPnl = (isSameDay ? stats.todayPnlUsd : 0) + pnlUsd;
+  const todayTrades = (isSameDay ? stats.todayTrades : 0) + 1;
+
+  return {
+    ...stats,
+    completedTrades: stats.completedTrades + 1,
+    wins: stats.wins + (isWin ? 1 : 0),
+    losses: stats.losses + (isWin ? 0 : 1),
+    realizedPnlUsd: newRealized,
+    unrealizedPnlUsd: 0,
+    sessionEquity: newEquity,
+    todayDate: today,
+    todayPnlUsd: todayPnl,
+    todayTrades,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function saveSessionStats(stats: SessionStats): void {
+  fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2), 'utf-8');
+}
+
+export function printDashboard(
+  stats: SessionStats,
+  position: PositionState,
+  price: number,
+  config: BotConfig,
+  signal: Signal | null = null,
+  ictSignal: IctSignalResult | null = null,
+): void {
+  const now = new Date().toTimeString().slice(0, 8);
+  const maxLvls = Math.floor(config.maxCapUsd / config.orderSizeUsd);
+  const uptime = fmtUptime(stats.ticks * (config.tickIntervalMs / 1000));
+  const hasPosition = position.side !== 'NONE';
+  const activeSide = hasPosition ? position.side : config.side;
+  const activePositionCount = position.openPositions?.length ?? (hasPosition ? 1 : 0);
+
+  const tpPrice = hasPosition ? calculateTakeProfitPrice(position, config.takeProfitPct) : 0;
+  const nextDcaPrice = hasPosition
+    ? position.lastDcaPrice * (1 + (activeSide === 'LONG' ? -1 : 1) * config.dcaTriggerPct)
+    : 0;
+  const distToTpUsd = hasPosition ? Math.abs(tpPrice - price) : 0;
+  const distToTpPct = hasPosition ? (distToTpUsd / price) * 100 : 0;
+  const distToDcaUsd = hasPosition ? Math.abs(nextDcaPrice - price) : 0;
+  const distToDcaPct = hasPosition ? (distToDcaUsd / price) * 100 : 0;
+
+  const sig = signal ?? stats.latestSignal;
+  const sigDir = sig?.direction ?? 'NONE';
+  const sigLine =
+    `${sigDir.padEnd(4)}` +
+    `  drop=${sig ? (sig.priceDrop * 100).toFixed(2) + '%' : '--'}` +
+    `  vol=${sig ? sig.volumeRatio.toFixed(1) + 'x' : '--'}` +
+    `  ${sig ? (sig.closedAbovePrev ? 'close-up' : 'close-down') : ''}` +
+    `  (fired: ${stats.signalsFired})`;
+
+  const ict = ictSignal ?? stats.latestIctSignal;
+  const tradeSelection = stats.latestTradeSelection;
+  const selectedCandidate = tradeSelection?.selectedCandidate ?? null;
+  const selectedAttribution = selectedCandidate ? createScoreAttribution(selectedCandidate) : null;
+  const topFactors = loadTopPerformingFactors();
+  const sizing = stats.latestPositionSizing;
+  const avgPositionSize = stats.positionSizingSamples > 0
+    ? stats.totalPositionSizeUsd / stats.positionSizingSamples
+    : 0;
+  const avgExpectedProfit = stats.positionSizingSamples > 0
+    ? stats.totalExpectedProfitUsd / stats.positionSizingSamples
+    : 0;
+  const avgExpectedLoss = stats.positionSizingSamples > 0
+    ? stats.totalExpectedLossUsd / stats.positionSizingSamples
+    : 0;
+  const ictLine =
+    `${(ict?.signal ?? 'NONE').padEnd(4)}` +
+    `  confidence=${ict ? ict.confidence.toFixed(2) : '--'}` +
+    `  zone=${ict ? ict.sourceZoneType : '--'}` +
+    `  id=${ict ? shorten(ict.zoneId, 16) : '--'}` +
+    `  reason=${ict ? shorten(ict.reason, 22) : '--'}` +
+    `  (fired: ${stats.signalsFired})`;
+
+  const unrealUsdSign = stats.unrealizedPnlUsd >= 0 ? '+' : '-';
+  const realizedSign = stats.realizedPnlUsd >= 0 ? '+' : '';
+  const winRate = stats.completedTrades > 0
+    ? `${((stats.wins / stats.completedTrades) * 100).toFixed(0)}%`
+    : 'N/A';
+
+  const width = 69;
+  const line = (content: string): string =>
+    `  |  ${content}${' '.repeat(Math.max(0, width - 4 - content.length))}|`;
+
+  console.log('');
+  console.log(`  + DASHBOARD  ${now}  [${uptime}]  ${config.symbol} ${activeSide} ${'-'.repeat(Math.max(0, width - 26 - uptime.length - config.symbol.length))}+`);
+  console.log(line(`Data Source     ${stats.dataSource}`));
+  console.log(line(`TradingView     ${config.tradingViewSymbol}  1m`));
+  console.log(line(`BOT_MODE        ${config.botMode}`));
+  console.log(line(`Price           $${fp(price)}`));
+  console.log(line(`Signal Source   ${config.signalSource}`));
+  console.log(line(`Live Trading    ${config.liveTradingEnabled ? 'ENABLED' : 'disabled'}`));
+  console.log(line(`Exchange        ${config.exchangeName || 'NONE'}`));
+  console.log(line(`Live Armed      ${stats.liveArmed ? 'YES' : 'NO'}`));
+  console.log(line(`Live Trades     ${stats.dailyLiveTrades}/${config.maxDailyTrades}`));
+  console.log(line(`Live PnL        ${formatSignedUsd(stats.dailyLivePnlUsd)}`));
+  console.log(line(`Max Live Loss   $${config.maxDailyLossUsd.toFixed(2)}`));
+  console.log(line(`Last Live Order ${stats.lastLiveOrderStatus ?? 'NONE'}`));
+  console.log(line(config.signalSource === 'ICT'
+    ? `ICT Signal      ${ictLine}`
+    : `Signal          ${sigLine}`,
+  ));
+  if (config.signalSource === 'ICT') {
+    console.log(line(`ICT Evaluations ${stats.ictEvaluations}`));
+    console.log(line(`ICT Accepted    ${stats.ictAccepted}`));
+    console.log(line(`ICT Rejected    ${stats.ictRejected}`));
+    console.log(line(`Candidates Eval ${tradeSelection?.candidatesEvaluated ?? 0}`));
+    console.log(line(`Selected Cand.  ${selectedCandidate ? `${selectedCandidate.signalDirection} ${selectedCandidate.zoneType} ${shorten(selectedCandidate.zoneId, 18)}` : 'NONE'}`));
+    console.log(line(`Expected TP PnL ${selectedCandidate ? '$' + selectedCandidate.expectedProfitAtTPUsd.toFixed(2) : '--'}`));
+    if (selectedAttribution) {
+      console.log(line(`Score Final     ${selectedAttribution.finalScore.toFixed(2)}`));
+      console.log(line(`Liquidity Sweep +${selectedAttribution.breakdown.liquiditySweepScore.toFixed(2)}`));
+      console.log(line(`Displacement    +${selectedAttribution.breakdown.displacementScore.toFixed(2)}`));
+      console.log(line(`MSS             +${selectedAttribution.breakdown.mssScore.toFixed(2)}`));
+      console.log(line(`FVG Quality     +${selectedAttribution.breakdown.fvgQualityScore.toFixed(2)}`));
+      console.log(line(`IFVG Bonus      +${selectedAttribution.breakdown.ifvgBonus.toFixed(2)}`));
+      console.log(line(`Target Fit      +${selectedAttribution.breakdown.targetFitScore.toFixed(2)}`));
+      console.log(line(`Reaction        +${selectedAttribution.breakdown.reactionScore.toFixed(2)}`));
+      console.log(line(`Session         +${selectedAttribution.breakdown.sessionScore.toFixed(2)}`));
+      console.log(line(`Confidence      +${selectedAttribution.breakdown.confidenceScore.toFixed(2)}`));
+    } else {
+      console.log(line(`Selection Score --`));
+    }
+    console.log(line(`Target Profit   $${config.targetProfitMinUsd.toFixed(2)}-$${config.targetProfitMaxUsd.toFixed(2)}`));
+    console.log(line(`Sizing Mode     ${config.positionSizingMode}`));
+    console.log(line(`Target R        ${config.targetRMultiple.toFixed(2)}`));
+    console.log(line(`Expected Profit ${sizing && sizing.status === 'ACCEPTED' ? '$' + sizing.expectedProfitUsd.toFixed(2) : '--'}`));
+    console.log(line(`Expected Loss   ${sizing && sizing.status === 'ACCEPTED' ? '$' + sizing.expectedLossUsd.toFixed(2) : '--'}`));
+    console.log(line(`Risk Used       ${sizing && sizing.status === 'ACCEPTED' ? sizing.riskUtilizationPercent.toFixed(2) + '%' : '--'}`));
+    console.log(line(`Hard Stop       ${sizing && sizing.status === 'ACCEPTED' ? '$' + sizing.hardStopPrice.toFixed(2) : '--'}`));
+    console.log(line(`Target Price    ${sizing && sizing.status === 'ACCEPTED' ? '$' + sizing.resolvedTargetPrice.toFixed(2) : '--'}`));
+    console.log(line(`Position Size   ${sizing && sizing.status === 'ACCEPTED' ? '$' + sizing.recommendedPositionSizeUsd.toFixed(2) : '--'}`));
+    console.log(line(`Risk Reward     ${sizing ? sizing.riskRewardRatio.toFixed(2) : '--'}`));
+    if (!selectedCandidate) {
+      console.log(line(`Selection Reject ${shorten(tradeSelection?.rejectionReason ?? 'No selection yet', 36)}`));
+    }
+
+    if (config.debugIctPipeline) {
+      const rej = stats.latestFvgRejectionSummary;
+      console.log(line(`Raw FVGs        ${rej ? rej.totalRawFvgs : '--'}`));
+      console.log(line(`Validated FVGs  ${rej ? rej.acceptedValidatedFvgs : '--'}`));
+      console.log(line(`Top Rejection   ${rej ? shorten(rej.topRejectionReason, 36) : '--'}`));
+    }
+  }
+
+  if (hasPosition) {
+    const unrPct = position.totalUsdInvested > 0
+      ? (stats.unrealizedPnlUsd / position.totalUsdInvested) * 100
+      : 0;
+    const unrealPctSign = unrPct >= 0 ? '+' : '';
+    console.log(line(`Active Positions ${activePositionCount}/${config.maxConcurrentPositions}`));
+    console.log(line(`Avg Entry       $${fp(position.averageEntryPrice)}`));
+    console.log(line(`Unrealized PnL  ${unrealUsdSign}$${fp(Math.abs(stats.unrealizedPnlUsd))} (${unrealPctSign}${unrPct.toFixed(2)}%)`));
+    console.log(line(`TP Price        $${fp(tpPrice)}`));
+    console.log(line(`Managed Target  ${formatManagedTarget(position)}`));
+    console.log(line(`Sizing Profit   ${formatOptionalUsd(position.expectedProfitUsd)} / Loss ${formatOptionalUsd(position.expectedLossUsd)}`));
+    console.log(line(`Sizing RR       ${position.riskRewardRatio !== null ? position.riskRewardRatio.toFixed(2) : '--'}`));
+    console.log(line(`Sizing Mode     ${position.sizingMode ?? '--'}`));
+    console.log(line(`Risk Used       ${position.riskUtilizationPercent !== null ? position.riskUtilizationPercent.toFixed(2) + '%' : '--'}`));
+    console.log(line(`Hard Stop       ${position.hardStopPrice !== null ? '$' + fp(position.hardStopPrice) : '--'}`));
+    console.log(line(`Target R        ${position.targetRMultiple !== null ? position.targetRMultiple.toFixed(2) : '--'}`));
+    console.log(line(`Stop State      ${position.stopAtBreakeven ? 'BE' : 'Initial'}`));
+    console.log(line(`Quick Target    $${config.profitTargetUsdMin.toFixed(2)}-$${config.profitTargetUsdMax.toFixed(2)}`));
+    console.log(line(`Max Loss        $${config.maxLossUsd.toFixed(2)}`));
+    console.log(line(`Position Age    ${formatPositionAge(position.openedAt)}`));
+    console.log(line(`Max Hold        ${config.maxPositionMinutes}m`));
+    console.log(line(`Entry Zone Type ${formatEntryZone(position)}`));
+    console.log(line(`Zone High       ${formatZonePrice(position.entryZoneHigh)}`));
+    console.log(line(`Zone Low        ${formatZonePrice(position.entryZoneLow)}`));
+    console.log(line(`Zone Respected  ${formatZoneRespected(position.entryZoneRespected)}`));
+    console.log(line(`Last Close      ${stats.latestCloseReason ?? 'NONE'}`));
+    console.log(line(`Invested        $${fp(position.totalUsdInvested)}  (DCA ${position.dcaCount - 1}/${maxLvls - 1})`));
+    console.log(line(`Dist to TP      $${fp(distToTpUsd)}  (${distToTpPct.toFixed(3)}% away)`));
+    console.log(line(`Dist to DCA     $${fp(distToDcaUsd)}  (${distToDcaPct.toFixed(3)}% away)`));
+  } else {
+    console.log(line(`Position        NONE - waiting for ${config.signalSource} signal`));
+    console.log(line(`Last Close      ${stats.latestCloseReason ?? 'NONE'}`));
+    console.log(line(config.signalSource === 'ICT'
+      ? `                minConfidence=${config.ictMinConfidence}`
+      : `                lookback=${config.volumeLookback}  spike=${config.volumeSpikeMultiplier}x  drop=${config.reversalDropPercent}%`,
+    ));
+    console.log(line(''));
+    console.log(line(''));
+    console.log(line(''));
+  }
+
+  const todaySign = stats.todayPnlUsd >= 0 ? '+' : '';
+  console.log(`  +${'-'.repeat(width - 1)}+`);
+  console.log(line(`Today           ${todaySign}$${fp(Math.abs(stats.todayPnlUsd))}  (${stats.todayTrades} trade${stats.todayTrades !== 1 ? 's' : ''})`));
+  console.log(line(`Trades  ${String(stats.completedTrades).padEnd(5)}  Wins ${String(stats.wins).padEnd(4)}  Losses ${String(stats.losses).padEnd(4)}  WR ${winRate}`));
+  console.log(line(`Realized PnL    ${realizedSign}$${fp(Math.abs(stats.realizedPnlUsd))}`));
+  console.log(line(`Avg Size        ${stats.positionSizingSamples > 0 ? '$' + fp(avgPositionSize) : '--'}  Avg TP ${stats.positionSizingSamples > 0 ? '$' + fp(avgExpectedProfit) : '--'}  Avg Risk ${stats.positionSizingSamples > 0 ? '$' + fp(avgExpectedLoss) : '--'}`));
+  console.log(line(`Size Dist       S:${stats.positionSizeDistribution.small} M:${stats.positionSizeDistribution.medium} L:${stats.positionSizeDistribution.large}`));
+  console.log(line(`Top Factors     ${topFactors.length > 0 ? topFactors.join('  ') : '--'}`));
+  console.log(line(`Session Equity  $${fp(stats.sessionEquity)}`));
+  console.log(line(`Max Cap Used    $${fp(stats.maxCapitalUsed)}  Max Drawdown $${fp(stats.maxDrawdownUsd)}`));
+  console.log(line(`Ticks           ${stats.ticks}`));
+  console.log(`  +${'-'.repeat(width - 1)}+`);
+}
+
+function fp(n: number): string {
+  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatSignedUsd(value: number): string {
+  const sign = value >= 0 ? '+' : '-';
+  return `${sign}$${fp(Math.abs(value))}`;
+}
+
+function todayString(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function fmtUptime(totalSec: number): string {
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = Math.floor(totalSec % 60);
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+function shorten(value: string, maxLength: number): string {
+  if (value.length <= maxLength) return value;
+  return value.slice(0, Math.max(0, maxLength - 3)) + '...';
+}
+
+function formatPositionAge(openedAt: string | null): string {
+  if (!openedAt) return 'unknown';
+  const opened = new Date(openedAt);
+  if (Number.isNaN(opened.getTime())) return 'unknown';
+  const minutes = Math.max(0, (Date.now() - opened.getTime()) / 60_000);
+  return `${minutes.toFixed(1)}m`;
+}
+
+function formatEntryZone(position: PositionState): string {
+  if (!position.entryZoneType) return '--';
+  return `${position.entryZoneType} ${position.entryZoneDirection ?? '--'}`;
+}
+
+function formatZonePrice(value: number | null): string {
+  return value === null ? '--' : `$${fp(value)}`;
+}
+
+function formatZoneRespected(value: boolean | null): string {
+  if (value === null) return 'UNKNOWN';
+  return value ? 'YES' : 'NO';
+}
+
+function formatManagedTarget(position: PositionState): string {
+  if (position.targetPrice === null) return '--';
+  const source = position.targetSource ?? '--';
+  const disrespected = position.targetDisrespected ? ' disrespected' : '';
+  return `${source} $${fp(position.targetPrice)}${disrespected}`;
+}
+
+function formatOptionalUsd(value: number | null): string {
+  return value === null ? '--' : `$${fp(value)}`;
+}
+
+function loadTopPerformingFactors(): string[] {
+  try {
+    if (!fs.existsSync(SCORE_ATTRIBUTION_REPORT_FILE)) return [];
+    const raw = fs.readFileSync(SCORE_ATTRIBUTION_REPORT_FILE, 'utf-8');
+    const report = JSON.parse(raw) as ScoreAttributionReport;
+    return report.topPerformingFactors
+      .slice(0, 3)
+      .map((factor, index) => `#${index + 1} ${factor.factor}`);
+  } catch {
+    return [];
+  }
+}

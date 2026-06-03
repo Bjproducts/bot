@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ICT FVG / IFVG Visual Validation</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #667085;
+      --line: #d0d5dd;
+      --bull: #107c41;
+      --bull-soft: #dff3e7;
+      --bear: #b42318;
+      --bear-soft: #fde3df;
+      --ifvg: #175cd3;
+      --flag: #7a2e0e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    header {
+      padding: 24px 28px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    main {
+      padding: 22px 28px 36px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px 18px;
+      color: var(--muted);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .stat,
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .stat {
+      padding: 14px;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 22px;
+    }
+
+    section {
+      margin-top: 16px;
+      overflow: hidden;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .count {
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f9fafb;
+      color: #344054;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .id-cell {
+      max-width: 300px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pill {
+      display: inline-block;
+      min-width: 38px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .yes {
+      background: var(--flag);
+      color: #ffffff;
+    }
+
+    .no {
+      background: #eef2f6;
+      color: #344054;
+    }
+
+    .BULLISH {
+      color: var(--bull);
+      font-weight: 700;
+    }
+
+    .BEARISH {
+      color: var(--bear);
+      font-weight: 700;
+    }
+
+    .range-cell {
+      min-width: 220px;
+    }
+
+    .range {
+      position: relative;
+      height: 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f2f4f7;
+      overflow: hidden;
+    }
+
+    .zone-bar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      min-width: 4px;
+      opacity: 0.8;
+    }
+
+    .zone-bar.bullish {
+      background: var(--bull-soft);
+      border-right: 2px solid var(--bull);
+      border-left: 2px solid var(--bull);
+    }
+
+    .zone-bar.bearish {
+      background: var(--bear-soft);
+      border-right: 2px solid var(--bear);
+      border-left: 2px solid var(--bear);
+    }
+
+    .midpoint {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--ifvg);
+    }
+
+    .empty {
+      padding: 18px 16px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      main,
+      header {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ICT FVG / IFVG Visual Validation</h1>
+    <div class="meta">
+      <div>Generated: 2026-06-01T19:58:58.338Z</div>
+      <div>FVG source: C:\Users\bjpro\OneDrive\Desktop\nado-trading-bot\logs\detected-fvgs.json</div>
+      <div>IFVG source: C:\Users\bjpro\OneDrive\Desktop\nado-trading-bot\logs\detected-ifvgs.json</div>
+      <div>Price scale: 96 to 103</div>
+    </div>
+  </header>
+  <main>
+    <div class="summary">
+      <div class="stat"><span>Bullish FVGs</span><strong>1</strong></div>
+      <div class="stat"><span>Bearish FVGs</span><strong>2</strong></div>
+      <div class="stat"><span>Bullish IFVGs</span><strong>2</strong></div>
+      <div class="stat"><span>Bearish IFVGs</span><strong>1</strong></div>
+      <div class="stat"><span>Total Zones</span><strong>6</strong></div>
+    </div>
+    <section>
+  <div class="section-head">
+    <h2>Bullish FVGs</h2>
+    <div class="count">1 zone</div>
+  </div>
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Direction</th>
+        <th>High</th>
+        <th>Low</th>
+        <th>Midpoint</th>
+        <th>Created At</th>
+        <th>Invalidated</th>
+        <th>Filled</th>
+        <th>Flipped</th>
+        <th>Range</th>
+        <th>ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+  <td class="BULLISH">BULLISH</td>
+  <td>103</td>
+  <td>101</td>
+  <td>102</td>
+  <td>2026-06-01T00:02:00.000Z</td>
+  <td><span class="pill yes">YES</span></td>
+  <td><span class="pill yes">YES</span></td>
+  <td><span class="pill yes">YES</span></td>
+  <td class="range-cell"><div class="range" title="low 101 / midpoint 102 / high 103">
+  <div class="zone-bar bullish" style="left:71.429%;width:28.571%;"></div>
+  <div class="midpoint" style="left:85.714%;"></div>
+</div></td>
+  <td class="id-cell">FVG:BULLISH:0:1:2:101:103</td>
+</tr>
+    </tbody>
+  </table>
+</div>
+</section>
+<section>
+  <div class="section-head">
+    <h2>Bearish FVGs</h2>
+    <div class="count">2 zones</div>
+  </div>
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Direction</th>
+        <th>High</th>
+        <th>Low</th>
+        <th>Midpoint</th>
+        <th>Created At</th>
+        <th>Invalidated</th>
+        <th>Filled</th>
+        <th>Flipped</th>
+        <th>Range</th>
+        <th>ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+  <td class="BEARISH">BEARISH</td>
+  <td>103</td>
+  <td>99</td>
+  <td>101</td>
+  <td>2026-06-01T00:04:00.000Z</td>
+  <td><span class="pill yes">YES</span></td>
+  <td><span class="pill yes">YES</span></td>
+  <td><span class="pill yes">YES</span></td>
+  <td class="range-cell"><div class="range" title="low 99 / midpoint 101 / high 103">
+  <div class="zone-bar bearish" style="left:42.857%;width:57.143%;"></div>
+  <div class="midpoint" style="left:71.429%;"></div>
+</div></td>
+  <td class="id-cell">FVG:BEARISH:2:3:4:99:103</td>
+</tr>
+<tr>
+  <td class="BEARISH">BEARISH</td>
+  <td>97</td>
+  <td>96</td>
+  <td>96.5</td>
+  <td>2026-06-01T00:05:00.000Z</td>
+  <td><span class="pill yes">YES</span></td>
+  <td><span class="pill yes">YES</span></td>
+  <td><span class="pill yes">YES</span></td>
+  <td class="range-cell"><div class="range" title="low 96 / midpoint 96.5 / high 97">
+  <div class="zone-bar bearish" style="left:0.000%;width:14.286%;"></div>
+  <div class="midpoint" style="left:7.143%;"></div>
+</div></td>
+  <td class="id-cell">FVG:BEARISH:3:4:5:96:97</td>
+</tr>
+    </tbody>
+  </table>
+</div>
+</section>
+<section>
+  <div class="section-head">
+    <h2>Bullish IFVGs</h2>
+    <div class="count">2 zones</div>
+  </div>
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Direction</th>
+        <th>High</th>
+        <th>Low</th>
+        <th>Midpoint</th>
+        <th>Created At</th>
+        <th>Invalidated</th>
+        <th>Filled</th>
+        <th>Flipped</th>
+        <th>Range</th>
+        <th>ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+  <td class="BULLISH">BULLISH</td>
+  <td>103</td>
+  <td>99</td>
+  <td>101</td>
+  <td>2026-06-01T00:06:00.000Z</td>
+  <td><span class="pill no">NO</span></td>
+  <td><span class="pill no">NO</span></td>
+  <td><span class="pill no">NO</span></td>
+  <td class="range-cell"><div class="range" title="low 99 / midpoint 101 / high 103">
+  <div class="zone-bar bullish" style="left:42.857%;width:57.143%;"></div>
+  <div class="midpoint" style="left:71.429%;"></div>
+</div></td>
+  <td class="id-cell">IFVG:BULLISH:FVG:BEARISH:2:3:4:99:103:6</td>
+</tr>
+<tr>
+  <td class="BULLISH">BULLISH</td>
+  <td>97</td>
+  <td>96</td>
+  <td>96.5</td>
+  <td>2026-06-01T00:06:00.000Z</td>
+  <td><span class="pill no">NO</span></td>
+  <td><span class="pill no">NO</span></td>
+  <td><span class="pill no">NO</span></td>
+  <td class="range-cell"><div class="range" title="low 96 / midpoint 96.5 / high 97">
+  <div class="zone-bar bullish" style="left:0.000%;width:14.286%;"></div>
+  <div class="midpoint" style="left:7.143%;"></div>
+</div></td>
+  <td class="id-cell">IFVG:BULLISH:FVG:BEARISH:3:4:5:96:97:6</td>
+</tr>
+    </tbody>
+  </table>
+</div>
+</section>
+<section>
+  <div class="section-head">
+    <h2>Bearish IFVGs</h2>
+    <div class="count">1 zone</div>
+  </div>
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Direction</th>
+        <th>High</th>
+        <th>Low</th>
+        <th>Midpoint</th>
+        <th>Created At</th>
+        <th>Invalidated</th>
+        <th>Filled</th>
+        <th>Flipped</th>
+        <th>Range</th>
+        <th>ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+  <td class="BEARISH">BEARISH</td>
+  <td>103</td>
+  <td>101</td>
+  <td>102</td>
+  <td>2026-06-01T00:03:00.000Z</td>
+  <td><span class="pill yes">YES</span></td>
+  <td><span class="pill yes">YES</span></td>
+  <td><span class="pill yes">YES</span></td>
+  <td class="range-cell"><div class="range" title="low 101 / midpoint 102 / high 103">
+  <div class="zone-bar bearish" style="left:71.429%;width:28.571%;"></div>
+  <div class="midpoint" style="left:85.714%;"></div>
+</div></td>
+  <td class="id-cell">IFVG:BEARISH:FVG:BULLISH:0:1:2:101:103:3</td>
+</tr>
+    </tbody>
+  </table>
+</div>
+</section>
+  </main>
+</body>
+</html>
