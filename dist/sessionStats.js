@@ -38,6 +38,7 @@ exports.updateUnrealized = updateUnrealized;
 exports.recordClosedTrade = recordClosedTrade;
 exports.saveSessionStats = saveSessionStats;
 exports.printDashboard = printDashboard;
+exports.appendSessionStatsHistory = appendSessionStatsHistory;
 exports.formatPerPositionRows = formatPerPositionRows;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
@@ -46,6 +47,7 @@ const positionTradeManagement_1 = require("./positionTradeManagement");
 const exchangeTypes_1 = require("./execution/exchangeTypes");
 const scoreAttribution_1 = require("./analytics/scoreAttribution");
 const STATS_FILE = path.resolve(__dirname, '../session-stats.json');
+const SESSION_STATS_HISTORY_FILE = path.resolve(__dirname, '../logs/session-stats-history.jsonl');
 const SCORE_ATTRIBUTION_REPORT_FILE = path.resolve(__dirname, '../logs/score-attribution-report.json');
 function createSessionStats(config, sourceName) {
     const now = new Date().toISOString();
@@ -73,6 +75,10 @@ function createSessionStats(config, sourceName) {
         latestTargetSelection: null,
         latestFvgRejectionSummary: null,
         latestCloseReason: null,
+        journalStatus: 'OK',
+        lastJournalWrite: null,
+        completedTradesLogged: 0,
+        tradeEventsLogged: 0,
         signalsFired: 0,
         ictEvaluations: 0,
         ictBuyCount: 0,
@@ -151,6 +157,7 @@ function recordClosedTrade(stats, pnlUsd, config) {
 }
 function saveSessionStats(stats) {
     fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2), 'utf-8');
+    appendSessionStatsHistory(stats);
 }
 function printDashboard(stats, position, price, config, signal = null, ictSignal = null) {
     const now = new Date().toTimeString().slice(0, 8);
@@ -326,10 +333,25 @@ function printDashboard(stats, position, price, config, signal = null, ictSignal
     console.log(line(`Avg Size        ${stats.positionSizingSamples > 0 ? '$' + fp(avgPositionSize) : '--'}  Avg TP ${stats.positionSizingSamples > 0 ? '$' + fp(avgExpectedProfit) : '--'}  Avg Risk ${stats.positionSizingSamples > 0 ? '$' + fp(avgExpectedLoss) : '--'}`));
     console.log(line(`Size Dist       S:${stats.positionSizeDistribution.small} M:${stats.positionSizeDistribution.medium} L:${stats.positionSizeDistribution.large}`));
     console.log(line(`Top Factors     ${topFactors.length > 0 ? topFactors.join('  ') : '--'}`));
+    console.log(line(`Journal Status  ${stats.journalStatus}`));
+    console.log(line(`Last Journal    ${stats.lastJournalWrite ?? '--'}`));
+    console.log(line(`Completed Logs  ${stats.completedTradesLogged}`));
+    console.log(line(`Trade Events    ${stats.tradeEventsLogged}`));
     console.log(line(`Session Equity  $${fp(stats.sessionEquity)}`));
     console.log(line(`Max Cap Used    $${fp(stats.maxCapitalUsed)}  Max Drawdown $${fp(stats.maxDrawdownUsd)}`));
     console.log(line(`Ticks           ${stats.ticks}`));
     console.log(`  +${'-'.repeat(width - 1)}+`);
+}
+function appendSessionStatsHistory(stats) {
+    try {
+        const dir = path.dirname(SESSION_STATS_HISTORY_FILE);
+        if (!fs.existsSync(dir))
+            fs.mkdirSync(dir, { recursive: true });
+        fs.appendFileSync(SESSION_STATS_HISTORY_FILE, JSON.stringify({ timestamp: new Date().toISOString(), stats }) + '\n', 'utf-8');
+    }
+    catch (err) {
+        console.error('  Journal: failed to append session stats history:', err);
+    }
 }
 function formatPerPositionRows(position, price) {
     const positions = position.openPositions?.length ? position.openPositions : (position.side !== 'NONE' ? [position] : []);

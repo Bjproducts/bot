@@ -57,6 +57,8 @@ export interface PositionState {
   remainingSizeAfterPartial: number | null;
   finalRunnerPnlUsd: number | null;
   totalPnlUsd: number | null;
+  maxFavorableExcursionUsd: number;
+  maxAdverseExcursionUsd: number;
   hardStopPrice:      number | null;
   hardStopEnabled:    boolean;
   stopPrice:          number | null;
@@ -107,6 +109,10 @@ export interface SessionStats {
   latestTargetSelection: TargetSelectionResult | null;
   latestFvgRejectionSummary: ValidatedFvgRejectionSummary | null;
   latestCloseReason: PositionCloseReason | null;
+  journalStatus: 'OK' | 'ERROR';
+  lastJournalWrite: string | null;
+  completedTradesLogged: number;
+  tradeEventsLogged: number;
   signalsFired:    number;
   ictEvaluations:  number;
   ictBuyCount:     number;

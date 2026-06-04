@@ -50,6 +50,8 @@ export interface TradeEvent {
   remainingSizeAfterPartial?: number;
   finalRunnerPnlUsd?: number;
   totalPnlUsd?: number;
+  maxFavorableExcursionUsd?: number;
+  maxAdverseExcursionUsd?: number;
   positionSizeUsd?: number;
   sizingMode?: string;
   hardStopPrice?: number;
@@ -116,6 +118,8 @@ export interface CompletedTrade {
   remainingSizeAfterPartial?: number;
   finalRunnerPnlUsd?: number;
   totalPnlUsd?: number;
+  maxFavorableExcursionUsd?: number;
+  maxAdverseExcursionUsd?: number;
   positionSizeUsd?: number;
   sizingMode?: string;
   hardStopPrice?: number;
@@ -183,6 +187,8 @@ export const CSV_HEADER = [
   'remainingSizeAfterPartial',
   'finalRunnerPnlUsd',
   'totalPnlUsd',
+  'maxFavorableExcursionUsd',
+  'maxAdverseExcursionUsd',
   'positionSizeUsd',
   'sizingMode',
   'hardStopPrice',

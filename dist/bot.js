@@ -110,16 +110,26 @@ class BotEngine {
     }
     stop() {
         this.running = false;
-        (0, sessionStats_1.saveSessionStats)(this.stats);
+        (0, sessionStats_1.saveSessionStats)(this.statsWithJournalStatus());
     }
     snapshot() {
         return {
-            stats: this.stats,
+            stats: this.statsWithJournalStatus(),
             position: this.position,
             price: this.lastPrice,
             signal: this.latestSignal,
             ictSignal: this.latestIctSignal,
             tradeSelection: this.latestTradeSelection,
+        };
+    }
+    statsWithJournalStatus() {
+        const status = this.journal.getStatus();
+        return {
+            ...this.stats,
+            journalStatus: status.status,
+            lastJournalWrite: status.lastJournalWrite,
+            completedTradesLogged: status.completedTradesLogged,
+            tradeEventsLogged: status.tradeEventsLogged,
         };
     }
     scheduleTick() {
@@ -716,6 +726,7 @@ class BotEngine {
         const { config } = this;
         if (position.side === 'NONE')
             return;
+        this.updateExcursions(position, price);
         if (this.config.signalSource === 'ICT') {
             this.updateIctTradeManagement(position, candle);
         }
@@ -761,6 +772,19 @@ class BotEngine {
         const canDca = activePosition.totalUsdInvested + config.orderSizeUsd <= config.maxCapUsd;
         if (dcaTriggered && canDca && this.canAddPaperEntry(activeSide)) {
             this.executeDca(activePosition, price);
+        }
+    }
+    updateExcursions(position, price) {
+        const latest = this.positions.find(active => active.id === position.id) ?? position;
+        const unrealizedPnlUsd = (0, positionExitManager_1.calculateUnrealizedPnl)(latest, price);
+        const updated = {
+            ...latest,
+            maxFavorableExcursionUsd: Math.max(latest.maxFavorableExcursionUsd, unrealizedPnlUsd),
+            maxAdverseExcursionUsd: Math.min(latest.maxAdverseExcursionUsd, unrealizedPnlUsd),
+        };
+        if (updated.maxFavorableExcursionUsd !== latest.maxFavorableExcursionUsd
+            || updated.maxAdverseExcursionUsd !== latest.maxAdverseExcursionUsd) {
+            this.updatePosition(updated);
         }
     }
     updateIctTradeManagement(position, candle) {
@@ -908,6 +932,8 @@ class BotEngine {
             ...position,
             finalRunnerPnlUsd: pnlUsd,
             totalPnlUsd,
+            maxFavorableExcursionUsd: position.maxFavorableExcursionUsd,
+            maxAdverseExcursionUsd: position.maxAdverseExcursionUsd,
         });
         const completed = {
             id: `${now.toISOString()}-${config.symbol}-${activeSide}`,
@@ -931,6 +957,8 @@ class BotEngine {
                 ...position,
                 finalRunnerPnlUsd: pnlUsd,
                 totalPnlUsd,
+                maxFavorableExcursionUsd: position.maxFavorableExcursionUsd,
+                maxAdverseExcursionUsd: position.maxAdverseExcursionUsd,
             }),
             ...this.makePositionSizingFields(position),
             ...this.makeScoreAttributionFields(position),
@@ -990,6 +1018,8 @@ class BotEngine {
             remainingSizeAfterPartial: position.remainingSizeAfterPartial ?? undefined,
             finalRunnerPnlUsd: position.finalRunnerPnlUsd ?? undefined,
             totalPnlUsd: position.totalPnlUsd ?? undefined,
+            maxFavorableExcursionUsd: position.maxFavorableExcursionUsd,
+            maxAdverseExcursionUsd: position.maxAdverseExcursionUsd,
         };
     }
     makeManagedTargetFields(position = this.position) {
@@ -1010,6 +1040,8 @@ class BotEngine {
             remainingSizeAfterPartial: position.remainingSizeAfterPartial ?? undefined,
             finalRunnerPnlUsd: position.finalRunnerPnlUsd ?? undefined,
             totalPnlUsd: position.totalPnlUsd ?? undefined,
+            maxFavorableExcursionUsd: position.maxFavorableExcursionUsd,
+            maxAdverseExcursionUsd: position.maxAdverseExcursionUsd,
         };
     }
     makePositionSizingFields(position = this.position) {
@@ -1155,6 +1187,8 @@ class BotEngine {
             remainingSizeAfterPartial: null,
             finalRunnerPnlUsd: null,
             totalPnlUsd: null,
+            maxFavorableExcursionUsd: activePositions.reduce((max, position) => Math.max(max, position.maxFavorableExcursionUsd), 0),
+            maxAdverseExcursionUsd: activePositions.reduce((min, position) => Math.min(min, position.maxAdverseExcursionUsd), 0),
             hardStopPrice: null,
             hardStopEnabled: activePositions.some(position => position.hardStopEnabled),
             stopPrice: null,

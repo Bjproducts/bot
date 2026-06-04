@@ -53,24 +53,36 @@ console.log('');
 engine.start();
 const dashboardTimer = setInterval(() => {
     const { stats, position, price, signal, ictSignal } = engine.snapshot();
-    (0, sessionStats_1.printDashboard)(stats, position, price, config, signal, ictSignal);
-    (0, sessionStats_1.saveSessionStats)(stats);
+    const journalStats = attachJournalStatus(stats);
+    (0, sessionStats_1.printDashboard)(journalStats, position, price, config, signal, ictSignal);
+    (0, sessionStats_1.saveSessionStats)(journalStats);
 }, DASHBOARD_INTERVAL_MS);
 setTimeout(() => {
     const { stats, position, price, signal, ictSignal } = engine.snapshot();
-    (0, sessionStats_1.printDashboard)(stats, position, price, config, signal, ictSignal);
+    (0, sessionStats_1.printDashboard)(attachJournalStatus(stats), position, price, config, signal, ictSignal);
 }, 3_000);
 function shutdown() {
     clearInterval(dashboardTimer);
     engine.stop();
     const { stats, position, price, signal, ictSignal } = engine.snapshot();
-    (0, sessionStats_1.printDashboard)(stats, position, price, config, signal, ictSignal);
-    (0, sessionStats_1.saveSessionStats)(stats);
+    const journalStats = attachJournalStatus(stats);
+    (0, sessionStats_1.printDashboard)(journalStats, position, price, config, signal, ictSignal);
+    (0, sessionStats_1.saveSessionStats)(journalStats);
     console.log('');
     console.log('  Session stats saved -> session-stats.json');
     console.log('  Position state saved -> position-state.json');
     console.log('');
     process.exit(0);
+}
+function attachJournalStatus(stats) {
+    const status = journal.getStatus();
+    return {
+        ...stats,
+        journalStatus: status.status,
+        lastJournalWrite: status.lastJournalWrite,
+        completedTradesLogged: status.completedTradesLogged,
+        tradeEventsLogged: status.tradeEventsLogged,
+    };
 }
 function signalDescription() {
     if (config.signalSource === 'ICT') {

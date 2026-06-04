@@ -42,6 +42,18 @@ const LOGS_DIR = path.resolve(__dirname, '../../logs');
 const CSV_PATH = path.join(LOGS_DIR, 'trades.csv');
 const EVENT_LOG_PATH = path.join(LOGS_DIR, 'events.log');
 const COMPLETED_TRADES_PATH = path.join(LOGS_DIR, 'completed-trades.json');
+const TRADE_EVENTS_JSONL_PATH = path.join(LOGS_DIR, 'trade-events.jsonl');
+const COMPLETED_TRADES_JSONL_PATH = path.join(LOGS_DIR, 'completed-trades.jsonl');
+const DURABLE_EVENT_TYPES = new Set([
+    'ENTRY',
+    'BREAKEVEN_ACTIVATED',
+    'PARTIAL_CLOSE',
+    'MANAGED_TARGET_EXIT',
+    'BREAKEVEN_STOP_EXIT',
+    'ENTRY_ZONE_DISRESPECT_EXIT',
+    'HARD_STOP_EXIT',
+    'RISK_EXIT',
+]);
 /**
  * TradeJournal — writes every trade event to three log targets:
  *
@@ -57,26 +69,49 @@ class TradeJournal {
     csvPath;
     eventLogPath;
     completedTradesPath;
+    tradeEventsJsonlPath;
+    completedTradesJsonlPath;
+    lastWriteAt = null;
+    lastError = null;
+    tradeEventsLogged = 0;
+    completedTradesLogged = 0;
     constructor(options = {}) {
         this.logsDir = options.logsDir ?? LOGS_DIR;
         this.csvPath = path.join(this.logsDir, 'trades.csv');
         this.eventLogPath = path.join(this.logsDir, 'events.log');
         this.completedTradesPath = path.join(this.logsDir, 'completed-trades.json');
+        this.tradeEventsJsonlPath = path.join(this.logsDir, 'trade-events.jsonl');
+        this.completedTradesJsonlPath = path.join(this.logsDir, 'completed-trades.jsonl');
         this.ensureLogsDir();
         this.ensureCsvHeader();
         this.ensureCompletedTradesFile();
+        this.ensureAppendOnlyFiles();
+        this.tradeEventsLogged = countJsonlRows(this.tradeEventsJsonlPath);
+        this.completedTradesLogged = countJsonlRows(this.completedTradesJsonlPath);
     }
     // ─── Public API ────────────────────────────────────────────────────────────
     /** Log an ENTRY or DCA event to CSV + events.log. */
     logEvent(event) {
         this.appendCsvRow(event);
         this.appendEventLine(event);
+        this.appendTradeEventJsonl(event);
     }
     /** Log a close event and append a CompletedTrade to the JSON file. */
     logClose(event, trade) {
         this.appendCsvRow(event);
         this.appendEventLine(event);
+        this.appendTradeEventJsonl(event);
         this.appendCompletedTrade(trade);
+        this.appendCompletedTradeJsonl(event, trade);
+    }
+    getStatus() {
+        return {
+            status: this.lastError === null ? 'OK' : 'ERROR',
+            lastJournalWrite: this.lastWriteAt,
+            completedTradesLogged: this.completedTradesLogged,
+            tradeEventsLogged: this.tradeEventsLogged,
+            lastError: this.lastError,
+        };
     }
     // ─── CSV ───────────────────────────────────────────────────────────────────
     appendCsvRow(e) {
@@ -125,6 +160,8 @@ class TradeJournal {
             e.remainingSizeAfterPartial !== undefined ? e.remainingSizeAfterPartial.toFixed(8) : '',
             e.finalRunnerPnlUsd !== undefined ? e.finalRunnerPnlUsd.toFixed(4) : '',
             e.totalPnlUsd !== undefined ? e.totalPnlUsd.toFixed(4) : '',
+            e.maxFavorableExcursionUsd !== undefined ? e.maxFavorableExcursionUsd.toFixed(4) : '',
+            e.maxAdverseExcursionUsd !== undefined ? e.maxAdverseExcursionUsd.toFixed(4) : '',
             e.positionSizeUsd !== undefined ? e.positionSizeUsd.toFixed(2) : '',
             e.sizingMode ?? '',
             e.hardStopPrice !== undefined ? e.hardStopPrice.toFixed(2) : '',
@@ -187,7 +224,9 @@ class TradeJournal {
             `  realizedPartial=${moneyOrDash(e.realizedPartialPnlUsd)}` +
             `  remainingAfterPartial=${e.remainingSizeAfterPartial !== undefined ? e.remainingSizeAfterPartial.toFixed(8) : '--'}` +
             `  finalRunner=${moneyOrDash(e.finalRunnerPnlUsd)}` +
-            `  totalPnl=${moneyOrDash(e.totalPnlUsd)}`;
+            `  totalPnl=${moneyOrDash(e.totalPnlUsd)}` +
+            `  mfe=${moneyOrDash(e.maxFavorableExcursionUsd)}` +
+            `  mae=${moneyOrDash(e.maxAdverseExcursionUsd)}`;
         const targetPart = e.targetPrice !== undefined
             ? `  target=${e.targetSource ?? '--'}:$${e.targetPrice.toFixed(2)}` +
                 `  targetZone=${e.targetZoneId ?? '--'}` +
@@ -239,17 +278,105 @@ class TradeJournal {
             '\n';
         try {
             fs.appendFileSync(this.eventLogPath, line, 'utf-8');
+            this.markWrite();
         }
         catch (err) {
             console.error('  ⚠  Journal: failed to write event log line:', err);
         }
     }
     // ─── Completed trades ──────────────────────────────────────────────────────
+    appendTradeEventJsonl(event) {
+        if (!DURABLE_EVENT_TYPES.has(event.action))
+            return;
+        const record = {
+            timestamp: event.timestamp,
+            positionId: event.positionId ?? null,
+            symbol: event.symbol,
+            side: event.side,
+            eventType: event.action,
+            entryPrice: event.entryPrice ?? event.avgEntry,
+            currentPrice: event.price,
+            targetPrice: event.targetPrice ?? null,
+            hardStopPrice: event.hardStopPrice ?? null,
+            activeStopPrice: event.activeStopPrice ?? null,
+            positionSizeUsd: event.positionSizeUsd ?? event.investedUsd,
+            quantity: event.size,
+            unrealizedPnlUsd: event.unrealizedPnlUsd ?? null,
+            realizedPnlUsd: event.realizedPnlUsd,
+            realizedPartialPnlUsd: event.realizedPartialPnlUsd ?? 0,
+            runnerPnlUsd: event.finalRunnerPnlUsd ?? null,
+            totalPnlUsd: event.totalPnlUsd ?? event.realizedPnlUsd,
+            confidence: event.ictConfidence ?? null,
+            zoneId: event.ictZoneId ?? event.entryZoneId ?? null,
+            zoneType: event.ictZoneType ?? event.entryZoneType ?? null,
+            stopSource: event.stopSource ?? null,
+            riskDistance: event.riskDistance ?? null,
+            expectedProfitUsd: event.expectedProfitUsd ?? null,
+            expectedLossUsd: event.expectedLossUsd ?? null,
+            riskRewardRatio: event.riskRewardRatio ?? null,
+            exitReason: event.action.endsWith('_EXIT') ? event.action : null,
+        };
+        this.appendJsonLine(this.tradeEventsJsonlPath, record);
+        this.tradeEventsLogged += 1;
+    }
+    appendCompletedTradeJsonl(event, trade) {
+        const record = {
+            entryEvent: {
+                timestamp: trade.entryTimestamp,
+                positionId: trade.positionId ?? event.positionId ?? null,
+                symbol: trade.symbol,
+                side: trade.side,
+                entryPrice: trade.entryPrice,
+                confidence: event.ictConfidence ?? null,
+                zoneId: event.ictZoneId ?? trade.entryZoneId ?? null,
+                zoneType: event.ictZoneType ?? trade.entryZoneType ?? null,
+            },
+            partialClose: {
+                partialCloseDone: trade.partialCloseDone ?? false,
+                partialClosePrice: trade.partialClosePrice ?? null,
+                partialCloseTime: trade.partialCloseTime ?? null,
+                partialCloseFraction: trade.partialCloseFraction ?? null,
+                realizedPartialPnlUsd: trade.realizedPartialPnlUsd ?? 0,
+                remainingSizeAfterPartial: trade.remainingSizeAfterPartial ?? null,
+            },
+            breakeven: {
+                activated: trade.breakevenActivated ?? trade.stopAtBreakeven ?? false,
+                activationPrice: trade.breakevenActivationPrice ?? null,
+                activationTime: trade.breakevenActivationTime ?? null,
+            },
+            finalExit: {
+                timestamp: trade.exitTimestamp,
+                exitPrice: trade.exitPrice,
+                exitReason: trade.reason,
+                runnerPnlUsd: trade.finalRunnerPnlUsd ?? null,
+                totalPnlUsd: trade.totalPnlUsd ?? trade.realizedPnlUsd,
+            },
+            finalTotalPnlUsd: trade.totalPnlUsd ?? trade.realizedPnlUsd,
+            exitType: trade.reason,
+            durationMinutes: trade.tradeDurationMinutes ?? null,
+            mfeUsd: trade.maxFavorableExcursionUsd ?? null,
+            maeUsd: trade.maxAdverseExcursionUsd ?? null,
+            trade,
+        };
+        this.appendJsonLine(this.completedTradesJsonlPath, record);
+        this.completedTradesLogged += 1;
+    }
+    appendJsonLine(filePath, record) {
+        try {
+            fs.appendFileSync(filePath, JSON.stringify(record) + '\n', 'utf-8');
+            this.markWrite();
+        }
+        catch (err) {
+            this.markError(err);
+            console.error('  Journal: failed to write JSONL row:', err);
+        }
+    }
     appendCompletedTrade(trade) {
         try {
             const existing = this.readCompletedTrades();
             existing.push(trade);
             fs.writeFileSync(this.completedTradesPath, JSON.stringify(existing, null, 2), 'utf-8');
+            this.markWrite();
         }
         catch (err) {
             console.error('  ⚠  Journal: failed to save completed trade:', err);
@@ -278,6 +405,20 @@ class TradeJournal {
             fs.writeFileSync(this.completedTradesPath, '[]', 'utf-8');
         }
     }
+    ensureAppendOnlyFiles() {
+        for (const filePath of [this.eventLogPath, this.tradeEventsJsonlPath, this.completedTradesJsonlPath]) {
+            if (!fs.existsSync(filePath)) {
+                fs.closeSync(fs.openSync(filePath, 'a'));
+            }
+        }
+    }
+    markWrite() {
+        this.lastWriteAt = new Date().toISOString();
+        this.lastError = null;
+    }
+    markError(err) {
+        this.lastError = err instanceof Error ? err.message : String(err);
+    }
 }
 exports.TradeJournal = TradeJournal;
 function csv(value) {
@@ -288,6 +429,17 @@ function moneyOrDash(value) {
 }
 function money(value) {
     return value !== undefined ? value.toFixed(2) : '--';
+}
+function countJsonlRows(filePath) {
+    try {
+        if (!fs.existsSync(filePath))
+            return 0;
+        const raw = fs.readFileSync(filePath, 'utf-8').trim();
+        return raw.length === 0 ? 0 : raw.split(/\r?\n/).length;
+    }
+    catch {
+        return 0;
+    }
 }
 function repairTradesCsvHeader(logsDir = LOGS_DIR) {
     if (!fs.existsSync(logsDir)) {

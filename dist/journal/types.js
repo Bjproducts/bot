@@ -46,6 +46,8 @@ exports.CSV_HEADER = [
     'remainingSizeAfterPartial',
     'finalRunnerPnlUsd',
     'totalPnlUsd',
+    'maxFavorableExcursionUsd',
+    'maxAdverseExcursionUsd',
     'positionSizeUsd',
     'sizingMode',
     'hardStopPrice',

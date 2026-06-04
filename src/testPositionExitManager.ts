@@ -152,6 +152,13 @@ for (const fixture of zoneDisrespectFixtures) {
 results.push(testCompletedTradeRecordWritten());
 results.push(testCompletedDisrespectTradeRecordWritten());
 results.push(testCompletedHardStopTradeRecordWritten());
+results.push(testEntryWritesTradeEventsJsonl());
+results.push(testPartialCloseWritesTradeEventsJsonl());
+results.push(testBreakevenWritesTradeEventsJsonl());
+results.push(testManagedTargetWritesCompletedJsonl());
+results.push(testHardStopWritesCompletedJsonl());
+results.push(testRestartDoesNotEraseJsonlLogs());
+results.push(testCompletedJsonlPnlIncludesPartialAndRunner());
 results.push(testMaxHoldDefaultIsFiveMinutes());
 results.push(testExitPriorityChoosesZoneDisrespectBeforeTimeExit());
 results.push(testLongHardStopExit());
@@ -269,6 +276,8 @@ function position(side: 'LONG' | 'SHORT', openedAt: string): PositionState {
     remainingSizeAfterPartial: null,
     finalRunnerPnlUsd: null,
     totalPnlUsd: null,
+    maxFavorableExcursionUsd: 0,
+    maxAdverseExcursionUsd: 0,
     hardStopPrice: null,
     hardStopEnabled: false,
     stopPrice: null,
@@ -759,6 +768,184 @@ function testCompletedHardStopTradeRecordWritten(): TestResult {
     actual,
     passed,
   };
+}
+
+function testEntryWritesTradeEventsJsonl(): TestResult {
+  return testJsonlEventWrite('ENTRY', 'trade-events.jsonl');
+}
+
+function testPartialCloseWritesTradeEventsJsonl(): TestResult {
+  return testJsonlEventWrite('PARTIAL_CLOSE', 'trade-events.jsonl');
+}
+
+function testBreakevenWritesTradeEventsJsonl(): TestResult {
+  return testJsonlEventWrite('BREAKEVEN_ACTIVATED', 'trade-events.jsonl');
+}
+
+function testManagedTargetWritesCompletedJsonl(): TestResult {
+  return testJsonlCloseWrite('MANAGED_TARGET_EXIT');
+}
+
+function testHardStopWritesCompletedJsonl(): TestResult {
+  return testJsonlCloseWrite('HARD_STOP_EXIT');
+}
+
+function testRestartDoesNotEraseJsonlLogs(): TestResult {
+  const logsDir = tempLogsDir('journal-restart');
+  const first = new TradeJournal({ logsDir });
+  first.logEvent(journalEvent('ENTRY'));
+  const second = new TradeJournal({ logsDir });
+  second.logEvent(journalEvent('BREAKEVEN_ACTIVATED'));
+  const rows = readJsonl(path.join(logsDir, 'trade-events.jsonl'));
+  fs.rmSync(logsDir, { recursive: true, force: true });
+
+  return {
+    name: 'killing/restarting bot does not erase JSONL logs',
+    expected: '2 rows',
+    actual: `${rows.length} rows`,
+    passed: rows.length === 2
+      && rows[0]?.eventType === 'ENTRY'
+      && rows[1]?.eventType === 'BREAKEVEN_ACTIVATED',
+  };
+}
+
+function testCompletedJsonlPnlIncludesPartialAndRunner(): TestResult {
+  const logsDir = tempLogsDir('journal-pnl');
+  const journal = new TradeJournal({ logsDir });
+  const trade = completedTrade('MANAGED_TARGET_EXIT', {
+    realizedPnlUsd: 1.25,
+    realizedPartialPnlUsd: 1,
+    finalRunnerPnlUsd: 0.25,
+    totalPnlUsd: 1.25,
+  });
+  journal.logClose(journalEvent('MANAGED_TARGET_EXIT', {
+    realizedPnlUsd: 1.25,
+    realizedPartialPnlUsd: 1,
+    finalRunnerPnlUsd: 0.25,
+    totalPnlUsd: 1.25,
+  }), trade);
+  const rows = readJsonl(path.join(logsDir, 'completed-trades.jsonl'));
+  fs.rmSync(logsDir, { recursive: true, force: true });
+
+  return {
+    name: 'completed trade JSONL PnL includes partial plus runner PnL',
+    expected: '1.25',
+    actual: String(rows[0]?.finalTotalPnlUsd ?? 'missing'),
+    passed: rows[0]?.finalTotalPnlUsd === 1.25
+      && rows[0]?.partialClose?.realizedPartialPnlUsd === 1
+      && rows[0]?.finalExit?.runnerPnlUsd === 0.25,
+  };
+}
+
+function testJsonlEventWrite(action: TradeEvent['action'], fileName: string): TestResult {
+  const logsDir = tempLogsDir(`journal-${action}`);
+  const journal = new TradeJournal({ logsDir });
+  journal.logEvent(journalEvent(action));
+  const rows = readJsonl(path.join(logsDir, fileName));
+  fs.rmSync(logsDir, { recursive: true, force: true });
+
+  return {
+    name: `${action} writes to ${fileName}`,
+    expected: action,
+    actual: String(rows[0]?.eventType ?? 'missing'),
+    passed: rows.length === 1 && rows[0]?.eventType === action,
+  };
+}
+
+function testJsonlCloseWrite(reason: PositionCloseReason): TestResult {
+  const logsDir = tempLogsDir(`journal-${reason}`);
+  const journal = new TradeJournal({ logsDir });
+  journal.logClose(journalEvent(reason), completedTrade(reason));
+  const rows = readJsonl(path.join(logsDir, 'completed-trades.jsonl'));
+  fs.rmSync(logsDir, { recursive: true, force: true });
+
+  return {
+    name: `${reason} writes to completed-trades.jsonl`,
+    expected: reason,
+    actual: String(rows[0]?.exitType ?? 'missing'),
+    passed: rows.length === 1 && rows[0]?.exitType === reason,
+  };
+}
+
+function journalEvent(
+  action: TradeEvent['action'],
+  overrides: Partial<TradeEvent> = {},
+): TradeEvent {
+  return {
+    timestamp: now.toISOString(),
+    symbol: 'BTC',
+    marketDataSource: 'TEST',
+    action,
+    side: 'LONG',
+    price: 101,
+    size: 1,
+    investedUsd: 100,
+    avgEntry: 100,
+    dcaCount: 0,
+    realizedPnlUsd: 0,
+    positionId: 'position-1',
+    signalDirection: 'BUY',
+    signalSource: 'ICT',
+    ictConfidence: 90,
+    ictZoneId: 'zone-1',
+    ictZoneType: 'FVG',
+    targetPrice: 102,
+    hardStopPrice: 99,
+    activeStopPrice: 100,
+    positionSizeUsd: 100,
+    unrealizedPnlUsd: 1,
+    realizedPartialPnlUsd: 0,
+    totalPnlUsd: 0,
+    stopSource: 'firstCandleLow',
+    riskDistance: 1,
+    expectedProfitUsd: 1.5,
+    expectedLossUsd: 1,
+    riskRewardRatio: 1.5,
+    ...overrides,
+  };
+}
+
+function completedTrade(
+  reason: PositionCloseReason,
+  overrides: Partial<CompletedTrade> = {},
+): CompletedTrade {
+  return {
+    id: 'completed-1',
+    symbol: 'BTC',
+    side: 'LONG',
+    marketDataSource: 'TEST',
+    entryTimestamp: recent,
+    exitTimestamp: now.toISOString(),
+    entryPrice: 100,
+    avgEntryPrice: 100,
+    exitPrice: 101,
+    dcaCount: 0,
+    totalInvestedUsd: 100,
+    realizedPnlUsd: 1,
+    positionId: 'position-1',
+    pnlPct: 1,
+    reason,
+    partialCloseDone: false,
+    realizedPartialPnlUsd: 0,
+    finalRunnerPnlUsd: 1,
+    totalPnlUsd: 1,
+    maxFavorableExcursionUsd: 1.5,
+    maxAdverseExcursionUsd: -0.25,
+    tradeDurationMinutes: 5,
+    ...overrides,
+  };
+}
+
+function readJsonl(filePath: string): Array<Record<string, any>> {
+  const raw = fs.readFileSync(filePath, 'utf-8').trim();
+  if (!raw) return [];
+  return raw.split(/\r?\n/).map(line => JSON.parse(line) as Record<string, any>);
+}
+
+function tempLogsDir(label: string): string {
+  const dir = path.resolve(__dirname, '../logs', `.${label}-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  fs.rmSync(dir, { recursive: true, force: true });
+  return dir;
 }
 
 function settings(overrides: Partial<PositionExitSettings> = {}): PositionExitSettings {

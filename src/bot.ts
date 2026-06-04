@@ -139,7 +139,7 @@ export class BotEngine {
 
   stop(): void {
     this.running = false;
-    saveSessionStats(this.stats);
+    saveSessionStats(this.statsWithJournalStatus());
   }
 
   snapshot(): {
@@ -151,12 +151,23 @@ export class BotEngine {
     tradeSelection: TradeSelectionResult | null;
   } {
     return {
-      stats: this.stats,
+      stats: this.statsWithJournalStatus(),
       position: this.position,
       price: this.lastPrice,
       signal: this.latestSignal,
       ictSignal: this.latestIctSignal,
       tradeSelection: this.latestTradeSelection,
+    };
+  }
+
+  private statsWithJournalStatus(): SessionStats {
+    const status = this.journal.getStatus();
+    return {
+      ...this.stats,
+      journalStatus: status.status,
+      lastJournalWrite: status.lastJournalWrite,
+      completedTradesLogged: status.completedTradesLogged,
+      tradeEventsLogged: status.tradeEventsLogged,
     };
   }
 
@@ -856,6 +867,8 @@ export class BotEngine {
     const { config } = this;
     if (position.side === 'NONE') return;
 
+    this.updateExcursions(position, price);
+
     if (this.config.signalSource === 'ICT') {
       this.updateIctTradeManagement(position, candle);
     }
@@ -921,6 +934,22 @@ export class BotEngine {
     const canDca = activePosition.totalUsdInvested + config.orderSizeUsd <= config.maxCapUsd;
     if (dcaTriggered && canDca && this.canAddPaperEntry(activeSide)) {
       this.executeDca(activePosition, price);
+    }
+  }
+
+  private updateExcursions(position: PositionState, price: number): void {
+    const latest = this.positions.find(active => active.id === position.id) ?? position;
+    const unrealizedPnlUsd = calculateUnrealizedPnl(latest, price);
+    const updated: PositionState = {
+      ...latest,
+      maxFavorableExcursionUsd: Math.max(latest.maxFavorableExcursionUsd, unrealizedPnlUsd),
+      maxAdverseExcursionUsd: Math.min(latest.maxAdverseExcursionUsd, unrealizedPnlUsd),
+    };
+    if (
+      updated.maxFavorableExcursionUsd !== latest.maxFavorableExcursionUsd
+      || updated.maxAdverseExcursionUsd !== latest.maxAdverseExcursionUsd
+    ) {
+      this.updatePosition(updated);
     }
   }
 
@@ -1170,6 +1199,8 @@ export class BotEngine {
         ...position,
         finalRunnerPnlUsd: pnlUsd,
         totalPnlUsd,
+        maxFavorableExcursionUsd: position.maxFavorableExcursionUsd,
+        maxAdverseExcursionUsd: position.maxAdverseExcursionUsd,
       },
     );
 
@@ -1195,6 +1226,8 @@ export class BotEngine {
         ...position,
         finalRunnerPnlUsd: pnlUsd,
         totalPnlUsd,
+        maxFavorableExcursionUsd: position.maxFavorableExcursionUsd,
+        maxAdverseExcursionUsd: position.maxAdverseExcursionUsd,
       }),
       ...this.makePositionSizingFields(position),
       ...this.makeScoreAttributionFields(position),
@@ -1267,6 +1300,8 @@ export class BotEngine {
       remainingSizeAfterPartial: position.remainingSizeAfterPartial ?? undefined,
       finalRunnerPnlUsd: position.finalRunnerPnlUsd ?? undefined,
       totalPnlUsd: position.totalPnlUsd ?? undefined,
+      maxFavorableExcursionUsd: position.maxFavorableExcursionUsd,
+      maxAdverseExcursionUsd: position.maxAdverseExcursionUsd,
     };
   }
 
@@ -1288,6 +1323,8 @@ export class BotEngine {
       remainingSizeAfterPartial: position.remainingSizeAfterPartial ?? undefined,
       finalRunnerPnlUsd: position.finalRunnerPnlUsd ?? undefined,
       totalPnlUsd: position.totalPnlUsd ?? undefined,
+      maxFavorableExcursionUsd: position.maxFavorableExcursionUsd,
+      maxAdverseExcursionUsd: position.maxAdverseExcursionUsd,
     };
   }
 
@@ -1451,6 +1488,8 @@ export class BotEngine {
       remainingSizeAfterPartial: null,
       finalRunnerPnlUsd: null,
       totalPnlUsd: null,
+      maxFavorableExcursionUsd: activePositions.reduce((max, position) => Math.max(max, position.maxFavorableExcursionUsd), 0),
+      maxAdverseExcursionUsd: activePositions.reduce((min, position) => Math.min(min, position.maxAdverseExcursionUsd), 0),
       hardStopPrice: null,
       hardStopEnabled: activePositions.some(position => position.hardStopEnabled),
       stopPrice: null,

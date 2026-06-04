@@ -1,5 +1,107 @@
 # Development Log
 
+## Phase 8B - Durable Journaling and Recovery-Safe Logging
+
+### Objective
+
+Make trade history survive process stops, PM2 restarts, and server reboots by writing important lifecycle data immediately to append-only files. No ICT logic, FVG/IFVG logic, MSS logic, trade selection, risk sizing, partial-close logic, or breakeven logic was changed.
+
+### Append-Only Trade Events
+
+Added:
+
+```text
+logs/trade-events.jsonl
+```
+
+Every durable lifecycle event appends one JSON object immediately:
+
+- `ENTRY`
+- `BREAKEVEN_ACTIVATED`
+- `PARTIAL_CLOSE`
+- `MANAGED_TARGET_EXIT`
+- `BREAKEVEN_STOP_EXIT`
+- `ENTRY_ZONE_DISRESPECT_EXIT`
+- `HARD_STOP_EXIT`
+- `RISK_EXIT`
+
+Each JSONL event includes position identity, price, target, hard stop, active stop, size, quantity, unrealized/realized PnL, partial/runner PnL, confidence, zone fields, stop source, risk distance, expected profit/loss, RR, and exit reason.
+
+### Completed Trade JSONL
+
+Added:
+
+```text
+logs/completed-trades.jsonl
+```
+
+Every final exit immediately appends a completed trade record with:
+
+- entry event summary
+- partial close data
+- breakeven data
+- final exit
+- final total PnL
+- exit type
+- duration
+- MFE
+- MAE
+
+The existing `logs/completed-trades.json` array is still maintained for compatibility, but the JSONL file is the recovery-safe append-only source.
+
+### Session Stats History
+
+Added:
+
+```text
+logs/session-stats-history.jsonl
+```
+
+Every `saveSessionStats()` call now appends the stats snapshot to this history file in addition to updating `session-stats.json`.
+
+### Journal Status Dashboard
+
+Dashboard/session stats now include:
+
+- `Journal Status`
+- `Last Journal Write`
+- `Completed Trades Logged`
+- `Trade Events Logged`
+
+`BotEngine.snapshot()` and `BotEngine.stop()` attach current journal status so shutdown saves do not stale the counters.
+
+### Recovery Safety
+
+`TradeJournal` now creates missing log files without truncating existing files:
+
+- `events.log`
+- `trade-events.jsonl`
+- `completed-trades.jsonl`
+
+On construction it counts existing JSONL rows so restarts preserve previous event and completed-trade counts.
+
+### Tests Added
+
+- `ENTRY` writes to `trade-events.jsonl`
+- `PARTIAL_CLOSE` writes to `trade-events.jsonl`
+- `BREAKEVEN_ACTIVATED` writes to `trade-events.jsonl`
+- `MANAGED_TARGET_EXIT` writes to `completed-trades.jsonl`
+- `HARD_STOP_EXIT` writes to `completed-trades.jsonl`
+- Restarting `TradeJournal` does not erase JSONL logs
+- Completed JSONL PnL includes partial + runner PnL
+
+### Files Modified
+
+- `src/journal/tradeJournal.ts`
+- `src/journal/types.ts`
+- `src/sessionStats.ts`
+- `src/types.ts`
+- `src/state.ts`
+- `src/bot.ts`
+- `src/index.ts`
+- `src/testPositionExitManager.ts`
+- `docs/DEVLOG.md`
+
 ## Phase 8A - Dollar Breakeven, Partial Close, Per-Position Dashboard, Startup Lookback
 
 ### Objective
