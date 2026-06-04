@@ -125,6 +125,8 @@ export function loadConfig(): BotConfig {
     minRiskRewardRatio: envFloat('MIN_RISK_REWARD_RATIO', 1.5),
     maxTargetDistancePercent: envFloat('MAX_TARGET_DISTANCE_PERCENT', 0),
     oppositeSignalMaxLossUsd: envFloat('OPPOSITE_SIGNAL_MAX_LOSS_USD', 0.30),
+    maxTotalOpenPositions: envInt('MAX_TOTAL_OPEN_POSITIONS', 5),
+    maxActiveRiskPositions: envInt('MAX_ACTIVE_RISK_POSITIONS', 3),
 
     volumeLookback: envInt('VOLUME_LOOKBACK', 20),
     volumeSpikeMultiplier: envFloat('VOLUME_SPIKE_MULTIPLIER', 2),

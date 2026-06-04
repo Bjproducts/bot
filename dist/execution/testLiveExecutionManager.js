@@ -194,6 +194,8 @@ function makeConfig(patch = {}) {
         minRiskRewardRatio: 1.5,
         maxTargetDistancePercent: 0,
         oppositeSignalMaxLossUsd: 0.30,
+        maxTotalOpenPositions: 5,
+        maxActiveRiskPositions: 3,
         volumeLookback: 20,
         volumeSpikeMultiplier: 2,
         reversalDropPercent: 1,

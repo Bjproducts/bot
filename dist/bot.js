@@ -51,6 +51,7 @@ const validatedFvgDetector_1 = require("./ict/validatedFvgDetector");
 const validatedFvgRejectionLog_1 = require("./ict/validatedFvgRejectionLog");
 const candleBufferGap_1 = require("./ict/candleBufferGap");
 const oppositeExposureManager_1 = require("./risk/oppositeExposureManager");
+const positionSlotManager_1 = require("./risk/positionSlotManager");
 const reactionEngine_1 = require("./ict/reactionEngine");
 const ictSignalEngine_1 = require("./ict/ictSignalEngine");
 const tradeSelectionEngine_1 = require("./ict/tradeSelectionEngine");
@@ -364,8 +365,16 @@ class BotEngine {
             logEvent('ENTRY_SKIP_OPPOSITE_EXPOSURE', side, this.tick, oppositeGate.reason);
             return;
         }
-        if (!this.canOpenNewPosition()) {
-            logEvent('ENTRY_SKIP', side, this.tick, `max active positions reached (${this.positions.length}/${this.config.maxConcurrentPositions})`);
+        // Phase 8E: position slot gate — protected positions (BE-armed or
+        // stop==entry) do not consume a risk slot. Two caps now apply:
+        //   MAX_TOTAL_OPEN_POSITIONS (hard ceiling on simultaneous trades)
+        //   MAX_ACTIVE_RISK_POSITIONS (only counts unprotected positions)
+        const slotGate = this.evaluatePositionSlotGate();
+        if (slotGate.blockNewEntry) {
+            const eventName = slotGate.blockReasonCode === 'MAX_TOTAL_POSITIONS'
+                ? 'ENTRY_SKIP_MAX_TOTAL_POSITIONS'
+                : 'ENTRY_SKIP_MAX_RISK_POSITIONS';
+            logEvent(eventName, side, this.tick, slotGate.blockReason);
             return;
         }
         this.openInitialPosition(this.lastPrice, {
@@ -995,6 +1004,25 @@ class BotEngine {
                 `opposing=[${opposingIds.join(',')}]  reason="mixed exposure with unprotected loss"`);
             this.closePosition(position, price, 'MIXED_EXPOSURE_RISK_EXIT');
         }
+    }
+    /**
+     * Phase 8E: classify every open position into PROTECTED vs RISK and
+     * decide whether a new entry is allowed under the two-cap model.
+     */
+    evaluatePositionSlotGate() {
+        const slotInputs = this.positions
+            .filter(p => p.side !== 'NONE')
+            .map(p => ({
+            id: p.id ?? `pos-${p.openedAt ?? 'unknown'}`,
+            stopAtBreakeven: p.stopAtBreakeven,
+            partialCloseDone: p.partialCloseDone,
+            activeStopPrice: typeof p.hardStopPrice === 'number' ? p.hardStopPrice : null,
+            averageEntryPrice: p.averageEntryPrice,
+        }));
+        return (0, positionSlotManager_1.evaluatePositionSlotGate)(slotInputs, {
+            maxTotal: this.config.maxTotalOpenPositions,
+            maxRisk: this.config.maxActiveRiskPositions,
+        });
     }
     snapshotPositionsForExposure(price) {
         return this.positions

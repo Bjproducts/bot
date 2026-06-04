@@ -213,6 +213,11 @@ export interface BotConfig {
   // (on every tick when mixed exposure exists). Default $0.30.
   oppositeSignalMaxLossUsd: number;
 
+  // Phase 8E: position-slot caps. Protected positions (BE-armed or stop
+  // at entry) do not consume a risk slot, only the total slot.
+  maxTotalOpenPositions: number;
+  maxActiveRiskPositions: number;
+
   // Signal
   volumeLookback:        number;
   volumeSpikeMultiplier: number;

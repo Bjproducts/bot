@@ -47,6 +47,7 @@ const positionTradeManagement_1 = require("./positionTradeManagement");
 const exchangeTypes_1 = require("./execution/exchangeTypes");
 const scoreAttribution_1 = require("./analytics/scoreAttribution");
 const oppositeExposureManager_1 = require("./risk/oppositeExposureManager");
+const positionSlotManager_1 = require("./risk/positionSlotManager");
 const STATS_FILE = path.resolve(__dirname, '../session-stats.json');
 const SESSION_STATS_HISTORY_FILE = path.resolve(__dirname, '../logs/session-stats-history.jsonl');
 const SCORE_ATTRIBUTION_REPORT_FILE = path.resolve(__dirname, '../logs/score-attribution-report.json');
@@ -287,6 +288,20 @@ function printDashboard(stats, position, price, config, signal = null, ictSignal
         console.log(line(`Mixed Exposure  ${cleanup.mixedExposureActive ? 'YES' : 'NO'}`));
         console.log(line(`Opp Entry Block ${oppositeEntryBlocked ? 'YES' : 'NO'}`));
         console.log(line(`Opp Max Loss    $${config.oppositeSignalMaxLossUsd.toFixed(2)}`));
+        // Phase 8E — position slot accounting
+        const slotInputs = (position.openPositions ?? [position])
+            .filter(p => p.side !== 'NONE')
+            .map(p => ({
+            id: p.id ?? `pos-${p.openedAt ?? 'unknown'}`,
+            stopAtBreakeven: p.stopAtBreakeven,
+            partialCloseDone: p.partialCloseDone,
+            activeStopPrice: typeof p.hardStopPrice === 'number' ? p.hardStopPrice : null,
+            averageEntryPrice: p.averageEntryPrice,
+        }));
+        const slotCounts = (0, positionSlotManager_1.countPositionSlots)(slotInputs);
+        console.log(line(`Open Positions  ${slotCounts.total}/${config.maxTotalOpenPositions}`));
+        console.log(line(`Risk Positions  ${slotCounts.risk}/${config.maxActiveRiskPositions}`));
+        console.log(line(`Protected Pos.  ${slotCounts.protected}`));
         if (!selectedCandidate) {
             console.log(line(`Selection Reject ${shorten(tradeSelection?.rejectionReason ?? 'No selection yet', 36)}`));
         }

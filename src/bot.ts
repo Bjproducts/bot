@@ -46,6 +46,10 @@ import {
   evaluateOppositeSignalProtection,
   PositionSnapshot,
 } from './risk/oppositeExposureManager';
+import {
+  evaluatePositionSlotGate,
+  PositionSlotInput,
+} from './risk/positionSlotManager';
 import { evaluateReaction } from './ict/reactionEngine';
 import { createIctSignal } from './ict/ictSignalEngine';
 import { IctSignalResult, IctSignalZone } from './ict/ictSignalTypes';
@@ -445,13 +449,16 @@ export class BotEngine {
       return;
     }
 
-    if (!this.canOpenNewPosition()) {
-      logEvent(
-        'ENTRY_SKIP',
-        side,
-        this.tick,
-        `max active positions reached (${this.positions.length}/${this.config.maxConcurrentPositions})`,
-      );
+    // Phase 8E: position slot gate — protected positions (BE-armed or
+    // stop==entry) do not consume a risk slot. Two caps now apply:
+    //   MAX_TOTAL_OPEN_POSITIONS (hard ceiling on simultaneous trades)
+    //   MAX_ACTIVE_RISK_POSITIONS (only counts unprotected positions)
+    const slotGate = this.evaluatePositionSlotGate();
+    if (slotGate.blockNewEntry) {
+      const eventName = slotGate.blockReasonCode === 'MAX_TOTAL_POSITIONS'
+        ? 'ENTRY_SKIP_MAX_TOTAL_POSITIONS'
+        : 'ENTRY_SKIP_MAX_RISK_POSITIONS';
+      logEvent(eventName, side, this.tick, slotGate.blockReason);
       return;
     }
 
@@ -1284,6 +1291,26 @@ export class BotEngine {
       );
       this.closePosition(position, price, 'MIXED_EXPOSURE_RISK_EXIT');
     }
+  }
+
+  /**
+   * Phase 8E: classify every open position into PROTECTED vs RISK and
+   * decide whether a new entry is allowed under the two-cap model.
+   */
+  private evaluatePositionSlotGate() {
+    const slotInputs: PositionSlotInput[] = this.positions
+      .filter(p => p.side !== 'NONE')
+      .map(p => ({
+        id: p.id ?? `pos-${p.openedAt ?? 'unknown'}`,
+        stopAtBreakeven: p.stopAtBreakeven,
+        partialCloseDone: p.partialCloseDone,
+        activeStopPrice: typeof p.hardStopPrice === 'number' ? p.hardStopPrice : null,
+        averageEntryPrice: p.averageEntryPrice,
+      }));
+    return evaluatePositionSlotGate(slotInputs, {
+      maxTotal: this.config.maxTotalOpenPositions,
+      maxRisk: this.config.maxActiveRiskPositions,
+    });
   }
 
   private snapshotPositionsForExposure(price: number): PositionSnapshot[] {

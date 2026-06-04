@@ -23,6 +23,7 @@
     "position:sizing-test": "ts-node src/risk/testPositionSizing.ts",
     "risk:target-modes-test": "ts-node src/risk/testTargetModes.ts",
     "risk:opposite-exposure-test": "ts-node src/risk/testOppositeExposureManager.ts",
+    "risk:position-slot-test": "ts-node src/risk/testPositionSlotManager.ts",
     "analytics:test": "ts-node src/analytics/testScoreAttribution.ts",
     "analytics:pipeline-test": "ts-node src/analytics/testAttributionPipeline.ts",
     "live:execution-test": "ts-node src/execution/testLiveExecutionManager.ts",
