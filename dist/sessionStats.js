@@ -38,9 +38,11 @@ exports.updateUnrealized = updateUnrealized;
 exports.recordClosedTrade = recordClosedTrade;
 exports.saveSessionStats = saveSessionStats;
 exports.printDashboard = printDashboard;
+exports.formatPerPositionRows = formatPerPositionRows;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const positionExitManager_1 = require("./positionExitManager");
+const positionTradeManagement_1 = require("./positionTradeManagement");
 const exchangeTypes_1 = require("./execution/exchangeTypes");
 const scoreAttribution_1 = require("./analytics/scoreAttribution");
 const STATS_FILE = path.resolve(__dirname, '../session-stats.json');
@@ -302,6 +304,9 @@ function printDashboard(stats, position, price, config, signal = null, ictSignal
         console.log(line(`Invested        $${fp(position.totalUsdInvested)}  (DCA ${position.dcaCount - 1}/${maxLvls - 1})`));
         console.log(line(`Dist to TP      $${fp(distToTpUsd)}  (${distToTpPct.toFixed(3)}% away)`));
         console.log(line(`Dist to DCA     $${fp(distToDcaUsd)}  (${distToDcaPct.toFixed(3)}% away)`));
+        for (const row of formatPerPositionRows(position, price)) {
+            console.log(line(row));
+        }
     }
     else {
         console.log(line(`Position        NONE - waiting for ${config.signalSource} signal`));
@@ -325,6 +330,33 @@ function printDashboard(stats, position, price, config, signal = null, ictSignal
     console.log(line(`Max Cap Used    $${fp(stats.maxCapitalUsed)}  Max Drawdown $${fp(stats.maxDrawdownUsd)}`));
     console.log(line(`Ticks           ${stats.ticks}`));
     console.log(`  +${'-'.repeat(width - 1)}+`);
+}
+function formatPerPositionRows(position, price) {
+    const positions = position.openPositions?.length ? position.openPositions : (position.side !== 'NONE' ? [position] : []);
+    return positions.map((active, index) => {
+        const pnl = (0, positionExitManager_1.calculateUnrealizedPnl)(active, price);
+        const currentR = active.expectedLossUsd && active.expectedLossUsd > 0
+            ? (pnl / active.expectedLossUsd)
+            : null;
+        const progress = (0, positionExitManager_1.calculateProgressToTargetPercent)(active, price);
+        const runner = active.partialCloseDone ? ' runner active' : '';
+        return `#${index + 1} ${active.side}` +
+            ` entry ${fp(active.averageEntryPrice)}` +
+            ` current ${fp(price)}` +
+            ` target ${active.targetPrice !== null ? fp(active.targetPrice) : '--'}` +
+            ` hardStop ${active.hardStopPrice !== null ? fp(active.hardStopPrice) : '--'}` +
+            ` activeStop ${formatPlainPrice((0, positionTradeManagement_1.getActiveStopPrice)(active))}` +
+            ` size $${fp(active.totalUsdInvested)}` +
+            ` pnl ${formatSignedUsd(pnl)}` +
+            ` ${currentR !== null ? currentR.toFixed(2) + 'R' : '--R'}` +
+            ` progress ${progress !== null ? progress.toFixed(0) + '%' : '--'}` +
+            ` BE ${active.stopAtBreakeven ? 'YES' : 'NO'}` +
+            ` partial ${active.partialCloseDone ? 'YES' : 'NO'}` +
+            runner +
+            ` age ${formatPositionAge(active.openedAt)}` +
+            ` zone ${active.entryZoneType ?? '--'}` +
+            ` stopSource ${active.stopSource ?? '--'}`;
+    });
 }
 function fp(n) {
     return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -382,6 +414,9 @@ function formatManagedTarget(position) {
 }
 function formatOptionalUsd(value) {
     return value === null ? '--' : `$${fp(value)}`;
+}
+function formatPlainPrice(value) {
+    return value === null ? '--' : fp(value);
 }
 function formatPercent(value) {
     return `${value.toFixed(0)}%`;

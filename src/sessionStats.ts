@@ -3,7 +3,8 @@ import * as path from 'path';
 import { SessionStats, PositionState, BotConfig } from './types';
 import { Signal } from './signals/types';
 import { IctSignalResult } from './ict/ictSignalTypes';
-import { calculateProgressToTargetPercent, calculateTakeProfitPrice } from './positionExitManager';
+import { calculateProgressToTargetPercent, calculateTakeProfitPrice, calculateUnrealizedPnl } from './positionExitManager';
+import { getActiveStopPrice } from './positionTradeManagement';
 import { LIVE_ARM_CONFIRMATION } from './execution/exchangeTypes';
 import { createScoreAttribution } from './analytics/scoreAttribution';
 import { ScoreAttributionReport } from './analytics/scoreAttributionTypes';
@@ -302,6 +303,9 @@ export function printDashboard(
     console.log(line(`Invested        $${fp(position.totalUsdInvested)}  (DCA ${position.dcaCount - 1}/${maxLvls - 1})`));
     console.log(line(`Dist to TP      $${fp(distToTpUsd)}  (${distToTpPct.toFixed(3)}% away)`));
     console.log(line(`Dist to DCA     $${fp(distToDcaUsd)}  (${distToDcaPct.toFixed(3)}% away)`));
+    for (const row of formatPerPositionRows(position, price)) {
+      console.log(line(row));
+    }
   } else {
     console.log(line(`Position        NONE - waiting for ${config.signalSource} signal`));
     console.log(line(`Last Close      ${stats.latestCloseReason ?? 'NONE'}`));
@@ -326,6 +330,34 @@ export function printDashboard(
   console.log(line(`Max Cap Used    $${fp(stats.maxCapitalUsed)}  Max Drawdown $${fp(stats.maxDrawdownUsd)}`));
   console.log(line(`Ticks           ${stats.ticks}`));
   console.log(`  +${'-'.repeat(width - 1)}+`);
+}
+
+export function formatPerPositionRows(position: PositionState, price: number): string[] {
+  const positions = position.openPositions?.length ? position.openPositions : (position.side !== 'NONE' ? [position] : []);
+  return positions.map((active, index) => {
+    const pnl = calculateUnrealizedPnl(active, price);
+    const currentR = active.expectedLossUsd && active.expectedLossUsd > 0
+      ? (pnl / active.expectedLossUsd)
+      : null;
+    const progress = calculateProgressToTargetPercent(active, price);
+    const runner = active.partialCloseDone ? ' runner active' : '';
+    return `#${index + 1} ${active.side}` +
+      ` entry ${fp(active.averageEntryPrice)}` +
+      ` current ${fp(price)}` +
+      ` target ${active.targetPrice !== null ? fp(active.targetPrice) : '--'}` +
+      ` hardStop ${active.hardStopPrice !== null ? fp(active.hardStopPrice) : '--'}` +
+      ` activeStop ${formatPlainPrice(getActiveStopPrice(active))}` +
+      ` size $${fp(active.totalUsdInvested)}` +
+      ` pnl ${formatSignedUsd(pnl)}` +
+      ` ${currentR !== null ? currentR.toFixed(2) + 'R' : '--R'}` +
+      ` progress ${progress !== null ? progress.toFixed(0) + '%' : '--'}` +
+      ` BE ${active.stopAtBreakeven ? 'YES' : 'NO'}` +
+      ` partial ${active.partialCloseDone ? 'YES' : 'NO'}` +
+      runner +
+      ` age ${formatPositionAge(active.openedAt)}` +
+      ` zone ${active.entryZoneType ?? '--'}` +
+      ` stopSource ${active.stopSource ?? '--'}`;
+  });
 }
 
 function fp(n: number): string {
@@ -386,6 +418,10 @@ function formatManagedTarget(position: PositionState): string {
 
 function formatOptionalUsd(value: number | null): string {
   return value === null ? '--' : `$${fp(value)}`;
+}
+
+function formatPlainPrice(value: number | null): string {
+  return value === null ? '--' : fp(value);
 }
 
 function formatPercent(value: number): string {

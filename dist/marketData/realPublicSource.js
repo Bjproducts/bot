@@ -30,11 +30,13 @@ class RealPublicSource {
     lastCandleOpenTime = 0;
     lastPrice;
     binanceSymbol;
+    startupCandleLimit;
     constructor(config) {
         this.symbol = config.symbol;
         this.lastPrice = config.startPrice; // fallback until first fetch
         this.binanceSymbol = RealPublicSource.toBinanceSymbol(config.symbol);
         this.host = (0, config_1.normalizeRealPublicHost)(config.realPublicHost);
+        this.startupCandleLimit = config.startupCandleLimit;
         this.sourceName = `REAL_PUBLIC (${displayHost(this.host)})`;
     }
     // ─── IMarketDataSource ────────────────────────────────────────────────────
@@ -58,6 +60,15 @@ class RealPublicSource {
     }
     currentPrice() {
         return this.lastPrice;
+    }
+    async startupCandles() {
+        const candles = await this.fetchClosedCandles(this.startupCandleLimit);
+        const latest = candles[candles.length - 1] ?? null;
+        if (latest) {
+            this.lastCandleOpenTime = latest.timestamp.getTime();
+            this.lastPrice = latest.close;
+        }
+        return candles;
     }
     // ─── Binance fetch ────────────────────────────────────────────────────────
     async fetchLatestClosedCandle() {
@@ -91,6 +102,31 @@ class RealPublicSource {
             volume: parseFloat(raw[5]),
             timestamp: new Date(openTimeMs),
         };
+    }
+    async fetchClosedCandles(limit) {
+        const safeLimit = Math.max(2, Math.min(1000, Math.floor(limit)));
+        const url = buildKlineUrl(this.host, this.binanceSymbol, safeLimit + 1);
+        const response = await fetch(url, {
+            signal: AbortSignal.timeout(8_000),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        if (!Array.isArray(data) || data.length < 2) {
+            throw new Error(`Unexpected response shape from Binance`);
+        }
+        return data
+            .slice(0, -1)
+            .slice(-safeLimit)
+            .map(raw => ({
+            open: parseFloat(raw[1]),
+            high: parseFloat(raw[2]),
+            low: parseFloat(raw[3]),
+            close: parseFloat(raw[4]),
+            volume: parseFloat(raw[5]),
+            timestamp: new Date(raw[0]),
+        }));
     }
     // ─── Symbol mapping ───────────────────────────────────────────────────────
     static toBinanceSymbol(symbol) {

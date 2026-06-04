@@ -92,6 +92,7 @@ class TradeJournal {
             e.avgEntry.toFixed(2),
             e.dcaCount,
             e.realizedPnlUsd.toFixed(4),
+            csv(e.positionId ?? ''),
             e.signalDirection,
             e.signalSource,
             e.ictSignal ?? '',
@@ -114,6 +115,16 @@ class TradeJournal {
             e.breakevenActivated !== undefined ? String(e.breakevenActivated) : '',
             e.breakevenActivationPrice !== undefined ? e.breakevenActivationPrice.toFixed(2) : '',
             e.breakevenActivationTime ?? '',
+            e.activeStopPrice !== undefined ? e.activeStopPrice.toFixed(2) : '',
+            e.unrealizedPnlUsd !== undefined ? e.unrealizedPnlUsd.toFixed(4) : '',
+            e.partialCloseDone !== undefined ? String(e.partialCloseDone) : '',
+            e.partialClosePrice !== undefined ? e.partialClosePrice.toFixed(2) : '',
+            e.partialCloseTime ?? '',
+            e.partialCloseFraction !== undefined ? e.partialCloseFraction.toFixed(6) : '',
+            e.realizedPartialPnlUsd !== undefined ? e.realizedPartialPnlUsd.toFixed(4) : '',
+            e.remainingSizeAfterPartial !== undefined ? e.remainingSizeAfterPartial.toFixed(8) : '',
+            e.finalRunnerPnlUsd !== undefined ? e.finalRunnerPnlUsd.toFixed(4) : '',
+            e.totalPnlUsd !== undefined ? e.totalPnlUsd.toFixed(4) : '',
             e.positionSizeUsd !== undefined ? e.positionSizeUsd.toFixed(2) : '',
             e.sizingMode ?? '',
             e.hardStopPrice !== undefined ? e.hardStopPrice.toFixed(2) : '',
@@ -167,6 +178,16 @@ class TradeJournal {
         const durationPart = e.tradeDurationMinutes !== undefined
             ? `  duration=${e.tradeDurationMinutes.toFixed(2)}m`
             : '';
+        const managementPart = `  activeStop=${moneyOrDash(e.activeStopPrice)}` +
+            `  unrealized=${moneyOrDash(e.unrealizedPnlUsd)}` +
+            `  partialDone=${e.partialCloseDone !== undefined ? e.partialCloseDone : '--'}` +
+            `  partialPrice=${moneyOrDash(e.partialClosePrice)}` +
+            `  partialTime=${e.partialCloseTime ?? '--'}` +
+            `  partialFraction=${e.partialCloseFraction !== undefined ? e.partialCloseFraction.toFixed(4) : '--'}` +
+            `  realizedPartial=${moneyOrDash(e.realizedPartialPnlUsd)}` +
+            `  remainingAfterPartial=${e.remainingSizeAfterPartial !== undefined ? e.remainingSizeAfterPartial.toFixed(8) : '--'}` +
+            `  finalRunner=${moneyOrDash(e.finalRunnerPnlUsd)}` +
+            `  totalPnl=${moneyOrDash(e.totalPnlUsd)}`;
         const targetPart = e.targetPrice !== undefined
             ? `  target=${e.targetSource ?? '--'}:$${e.targetPrice.toFixed(2)}` +
                 `  targetZone=${e.targetZoneId ?? '--'}` +
@@ -203,11 +224,13 @@ class TradeJournal {
             `  size=${e.size.toFixed(6)}` +
             `  invested=$${e.investedUsd.toFixed(2)}` +
             `  avgEntry=$${e.avgEntry.toFixed(2)}` +
+            `  positionId=${e.positionId ?? '--'}` +
             `  dca=${e.dcaCount}` +
             `  signal=${e.signalDirection}` +
             ictPart +
             entryZonePart +
             targetPart +
+            managementPart +
             sizingPart +
             scorePart +
             durationPart +

@@ -14,7 +14,14 @@ import { Signal } from './signals/types';
 import { TradeJournal } from './journal/tradeJournal';
 import { TradeEvent, CompletedTrade } from './journal/types';
 import { EntryZoneDisrespectEvaluation, PositionCloseReason } from './positionExitTypes';
-import { evaluatePositionLifecycleExit, shouldActivateBreakeven } from './positionExitManager';
+import { calculateUnrealizedPnl, evaluatePositionLifecycleExit } from './positionExitManager';
+import {
+  activateDollarBreakeven,
+  applyPartialClose,
+  getActiveStopPrice,
+  planPartialClose,
+  shouldActivateDollarBreakeven,
+} from './positionTradeManagement';
 import { calculatePositionSizing } from './risk/positionSizing';
 import { PositionSizingResult } from './risk/positionSizingTypes';
 import { appendSizingRejection } from './risk/sizingRejectionLog';
@@ -127,7 +134,7 @@ export class BotEngine {
   start(): void {
     if (this.running) return;
     this.running = true;
-    this.scheduleTick();
+    void this.bootstrapAndSchedule();
   }
 
   stop(): void {
@@ -164,6 +171,29 @@ export class BotEngine {
       }
       this.scheduleTick();
     }, this.config.tickIntervalMs);
+  }
+
+  private async bootstrapAndSchedule(): Promise<void> {
+    await this.preloadStartupCandles();
+    if (this.running) this.scheduleTick();
+  }
+
+  private async preloadStartupCandles(): Promise<void> {
+    if (typeof this.dataSource.startupCandles !== 'function') return;
+
+    try {
+      const candles = await this.dataSource.startupCandles();
+      for (const candle of candles) {
+        this.rememberCandle(candle);
+      }
+      if (candles.length > 0) {
+        this.lastPrice = candles[candles.length - 1]!.close;
+        console.log(`  STARTUP_LOOKBACK loaded ${candles.length} closed candles`);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`  STARTUP_LOOKBACK failed: ${msg}`);
+    }
   }
 
   private async processTick(): Promise<void> {
@@ -836,6 +866,11 @@ export class BotEngine {
       price,
       candle?.timestamp ?? new Date(),
     );
+    latestPosition = this.partialCloseIfEligible(
+      latestPosition,
+      price,
+      candle?.timestamp ?? new Date(),
+    );
     const lifecycleExit = evaluatePositionLifecycleExit(latestPosition, price, candle, {
       takeProfitPct: config.takeProfitPct,
       profitTargetUsdMin: config.profitTargetUsdMin,
@@ -845,7 +880,6 @@ export class BotEngine {
       // Phase 7D: retained for settings compatibility; the exit evaluator no
       // longer closes by quick-profit or time-based rules.
       useQuickProfitExit: true,
-      breakevenTriggerPercent: 50,
     });
     const disrespectEvaluation = lifecycleExit.entryZoneDisrespect;
     if (
@@ -959,23 +993,22 @@ export class BotEngine {
     price: number,
     activationTime: Date,
   ): PositionState {
-    if (!shouldActivateBreakeven(position, price, 50)) return position;
+    if (!shouldActivateDollarBreakeven(position, price, {
+      breakevenTriggerProfitUsd: this.config.breakevenTriggerProfitUsd,
+    })) return position;
 
-    const activationIso = activationTime.toISOString();
-    const activated: PositionState = {
-      ...position,
-      stopAtBreakeven: true,
-      stopMovedToBreakevenAt: activationIso,
-      breakevenActivationPrice: price,
-      breakevenActivationTime: activationIso,
-    };
+    const activated = activateDollarBreakeven(position, price, activationTime);
+    const activationIso = activated.breakevenActivationTime ?? activationTime.toISOString();
+    const unrealizedPnlUsd = calculateUnrealizedPnl(position, price);
 
     this.updatePosition(activated);
     logEvent(
       'BREAKEVEN',
       position.side,
       this.tick,
-      `BE Activated  trigger=50%  activationPrice=$${fp(price)}  activationTime=${activationIso}  stop=entry $${fp(position.averageEntryPrice)}`,
+      `BE Activated  positionId=${position.id ?? '--'}  trigger=$${this.config.breakevenTriggerProfitUsd.toFixed(2)}` +
+      `  activationPrice=$${fp(price)}  activationTime=${activationIso}` +
+      `  pnl=$${unrealizedPnlUsd.toFixed(2)}  stop=entry $${fp(position.averageEntryPrice)}`,
     );
     this.journal.logEvent(this.makeEvent(
       'BREAKEVEN_ACTIVATED',
@@ -988,6 +1021,45 @@ export class BotEngine {
       activated,
     ));
     return activated;
+  }
+
+  private partialCloseIfEligible(
+    position: PositionState,
+    price: number,
+    closeTime: Date,
+  ): PositionState {
+    const plan = planPartialClose(position, price, {
+      partialCloseEnabled: this.config.partialCloseEnabled,
+      partialCloseTriggerProfitUsd: this.config.partialCloseTriggerProfitUsd,
+      partialCloseLockProfitUsd: this.config.partialCloseLockProfitUsd,
+    });
+    if (!plan.shouldClosePartial) return position;
+
+    const updated = applyPartialClose(position, price, closeTime, plan);
+    this.updatePosition(updated);
+
+    logEvent(
+      'PARTIAL_CLOSE',
+      position.side,
+      this.tick,
+      `positionId=${position.id ?? '--'}  entry=$${fp(position.averageEntryPrice)}` +
+      `  current=$${fp(price)}  originalSize=${plan.originalSize.toFixed(8)}` +
+      `  closedSize=${plan.closedSize.toFixed(8)}  remainingSize=${plan.remainingSize.toFixed(8)}` +
+      `  realizedPartialPnl=$${plan.realizedPartialPnlUsd.toFixed(2)}` +
+      `  unrealizedAtClose=$${plan.unrealizedProfitAtClose.toFixed(2)}` +
+      `  fraction=${plan.partialCloseFraction.toFixed(4)}`,
+    );
+    this.journal.logEvent(this.makeEvent(
+      'PARTIAL_CLOSE',
+      price,
+      plan.closedSize,
+      plan.realizedPartialPnlUsd,
+      this.currentSignalDirection(),
+      undefined,
+      undefined,
+      updated,
+    ));
+    return updated;
   }
 
   private opposingTargetEncountered(position: PositionState, candle: Candle): boolean {
@@ -1065,8 +1137,9 @@ export class BotEngine {
     const pnlUsd = activeSide === 'LONG'
       ? exitValue - entryValue
       : entryValue - exitValue;
-    const pnlPct = (pnlUsd / position.totalUsdInvested) * 100;
-    const sign = pnlUsd >= 0 ? '+' : '';
+    const totalPnlUsd = position.realizedPartialPnlUsd + pnlUsd;
+    const pnlPct = (totalPnlUsd / position.totalUsdInvested) * 100;
+    const sign = totalPnlUsd >= 0 ? '+' : '';
     const label = closeReasonLabel(reason);
     const now = new Date();
     const entryTime = position.openedAt
@@ -1079,7 +1152,8 @@ export class BotEngine {
       label,
       activeSide,
       this.tick,
-      `$${fp(price)}  PnL=${sign}$${pnlUsd.toFixed(2)} (${sign}${pnlPct.toFixed(3)}%)  ` +
+      `positionId=${position.id ?? '--'}  $${fp(price)}  PnL=${sign}$${totalPnlUsd.toFixed(2)} (${sign}${pnlPct.toFixed(3)}%)  ` +
+      `runner=${pnlUsd >= 0 ? '+' : ''}$${pnlUsd.toFixed(2)}  partial=$${position.realizedPartialPnlUsd.toFixed(2)}  ` +
       `duration=${tradeDurationMinutes.toFixed(2)}m  ` +
       `DCAs=${position.dcaCount - 1}  invested=$${position.totalUsdInvested.toFixed(0)}`,
     );
@@ -1088,11 +1162,15 @@ export class BotEngine {
       reason,
       price,
       position.activePositionSize,
-      pnlUsd,
+      totalPnlUsd,
       this.currentSignalDirection(),
       disrespectEvaluation,
       tradeDurationMinutes,
-      position,
+      {
+        ...position,
+        finalRunnerPnlUsd: pnlUsd,
+        totalPnlUsd,
+      },
     );
 
     const completed: CompletedTrade = {
@@ -1107,12 +1185,17 @@ export class BotEngine {
       exitPrice: price,
       dcaCount: position.dcaCount - 1,
       totalInvestedUsd: position.totalUsdInvested,
-      realizedPnlUsd: pnlUsd,
+      realizedPnlUsd: totalPnlUsd,
+      positionId: position.id ?? undefined,
       pnlPct,
       reason,
       tradeDurationMinutes,
       ...this.makeEntryZoneFields(disrespectEvaluation, position),
-      ...this.makeManagedTargetFields(position),
+      ...this.makeManagedTargetFields({
+        ...position,
+        finalRunnerPnlUsd: pnlUsd,
+        totalPnlUsd,
+      }),
       ...this.makePositionSizingFields(position),
       ...this.makeScoreAttributionFields(position),
     };
@@ -1121,7 +1204,7 @@ export class BotEngine {
     generateScoreAttributionReports();
 
     this.stats = {
-      ...recordClosedTrade(this.stats, pnlUsd, config),
+      ...recordClosedTrade(this.stats, totalPnlUsd, config),
       latestCloseReason: reason,
       latestPositionExit: null,
     };
@@ -1145,6 +1228,9 @@ export class BotEngine {
     const position = positionOverride ?? this.position;
     const side = position.side === 'NONE' ? this.config.side : position.side;
     const ictSignal = this.latestIctSignal;
+    const unrealizedPnlUsd = position.side === 'NONE'
+      ? 0
+      : calculateUnrealizedPnl(position, price);
 
     return {
       timestamp: new Date().toISOString(),
@@ -1158,6 +1244,7 @@ export class BotEngine {
       avgEntry: position.averageEntryPrice,
       dcaCount: Math.max(0, position.dcaCount - 1),
       realizedPnlUsd,
+      positionId: position.id ?? undefined,
       signalDirection,
       signalSource: this.config.signalSource,
       ictSignal: ictSignal?.signal,
@@ -1170,14 +1257,22 @@ export class BotEngine {
       ...this.makeManagedTargetFields(position),
       ...this.makePositionSizingFields(position),
       ...this.makeScoreAttributionFields(position),
+      activeStopPrice: getActiveStopPrice(position) ?? undefined,
+      unrealizedPnlUsd,
+      partialCloseDone: position.partialCloseDone,
+      partialClosePrice: position.partialClosePrice ?? undefined,
+      partialCloseTime: position.partialCloseTime ?? undefined,
+      partialCloseFraction: position.partialCloseFraction ?? undefined,
+      realizedPartialPnlUsd: position.realizedPartialPnlUsd,
+      remainingSizeAfterPartial: position.remainingSizeAfterPartial ?? undefined,
+      finalRunnerPnlUsd: position.finalRunnerPnlUsd ?? undefined,
+      totalPnlUsd: position.totalPnlUsd ?? undefined,
     };
   }
 
   private makeManagedTargetFields(position: PositionState = this.position): Partial<TradeEvent> {
-    if (position.targetPrice === null) return {};
-
     return {
-      targetPrice: position.targetPrice,
+      targetPrice: position.targetPrice ?? undefined,
       targetSource: position.targetSource ?? undefined,
       targetZoneId: position.targetZoneId ?? undefined,
       targetDisrespected: position.targetDisrespected ?? undefined,
@@ -1185,6 +1280,14 @@ export class BotEngine {
       breakevenActivated: position.stopAtBreakeven,
       breakevenActivationPrice: position.breakevenActivationPrice ?? undefined,
       breakevenActivationTime: position.breakevenActivationTime ?? undefined,
+      partialCloseDone: position.partialCloseDone,
+      partialClosePrice: position.partialClosePrice ?? undefined,
+      partialCloseTime: position.partialCloseTime ?? undefined,
+      partialCloseFraction: position.partialCloseFraction ?? undefined,
+      realizedPartialPnlUsd: position.realizedPartialPnlUsd,
+      remainingSizeAfterPartial: position.remainingSizeAfterPartial ?? undefined,
+      finalRunnerPnlUsd: position.finalRunnerPnlUsd ?? undefined,
+      totalPnlUsd: position.totalPnlUsd ?? undefined,
     };
   }
 
@@ -1340,6 +1443,14 @@ export class BotEngine {
       stopMovedToBreakevenAt: null,
       breakevenActivationPrice: null,
       breakevenActivationTime: null,
+      partialCloseDone: activePositions.every(position => position.partialCloseDone),
+      partialClosePrice: null,
+      partialCloseTime: null,
+      partialCloseFraction: null,
+      realizedPartialPnlUsd: activePositions.reduce((sum, position) => sum + position.realizedPartialPnlUsd, 0),
+      remainingSizeAfterPartial: null,
+      finalRunnerPnlUsd: null,
+      totalPnlUsd: null,
       hardStopPrice: null,
       hardStopEnabled: activePositions.some(position => position.hardStopEnabled),
       stopPrice: null,

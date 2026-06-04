@@ -32,12 +32,14 @@ export class RealPublicSource implements IMarketDataSource {
   private lastPrice:          number;
 
   private readonly binanceSymbol: string;
+  private readonly startupCandleLimit: number;
 
   constructor(config: BotConfig) {
     this.symbol      = config.symbol;
     this.lastPrice   = config.startPrice;   // fallback until first fetch
     this.binanceSymbol = RealPublicSource.toBinanceSymbol(config.symbol);
     this.host        = normalizeRealPublicHost(config.realPublicHost);
+    this.startupCandleLimit = config.startupCandleLimit;
     this.sourceName  = `REAL_PUBLIC (${displayHost(this.host)})`;
   }
 
@@ -66,6 +68,16 @@ export class RealPublicSource implements IMarketDataSource {
 
   currentPrice(): number {
     return this.lastPrice;
+  }
+
+  async startupCandles(): Promise<Candle[]> {
+    const candles = await this.fetchClosedCandles(this.startupCandleLimit);
+    const latest = candles[candles.length - 1] ?? null;
+    if (latest) {
+      this.lastCandleOpenTime = latest.timestamp.getTime();
+      this.lastPrice = latest.close;
+    }
+    return candles;
   }
 
   // ─── Binance fetch ────────────────────────────────────────────────────────
@@ -108,6 +120,36 @@ export class RealPublicSource implements IMarketDataSource {
       volume:    parseFloat(raw[5]),
       timestamp: new Date(openTimeMs),
     };
+  }
+
+  private async fetchClosedCandles(limit: number): Promise<Candle[]> {
+    const safeLimit = Math.max(2, Math.min(1000, Math.floor(limit)));
+    const url = buildKlineUrl(this.host, this.binanceSymbol, safeLimit + 1);
+
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(8_000),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json() as BinanceKline[];
+    if (!Array.isArray(data) || data.length < 2) {
+      throw new Error(`Unexpected response shape from Binance`);
+    }
+
+    return data
+      .slice(0, -1)
+      .slice(-safeLimit)
+      .map(raw => ({
+        open: parseFloat(raw[1]),
+        high: parseFloat(raw[2]),
+        low: parseFloat(raw[3]),
+        close: parseFloat(raw[4]),
+        volume: parseFloat(raw[5]),
+        timestamp: new Date(raw[0]),
+      }));
   }
 
   // ─── Symbol mapping ───────────────────────────────────────────────────────

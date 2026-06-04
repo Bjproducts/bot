@@ -18,6 +18,9 @@ export interface IMarketDataSource {
    */
   nextCandle(): Promise<Candle | null>;
 
+  /** Optional startup history preload. Sources without history can omit it. */
+  startupCandles?(): Promise<Candle[]>;
+
   /** Last known close price. Always valid after first candle. */
   currentPrice(): number;
 

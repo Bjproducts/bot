@@ -6,6 +6,7 @@ const tests = [
     testDefaultHostFallback(),
     testCustomHost(),
     testUrlGenerationRemainsCorrect(),
+    testStartupLimitUsesFiveHundredCandles(),
     testTrailingSlashStripped(),
     testWhitespaceNormalised(),
 ];
@@ -54,6 +55,16 @@ function testUrlGenerationRemainsCorrect() {
     const expected = 'https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1m&limit=5';
     return {
         name: 'URL generation: path, symbol, interval, limit unchanged',
+        expected,
+        actual: url,
+        passed: url === expected,
+    };
+}
+function testStartupLimitUsesFiveHundredCandles() {
+    const url = (0, realPublicSource_1.buildKlineUrl)(config_1.DEFAULT_REAL_PUBLIC_HOST, 'BTCUSDT', 501);
+    const expected = 'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=501';
+    return {
+        name: 'startup candle preload requests 500 closed candles plus current open candle',
         expected,
         actual: url,
         passed: url === expected,

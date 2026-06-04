@@ -1,5 +1,125 @@
 # Development Log
 
+## Phase 8A - Dollar Breakeven, Partial Close, Per-Position Dashboard, Startup Lookback
+
+### Objective
+
+Improve trade management and live dashboard visibility without changing ICT entry logic, FVG/IFVG detection, MSS validation, reaction scoring, target selection, or risk-first sizing.
+
+### Dollar-Based Breakeven
+
+Replaced progress-based BE activation with per-position dollar profit activation.
+
+```text
+if individualPositionUnrealizedPnlUsd >= BREAKEVEN_TRIGGER_PROFIT_USD:
+  stopAtBreakeven = true
+  active stop = entry price
+  breakevenActivationPrice = current price
+  breakevenActivationTime = current candle timestamp
+```
+
+Default:
+
+```text
+BREAKEVEN_TRIGGER_PROFIT_USD=0.80
+```
+
+The trigger is evaluated per open position. Aggregate basket PnL is not used to activate BE.
+
+### Partial Close
+
+Added one-time partial close management per position.
+
+```text
+if individualPositionUnrealizedPnlUsd >= PARTIAL_CLOSE_TRIGGER_PROFIT_USD
+and partialCloseDone == false:
+  partialCloseFraction = PARTIAL_CLOSE_LOCK_PROFIT_USD / unrealizedProfitUsd
+  close activePositionSize * partialCloseFraction
+  realizedPartialPnlUsd += PARTIAL_CLOSE_LOCK_PROFIT_USD
+  keep remaining size open as runner
+  keep stop at breakeven or better
+```
+
+Defaults:
+
+```text
+PARTIAL_CLOSE_ENABLED=true
+PARTIAL_CLOSE_TRIGGER_PROFIT_USD=1.30
+PARTIAL_CLOSE_LOCK_PROFIT_USD=1.00
+```
+
+Final completed trade PnL now uses:
+
+```text
+totalPnlUsd = realizedPartialPnlUsd + finalRunnerPnlUsd
+```
+
+### Dashboard
+
+Added per-position dashboard rows for active positions. Each row shows:
+
+- position index
+- side
+- entry
+- current price
+- target
+- hard stop
+- active stop
+- size
+- unrealized PnL
+- current R
+- progress to target
+- BE state
+- partial close state
+- runner state
+- age
+- entry zone type
+- stop source
+
+### Startup Lookback
+
+REAL_PUBLIC now preloads closed 1-minute candles before live ticking begins.
+
+```text
+STARTUP_CANDLE_LIMIT=500
+```
+
+The source requests `limit=501`, drops the current open candle, and loads the latest 500 closed candles into the bot candle buffers.
+
+### Logging
+
+Journal CSV and event logs now include:
+
+- `positionId`
+- `activeStopPrice`
+- `unrealizedPnlUsd`
+- `partialCloseDone`
+- `partialClosePrice`
+- `partialCloseTime`
+- `partialCloseFraction`
+- `realizedPartialPnlUsd`
+- `remainingSizeAfterPartial`
+- `finalRunnerPnlUsd`
+- `totalPnlUsd`
+
+### Files Modified
+
+- `src/positionTradeManagement.ts`
+- `src/bot.ts`
+- `src/types.ts`
+- `src/state.ts`
+- `src/config.ts`
+- `src/sessionStats.ts`
+- `src/marketData/types.ts`
+- `src/marketData/realPublicSource.ts`
+- `src/marketData/testRealPublicSource.ts`
+- `src/journal/types.ts`
+- `src/journal/tradeJournal.ts`
+- `src/testPositionExitManager.ts`
+- `src/execution/testLiveExecutionManager.ts`
+- `.env.example`
+- `docs/DEVLOG.md`
+
 ## Phase 7D - Break-Even Management + Time Exit Removal
 
 ### Objective

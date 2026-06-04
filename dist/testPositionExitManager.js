@@ -38,6 +38,8 @@ const path = __importStar(require("path"));
 const config_1 = require("./config");
 const tradeJournal_1 = require("./journal/tradeJournal");
 const positionExitManager_1 = require("./positionExitManager");
+const positionTradeManagement_1 = require("./positionTradeManagement");
+const sessionStats_1 = require("./sessionStats");
 const now = new Date('2026-06-01T12:00:00.000Z');
 const recent = '2026-06-01T11:50:00.000Z';
 const old = '2026-06-01T11:20:00.000Z';
@@ -86,8 +88,14 @@ const results = fixtures.map((fixture) => {
 results.push(testFixedTakeProfitDoesNotCloseWithoutManagedTarget());
 results.push(testQuickProfitDoesNotClose());
 results.push(testTimeExitDoesNotClose());
-results.push(testBreakevenActivatesAtHalfTargetDistance());
-results.push(testBreakevenDoesNotActivateBeforeHalfTargetDistance());
+results.push(testBreakevenActivatesAtDollarProfit());
+results.push(testBreakevenDoesNotUseAggregateBasketPnl());
+results.push(testPartialCloseTriggersAtDollarProfit());
+results.push(testPartialCloseRealizesExactlyOneDollar());
+results.push(testPartialCloseOnlyOnce());
+results.push(testRunnerRemainsOpenAfterPartialClose());
+results.push(testCompletedPnlIncludesPartialAndRunner());
+results.push(testDashboardFormatsMultipleActivePositions());
 const zoneDisrespectFixtures = [
     {
         name: 'SHORT closes when candle body closes above bearish entry zone high',
@@ -226,6 +234,14 @@ function position(side, openedAt) {
         stopMovedToBreakevenAt: null,
         breakevenActivationPrice: null,
         breakevenActivationTime: null,
+        partialCloseDone: false,
+        partialClosePrice: null,
+        partialCloseTime: null,
+        partialCloseFraction: null,
+        realizedPartialPnlUsd: 0,
+        remainingSizeAfterPartial: null,
+        finalRunnerPnlUsd: null,
+        totalPnlUsd: null,
         hardStopPrice: null,
         hardStopEnabled: false,
         stopPrice: null,
@@ -439,34 +455,126 @@ function testTimeExitDoesNotClose() {
         passed: !result.shouldClose && result.reason === null && result.positionAgeMinutes !== null,
     };
 }
-function testBreakevenActivatesAtHalfTargetDistance() {
-    const positionState = {
-        ...position('LONG', recent),
-        targetPrice: 110,
-        targetSource: 'SCALP_R',
-    };
-    const progress = (0, positionExitManager_1.calculateProgressToTargetPercent)(positionState, 105);
-    const activates = (0, positionExitManager_1.shouldActivateBreakeven)(positionState, 105, 50);
+function testBreakevenActivatesAtDollarProfit() {
+    const positionState = position('LONG', recent);
+    const activates = (0, positionTradeManagement_1.shouldActivateDollarBreakeven)(positionState, 100.8, {
+        breakevenTriggerProfitUsd: 0.80,
+    });
     return {
-        name: 'break-even activates at 50% target progress',
-        expected: '50 true',
-        actual: `${progress?.toFixed(0) ?? 'null'} ${activates}`,
-        passed: progress === 50 && activates,
+        name: 'breakeven activates at +$0.80 individual position profit',
+        expected: 'true',
+        actual: String(activates),
+        passed: activates,
     };
 }
-function testBreakevenDoesNotActivateBeforeHalfTargetDistance() {
-    const positionState = {
-        ...position('SHORT', recent),
-        targetPrice: 90,
-        targetSource: 'SCALP_R',
-    };
-    const progress = (0, positionExitManager_1.calculateProgressToTargetPercent)(positionState, 96);
-    const activates = (0, positionExitManager_1.shouldActivateBreakeven)(positionState, 96, 50);
+function testBreakevenDoesNotUseAggregateBasketPnl() {
+    const winner = position('LONG', recent);
+    const loser = position('SHORT', recent);
+    const winnerActivates = (0, positionTradeManagement_1.shouldActivateDollarBreakeven)(winner, 100.9, {
+        breakevenTriggerProfitUsd: 0.80,
+    });
+    const loserActivates = (0, positionTradeManagement_1.shouldActivateDollarBreakeven)(loser, 100.9, {
+        breakevenTriggerProfitUsd: 0.80,
+    });
     return {
-        name: 'break-even does not activate before 50% target progress',
-        expected: '40 false',
-        actual: `${progress?.toFixed(0) ?? 'null'} ${activates}`,
-        passed: progress === 40 && !activates,
+        name: 'breakeven does not activate from aggregate basket PnL',
+        expected: 'winner=true loser=false',
+        actual: `winner=${winnerActivates} loser=${loserActivates}`,
+        passed: winnerActivates && !loserActivates,
+    };
+}
+function testPartialCloseTriggersAtDollarProfit() {
+    const plan = (0, positionTradeManagement_1.planPartialClose)(position('LONG', recent), 101.3, partialSettings());
+    return {
+        name: 'partial close triggers at +$1.30',
+        expected: 'true',
+        actual: String(plan.shouldClosePartial),
+        passed: plan.shouldClosePartial,
+    };
+}
+function testPartialCloseRealizesExactlyOneDollar() {
+    const plan = (0, positionTradeManagement_1.planPartialClose)(position('LONG', recent), 101.3, partialSettings());
+    return {
+        name: 'partial close realizes exactly $1.00',
+        expected: '1.00',
+        actual: plan.realizedPartialPnlUsd.toFixed(2),
+        passed: Math.abs(plan.realizedPartialPnlUsd - 1) < 0.000001,
+    };
+}
+function testPartialCloseOnlyOnce() {
+    const alreadyPartial = {
+        ...position('LONG', recent),
+        partialCloseDone: true,
+    };
+    const plan = (0, positionTradeManagement_1.planPartialClose)(alreadyPartial, 101.3, partialSettings());
+    return {
+        name: 'partial close only happens once per position',
+        expected: 'false',
+        actual: String(plan.shouldClosePartial),
+        passed: !plan.shouldClosePartial,
+    };
+}
+function testRunnerRemainsOpenAfterPartialClose() {
+    const original = position('LONG', recent);
+    const plan = (0, positionTradeManagement_1.planPartialClose)(original, 101.3, partialSettings());
+    const updated = (0, positionTradeManagement_1.applyPartialClose)(original, 101.3, now, plan);
+    return {
+        name: 'runner remains open after partial close',
+        expected: 'side=LONG remaining>0 partial=true',
+        actual: `side=${updated.side} remaining=${updated.activePositionSize.toFixed(6)} partial=${updated.partialCloseDone}`,
+        passed: updated.side === 'LONG' && updated.activePositionSize > 0 && updated.partialCloseDone,
+    };
+}
+function testCompletedPnlIncludesPartialAndRunner() {
+    const partial = {
+        ...position('LONG', recent),
+        realizedPartialPnlUsd: 1,
+    };
+    const finalRunnerPnlUsd = 0.25;
+    const totalPnlUsd = partial.realizedPartialPnlUsd + finalRunnerPnlUsd;
+    return {
+        name: 'completed trade PnL includes partial plus final runner PnL',
+        expected: '1.25',
+        actual: totalPnlUsd.toFixed(2),
+        passed: totalPnlUsd === 1.25,
+    };
+}
+function testDashboardFormatsMultipleActivePositions() {
+    const aggregate = {
+        ...position('LONG', recent),
+        id: 'AGGREGATE',
+        openPositions: [
+            {
+                ...position('SHORT', recent),
+                id: 'p1',
+                averageEntryPrice: 100,
+                targetPrice: 98,
+                hardStopPrice: 101,
+                stopAtBreakeven: true,
+            },
+            {
+                ...position('LONG', recent),
+                id: 'p2',
+                averageEntryPrice: 100,
+                targetPrice: 102,
+                hardStopPrice: 99,
+                partialCloseDone: true,
+            },
+        ],
+    };
+    const rows = (0, sessionStats_1.formatPerPositionRows)(aggregate, 99);
+    return {
+        name: 'dashboard can display multiple active positions separately',
+        expected: '2 rows with #1 and #2',
+        actual: rows.join(' | '),
+        passed: rows.length === 2 && rows[0].includes('#1 SHORT') && rows[1].includes('#2 LONG'),
+    };
+}
+function partialSettings() {
+    return {
+        partialCloseEnabled: true,
+        partialCloseTriggerProfitUsd: 1.30,
+        partialCloseLockProfitUsd: 1.00,
     };
 }
 function testCompletedHardStopTradeRecordWritten() {

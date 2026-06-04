@@ -49,6 +49,14 @@ export interface PositionState {
   stopMovedToBreakevenAt: string | null;
   breakevenActivationPrice: number | null;
   breakevenActivationTime: string | null;
+  partialCloseDone: boolean;
+  partialClosePrice: number | null;
+  partialCloseTime: string | null;
+  partialCloseFraction: number | null;
+  realizedPartialPnlUsd: number;
+  remainingSizeAfterPartial: number | null;
+  finalRunnerPnlUsd: number | null;
+  totalPnlUsd: number | null;
   hardStopPrice:      number | null;
   hardStopEnabled:    boolean;
   stopPrice:          number | null;
@@ -173,6 +181,11 @@ export interface BotConfig {
   positionSizingMode: PositionSizingMode;
   hardStopEnabled: boolean;
   debugIctPipeline: boolean;
+  breakevenTriggerProfitUsd: number;
+  partialCloseEnabled: boolean;
+  partialCloseTriggerProfitUsd: number;
+  partialCloseLockProfitUsd: number;
+  startupCandleLimit: number;
 
   // Exit target mode (Phase 5g)
   exitTargetMode: ExitTargetMode;

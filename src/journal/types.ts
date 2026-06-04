@@ -3,7 +3,7 @@ import { EntryZoneDirection, EntryZoneType } from '../types';
 import { ScoreBreakdown } from '../analytics/scoreAttributionTypes';
 import { StopSource } from '../ict/tradeCandidateTypes';
 
-export type TradeAction = 'ENTRY' | 'DCA' | 'BREAKEVEN_ACTIVATED' | PositionCloseReason;
+export type TradeAction = 'ENTRY' | 'DCA' | 'BREAKEVEN_ACTIVATED' | 'PARTIAL_CLOSE' | PositionCloseReason;
 
 export interface TradeEvent {
   timestamp: string;
@@ -17,6 +17,7 @@ export interface TradeEvent {
   avgEntry: number;
   dcaCount: number;
   realizedPnlUsd: number;
+  positionId?: string;
   signalDirection: string;
   signalSource: string;
   ictSignal?: string;
@@ -39,6 +40,16 @@ export interface TradeEvent {
   breakevenActivated?: boolean;
   breakevenActivationPrice?: number;
   breakevenActivationTime?: string;
+  activeStopPrice?: number;
+  unrealizedPnlUsd?: number;
+  partialCloseDone?: boolean;
+  partialClosePrice?: number;
+  partialCloseTime?: string;
+  partialCloseFraction?: number;
+  realizedPartialPnlUsd?: number;
+  remainingSizeAfterPartial?: number;
+  finalRunnerPnlUsd?: number;
+  totalPnlUsd?: number;
   positionSizeUsd?: number;
   sizingMode?: string;
   hardStopPrice?: number;
@@ -77,6 +88,7 @@ export interface CompletedTrade {
   dcaCount: number;
   totalInvestedUsd: number;
   realizedPnlUsd: number;
+  positionId?: string;
   pnlPct: number;
   reason: PositionCloseReason;
   entryZoneId?: string;
@@ -94,6 +106,16 @@ export interface CompletedTrade {
   breakevenActivated?: boolean;
   breakevenActivationPrice?: number;
   breakevenActivationTime?: string;
+  activeStopPrice?: number;
+  unrealizedPnlUsd?: number;
+  partialCloseDone?: boolean;
+  partialClosePrice?: number;
+  partialCloseTime?: string;
+  partialCloseFraction?: number;
+  realizedPartialPnlUsd?: number;
+  remainingSizeAfterPartial?: number;
+  finalRunnerPnlUsd?: number;
+  totalPnlUsd?: number;
   positionSizeUsd?: number;
   sizingMode?: string;
   hardStopPrice?: number;
@@ -128,6 +150,7 @@ export const CSV_HEADER = [
   'avgEntry',
   'dcaCount',
   'realizedPnlUsd',
+  'positionId',
   'signalDirection',
   'signalSource',
   'ictSignal',
@@ -150,6 +173,16 @@ export const CSV_HEADER = [
   'breakevenActivated',
   'breakevenActivationPrice',
   'breakevenActivationTime',
+  'activeStopPrice',
+  'unrealizedPnlUsd',
+  'partialCloseDone',
+  'partialClosePrice',
+  'partialCloseTime',
+  'partialCloseFraction',
+  'realizedPartialPnlUsd',
+  'remainingSizeAfterPartial',
+  'finalRunnerPnlUsd',
+  'totalPnlUsd',
   'positionSizeUsd',
   'sizingMode',
   'hardStopPrice',
