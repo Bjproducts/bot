@@ -1,0 +1,19 @@
+[
+  {
+    "id": "mixed-1",
+    "symbol": "BTC",
+    "side": "LONG",
+    "marketDataSource": "TEST",
+    "entryTimestamp": "2026-06-04T20:17:48.087Z",
+    "exitTimestamp": "2026-06-04T20:17:48.087Z",
+    "entryPrice": 66100,
+    "avgEntryPrice": 66100,
+    "exitPrice": 66000,
+    "dcaCount": 0,
+    "totalInvestedUsd": 66,
+    "realizedPnlUsd": -0.69,
+    "pnlPct": -1.04,
+    "reason": "MIXED_EXPOSURE_RISK_EXIT",
+    "tradeDurationMinutes": 1
+  }
+]

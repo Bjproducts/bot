@@ -40,6 +40,12 @@ import {
   clearIctStateForGap,
   detectCandleGap,
 } from './ict/candleBufferGap';
+import {
+  assessDirectionalExposure,
+  evaluateMixedExposureCleanup,
+  evaluateOppositeSignalProtection,
+  PositionSnapshot,
+} from './risk/oppositeExposureManager';
 import { evaluateReaction } from './ict/reactionEngine';
 import { createIctSignal } from './ict/ictSignalEngine';
 import { IctSignalResult, IctSignalZone } from './ict/ictSignalTypes';
@@ -428,6 +434,16 @@ export class BotEngine {
     }
 
     this.applyOppositeSignalProtection(side, this.lastPrice, tradeSelection.action);
+
+    // Phase 8D: after protect/close has run, if ANY opposite-side position
+    // is still open (BE-armed or waiting in the small-loss zone), block
+    // the new opposite entry. The bot should only trade in one direction
+    // at a time.
+    const oppositeGate = this.gateOppositeExposure(side);
+    if (oppositeGate.blockNewEntry) {
+      logEvent('ENTRY_SKIP_OPPOSITE_EXPOSURE', side, this.tick, oppositeGate.reason);
+      return;
+    }
 
     if (!this.canOpenNewPosition()) {
       logEvent(
@@ -898,6 +914,13 @@ export class BotEngine {
   }
 
   private managePositions(price: number, candle: Candle | null): void {
+    // Phase 8D: mixed-exposure cleanup runs BEFORE per-position management.
+    // If both LONG and SHORT positions are open, any unprotected position
+    // losing >= oppositeSignalMaxLossUsd is closed with reason
+    // MIXED_EXPOSURE_RISK_EXIT. Protected positions (BE-armed, including
+    // partial-runner BE) are left alone.
+    this.applyMixedExposureCleanup(price);
+
     for (const position of [...this.positions]) {
       this.managePosition(position, price, candle);
     }
@@ -1219,6 +1242,61 @@ export class BotEngine {
         protectionReason: plan.protectionReason,
       });
     }
+  }
+
+  /**
+   * Phase 8D: post-protection block decision. Builds snapshots of every
+   * currently-open position and asks the pure evaluator whether the new
+   * opposite-direction entry is allowed.
+   */
+  private gateOppositeExposure(newSignalSide: TradeSide): { blockNewEntry: boolean; reason: string } {
+    const snapshots = this.snapshotPositionsForExposure(this.lastPrice);
+    const evaluation = evaluateOppositeSignalProtection(snapshots, newSignalSide, {
+      oppositeMaxLossUsd: this.config.oppositeSignalMaxLossUsd,
+    });
+    return { blockNewEntry: evaluation.blockNewEntry, reason: evaluation.blockReason };
+  }
+
+  /**
+   * Phase 8D: every-tick mixed-exposure cleanup. Closes unprotected
+   * losing positions that conflict with an opposite-side position.
+   */
+  private applyMixedExposureCleanup(price: number): void {
+    const snapshots = this.snapshotPositionsForExposure(price);
+    const plan = evaluateMixedExposureCleanup(snapshots, {
+      oppositeMaxLossUsd: this.config.oppositeSignalMaxLossUsd,
+    });
+    if (!plan.mixedExposureActive || plan.positionsToClose.length === 0) return;
+
+    for (const snap of plan.positionsToClose) {
+      const position = this.positions.find(p => (p.id ?? '') === snap.id);
+      if (!position || position.side === 'NONE') continue;
+      const opposingIds = snapshots
+        .filter(s => s.side !== snap.side)
+        .map(s => s.id);
+      logEvent(
+        'MIXED_EXPOSURE_RISK_EXIT',
+        position.side,
+        this.tick,
+        `positionId=${snap.id}  side=${snap.side}  entry=${snap.averageEntryPrice.toFixed(2)}  ` +
+        `price=${price.toFixed(2)}  pnl=$${snap.unrealizedPnlUsd.toFixed(2)}  ` +
+        `opposing=[${opposingIds.join(',')}]  reason="mixed exposure with unprotected loss"`,
+      );
+      this.closePosition(position, price, 'MIXED_EXPOSURE_RISK_EXIT');
+    }
+  }
+
+  private snapshotPositionsForExposure(price: number): PositionSnapshot[] {
+    return this.positions
+      .filter(p => p.side !== 'NONE')
+      .map(p => ({
+        id: p.id ?? `pos-${p.openedAt ?? 'unknown'}`,
+        side: p.side as 'LONG' | 'SHORT',
+        unrealizedPnlUsd: calculateUnrealizedPnl(p, price),
+        stopAtBreakeven: p.stopAtBreakeven,
+        averageEntryPrice: p.averageEntryPrice,
+        partialClosed: p.dcaCount > 1,
+      }));
   }
 
   private opposingTargetEncountered(position: PositionState, candle: Candle): boolean {

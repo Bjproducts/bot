@@ -50,6 +50,7 @@ const fvgDetector_1 = require("./ict/fvgDetector");
 const validatedFvgDetector_1 = require("./ict/validatedFvgDetector");
 const validatedFvgRejectionLog_1 = require("./ict/validatedFvgRejectionLog");
 const candleBufferGap_1 = require("./ict/candleBufferGap");
+const oppositeExposureManager_1 = require("./risk/oppositeExposureManager");
 const reactionEngine_1 = require("./ict/reactionEngine");
 const ictSignalEngine_1 = require("./ict/ictSignalEngine");
 const tradeSelectionEngine_1 = require("./ict/tradeSelectionEngine");
@@ -354,6 +355,15 @@ class BotEngine {
             return;
         }
         this.applyOppositeSignalProtection(side, this.lastPrice, tradeSelection.action);
+        // Phase 8D: after protect/close has run, if ANY opposite-side position
+        // is still open (BE-armed or waiting in the small-loss zone), block
+        // the new opposite entry. The bot should only trade in one direction
+        // at a time.
+        const oppositeGate = this.gateOppositeExposure(side);
+        if (oppositeGate.blockNewEntry) {
+            logEvent('ENTRY_SKIP_OPPOSITE_EXPOSURE', side, this.tick, oppositeGate.reason);
+            return;
+        }
         if (!this.canOpenNewPosition()) {
             logEvent('ENTRY_SKIP', side, this.tick, `max active positions reached (${this.positions.length}/${this.config.maxConcurrentPositions})`);
             return;
@@ -744,6 +754,12 @@ class BotEngine {
         this.journal.logEvent(this.makeEvent('ENTRY', price, fillAmount, 0, trigger.signalDirection, undefined, undefined, position));
     }
     managePositions(price, candle) {
+        // Phase 8D: mixed-exposure cleanup runs BEFORE per-position management.
+        // If both LONG and SHORT positions are open, any unprotected position
+        // losing >= oppositeSignalMaxLossUsd is closed with reason
+        // MIXED_EXPOSURE_RISK_EXIT. Protected positions (BE-armed, including
+        // partial-runner BE) are left alone.
+        this.applyMixedExposureCleanup(price);
         for (const position of [...this.positions]) {
             this.managePosition(position, price, candle);
         }
@@ -943,6 +959,54 @@ class BotEngine {
                 protectionReason: plan.protectionReason,
             });
         }
+    }
+    /**
+     * Phase 8D: post-protection block decision. Builds snapshots of every
+     * currently-open position and asks the pure evaluator whether the new
+     * opposite-direction entry is allowed.
+     */
+    gateOppositeExposure(newSignalSide) {
+        const snapshots = this.snapshotPositionsForExposure(this.lastPrice);
+        const evaluation = (0, oppositeExposureManager_1.evaluateOppositeSignalProtection)(snapshots, newSignalSide, {
+            oppositeMaxLossUsd: this.config.oppositeSignalMaxLossUsd,
+        });
+        return { blockNewEntry: evaluation.blockNewEntry, reason: evaluation.blockReason };
+    }
+    /**
+     * Phase 8D: every-tick mixed-exposure cleanup. Closes unprotected
+     * losing positions that conflict with an opposite-side position.
+     */
+    applyMixedExposureCleanup(price) {
+        const snapshots = this.snapshotPositionsForExposure(price);
+        const plan = (0, oppositeExposureManager_1.evaluateMixedExposureCleanup)(snapshots, {
+            oppositeMaxLossUsd: this.config.oppositeSignalMaxLossUsd,
+        });
+        if (!plan.mixedExposureActive || plan.positionsToClose.length === 0)
+            return;
+        for (const snap of plan.positionsToClose) {
+            const position = this.positions.find(p => (p.id ?? '') === snap.id);
+            if (!position || position.side === 'NONE')
+                continue;
+            const opposingIds = snapshots
+                .filter(s => s.side !== snap.side)
+                .map(s => s.id);
+            logEvent('MIXED_EXPOSURE_RISK_EXIT', position.side, this.tick, `positionId=${snap.id}  side=${snap.side}  entry=${snap.averageEntryPrice.toFixed(2)}  ` +
+                `price=${price.toFixed(2)}  pnl=$${snap.unrealizedPnlUsd.toFixed(2)}  ` +
+                `opposing=[${opposingIds.join(',')}]  reason="mixed exposure with unprotected loss"`);
+            this.closePosition(position, price, 'MIXED_EXPOSURE_RISK_EXIT');
+        }
+    }
+    snapshotPositionsForExposure(price) {
+        return this.positions
+            .filter(p => p.side !== 'NONE')
+            .map(p => ({
+            id: p.id ?? `pos-${p.openedAt ?? 'unknown'}`,
+            side: p.side,
+            unrealizedPnlUsd: (0, positionExitManager_1.calculateUnrealizedPnl)(p, price),
+            stopAtBreakeven: p.stopAtBreakeven,
+            averageEntryPrice: p.averageEntryPrice,
+            partialClosed: p.dcaCount > 1,
+        }));
     }
     opposingTargetEncountered(position, candle) {
         if (position.side === 'NONE'

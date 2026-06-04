@@ -189,6 +189,7 @@ function makeConfig(patch: Partial<BotConfig> = {}): BotConfig {
     targetRMultiple: 1.5,
     minRiskRewardRatio: 1.5,
     maxTargetDistancePercent: 0,
+    oppositeSignalMaxLossUsd: 0.30,
     volumeLookback: 20,
     volumeSpikeMultiplier: 2,
     reversalDropPercent: 1,

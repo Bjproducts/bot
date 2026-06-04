@@ -208,6 +208,11 @@ export interface BotConfig {
   minRiskRewardRatio: number;
   maxTargetDistancePercent: number;
 
+  // Phase 8D: max tolerable loss on an opposite-direction position before
+  // we either close it (on a new opposite signal) or cleanup-close it
+  // (on every tick when mixed exposure exists). Default $0.30.
+  oppositeSignalMaxLossUsd: number;
+
   // Signal
   volumeLookback:        number;
   volumeSpikeMultiplier: number;

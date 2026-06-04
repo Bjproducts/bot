@@ -8,6 +8,11 @@ import { getActiveStopPrice } from './positionTradeManagement';
 import { LIVE_ARM_CONFIRMATION } from './execution/exchangeTypes';
 import { createScoreAttribution } from './analytics/scoreAttribution';
 import { ScoreAttributionReport } from './analytics/scoreAttributionTypes';
+import {
+  assessDirectionalExposure,
+  evaluateMixedExposureCleanup,
+  PositionSnapshot,
+} from './risk/oppositeExposureManager';
 
 const STATS_FILE = path.resolve(__dirname, '../session-stats.json');
 const SESSION_STATS_HISTORY_FILE = path.resolve(__dirname, '../logs/session-stats-history.jsonl');
@@ -262,6 +267,27 @@ export function printDashboard(
     console.log(line(`Sizing Status   ${sizing ? sizing.status : '--'}`));
     console.log(line(`Sizing Reject   ${sizing && sizing.status === 'REJECTED' ? shorten(sizing.rejectionReason, 50) : '--'}`));
     console.log(line(`Sizing Rejects  ${stats.sizingRejections}  last: ${stats.lastSizingRejectionReason ? shorten(stats.lastSizingRejectionReason, 36) : '--'}`));
+
+    // Phase 8D — directional exposure summary
+    const exposureSnapshots: PositionSnapshot[] = (position.openPositions ?? [position])
+      .filter(p => p.side !== 'NONE')
+      .map(p => ({
+        id: p.id ?? `pos-${p.openedAt ?? 'unknown'}`,
+        side: p.side as 'LONG' | 'SHORT',
+        unrealizedPnlUsd: calculateUnrealizedPnl(p, price),
+        stopAtBreakeven: p.stopAtBreakeven,
+        averageEntryPrice: p.averageEntryPrice,
+        partialClosed: p.dcaCount > 1,
+      }));
+    const exposure = assessDirectionalExposure(exposureSnapshots);
+    const cleanup = evaluateMixedExposureCleanup(exposureSnapshots, {
+      oppositeMaxLossUsd: config.oppositeSignalMaxLossUsd,
+    });
+    const oppositeEntryBlocked = exposure === 'LONG' || exposure === 'SHORT' || exposure === 'MIXED';
+    console.log(line(`Directional Exp ${exposure}`));
+    console.log(line(`Mixed Exposure  ${cleanup.mixedExposureActive ? 'YES' : 'NO'}`));
+    console.log(line(`Opp Entry Block ${oppositeEntryBlocked ? 'YES' : 'NO'}`));
+    console.log(line(`Opp Max Loss    $${config.oppositeSignalMaxLossUsd.toFixed(2)}`));
     if (!selectedCandidate) {
       console.log(line(`Selection Reject ${shorten(tradeSelection?.rejectionReason ?? 'No selection yet', 36)}`));
     }

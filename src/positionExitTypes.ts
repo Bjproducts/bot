@@ -6,6 +6,7 @@ export type PositionCloseReason =
   | 'TIME_EXIT'
   | 'RISK_EXIT'
   | 'OPPOSITE_SIGNAL_RISK_EXIT'
+  | 'MIXED_EXPOSURE_RISK_EXIT'
   | 'HARD_STOP_EXIT'
   | 'ENTRY_ZONE_DISRESPECT_EXIT';
 
