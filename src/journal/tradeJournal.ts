@@ -18,6 +18,9 @@ const DURABLE_EVENT_TYPES = new Set<string>([
   'ENTRY_ZONE_DISRESPECT_EXIT',
   'HARD_STOP_EXIT',
   'RISK_EXIT',
+  'OPPOSITE_SIGNAL_BE_PROTECTION',
+  'OPPOSITE_SIGNAL_RISK_EXIT',
+  'PARTIAL_CLOSE_SKIPPED',
 ]);
 
 export interface TradeJournalOptions {
@@ -153,6 +156,18 @@ export class TradeJournal {
       e.riskDistance !== undefined ? e.riskDistance.toFixed(4) : '',
       e.zoneSize !== undefined ? e.zoneSize.toFixed(4) : '',
       e.stopSource ?? '',
+      e.stopModel ?? '',
+      e.originalStopPrice !== undefined ? e.originalStopPrice.toFixed(2) : '',
+      e.tightStopPrice !== undefined ? e.tightStopPrice.toFixed(2) : '',
+      e.selectedStopPrice !== undefined ? e.selectedStopPrice.toFixed(2) : '',
+      e.stopTightened !== undefined ? String(e.stopTightened) : '',
+      csv(e.stopTighteningReason ?? ''),
+      e.oppositeSignalProtected !== undefined ? String(e.oppositeSignalProtected) : '',
+      e.oldSide ?? '',
+      e.newSignalSide ?? '',
+      e.activeStopBefore !== undefined ? e.activeStopBefore.toFixed(2) : '',
+      e.activeStopAfter !== undefined ? e.activeStopAfter.toFixed(2) : '',
+      csv(e.protectionReason ?? ''),
       e.expectedProfitUsd !== undefined ? e.expectedProfitUsd.toFixed(4) : '',
       e.expectedLossUsd !== undefined ? e.expectedLossUsd.toFixed(4) : '',
       e.riskRewardRatio !== undefined ? e.riskRewardRatio.toFixed(4) : '',
@@ -229,6 +244,18 @@ export class TradeJournal {
         `  entry=${moneyOrDash(e.entryPrice)}` +
         `  stop=${moneyOrDash(e.stopPrice)}` +
         `  stopSource=${e.stopSource ?? '--'}` +
+        `  stopModel=${e.stopModel ?? '--'}` +
+        `  originalStop=${moneyOrDash(e.originalStopPrice)}` +
+        `  tightStop=${moneyOrDash(e.tightStopPrice)}` +
+        `  selectedStop=${moneyOrDash(e.selectedStopPrice)}` +
+        `  stopTightened=${e.stopTightened !== undefined ? e.stopTightened : '--'}` +
+        `  stopTighteningReason="${e.stopTighteningReason ?? ''}"` +
+        `  oppositeProtected=${e.oppositeSignalProtected !== undefined ? e.oppositeSignalProtected : '--'}` +
+        `  oldSide=${e.oldSide ?? '--'}` +
+        `  newSignalSide=${e.newSignalSide ?? '--'}` +
+        `  activeStopBefore=${moneyOrDash(e.activeStopBefore)}` +
+        `  activeStopAfter=${moneyOrDash(e.activeStopAfter)}` +
+        `  protectionReason="${e.protectionReason ?? ''}"` +
         `  riskDistance=${e.riskDistance !== undefined ? e.riskDistance.toFixed(4) : '--'}` +
         `  zoneSize=${e.zoneSize !== undefined ? e.zoneSize.toFixed(4) : '--'}` +
         `  expectedProfit=$${money(e.expectedProfitUsd)}` +
@@ -300,6 +327,18 @@ export class TradeJournal {
       zoneId: event.ictZoneId ?? event.entryZoneId ?? null,
       zoneType: event.ictZoneType ?? event.entryZoneType ?? null,
       stopSource: event.stopSource ?? null,
+      stopModel: event.stopModel ?? null,
+      originalStopPrice: event.originalStopPrice ?? null,
+      tightStopPrice: event.tightStopPrice ?? null,
+      selectedStopPrice: event.selectedStopPrice ?? null,
+      stopTightened: event.stopTightened ?? null,
+      stopTighteningReason: event.stopTighteningReason ?? null,
+      oppositeSignalProtected: event.oppositeSignalProtected ?? null,
+      oldSide: event.oldSide ?? null,
+      newSignalSide: event.newSignalSide ?? null,
+      activeStopBefore: event.activeStopBefore ?? null,
+      activeStopAfter: event.activeStopAfter ?? null,
+      reason: event.protectionReason ?? null,
       riskDistance: event.riskDistance ?? null,
       expectedProfitUsd: event.expectedProfitUsd ?? null,
       expectedLossUsd: event.expectedLossUsd ?? null,

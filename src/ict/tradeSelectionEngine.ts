@@ -88,6 +88,7 @@ function buildCandidate(
   const target = evaluation.targetSelection?.selectedTarget ?? null;
   const stopPrice = evaluation.stopPrice ?? null;
   const stopSource = evaluation.stopSource ?? null;
+  const stopModel = evaluation.stopModel ?? null;
   const realRewardDistance = target ? Math.abs(target.price - input.currentPrice) : 0;
   const realRiskDistance = stopPrice !== null ? Math.abs(input.currentPrice - stopPrice) : 0;
   const zoneSize = Math.abs(evaluation.zone.high - evaluation.zone.low);
@@ -174,6 +175,12 @@ function buildCandidate(
     entryPrice: input.currentPrice,
     stopPrice,
     stopSource,
+    stopModel,
+    originalStopPrice: evaluation.originalStopPrice ?? null,
+    tightStopPrice: evaluation.tightStopPrice ?? null,
+    selectedStopPrice: evaluation.selectedStopPrice ?? stopPrice,
+    stopTightened: evaluation.stopTightened ?? null,
+    stopTighteningReason: evaluation.stopTighteningReason ?? null,
     riskDistance: stopPrice !== null ? roundMoney(realRiskDistance) : null,
     zoneSize: roundMoney(zoneSize),
     realExpectedProfitUsd,

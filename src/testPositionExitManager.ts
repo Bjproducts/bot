@@ -11,6 +11,7 @@ import {
 import {
   applyPartialClose,
   planPartialClose,
+  planOppositeSignalProtection,
   shouldActivateDollarBreakeven,
 } from './positionTradeManagement';
 import { formatPerPositionRows } from './sessionStats';
@@ -159,6 +160,12 @@ results.push(testManagedTargetWritesCompletedJsonl());
 results.push(testHardStopWritesCompletedJsonl());
 results.push(testRestartDoesNotEraseJsonlLogs());
 results.push(testCompletedJsonlPnlIncludesPartialAndRunner());
+results.push(testOppositeSignalMovesProfitablePositionToBreakeven());
+results.push(testOppositeSignalRiskExitAtFiftyCentLossCap());
+results.push(testOppositeSignalDoesNotProtectSmallLoss());
+results.push(testOppositeProtectionEventsWriteTradeEventsJsonl());
+results.push(testOppositeRiskExitWritesCompletedJsonl());
+results.push(testPartialCloseSkippedWritesTradeEventsJsonl());
 results.push(testMaxHoldDefaultIsFiveMinutes());
 results.push(testExitPriorityChoosesZoneDisrespectBeforeTimeExit());
 results.push(testLongHardStopExit());
@@ -284,6 +291,13 @@ function position(side: 'LONG' | 'SHORT', openedAt: string): PositionState {
     stopSource: null,
     stopRiskDistance: null,
     stopZoneSize: null,
+    stopModel: null,
+    originalStopPrice: null,
+    tightStopPrice: null,
+    selectedStopPrice: null,
+    stopTightened: null,
+    stopTighteningReason: null,
+    oppositeSignalProtected: false,
     positionSizeUsd: null,
     expectedProfitUsd: null,
     expectedLossUsd: null,
@@ -770,6 +784,36 @@ function testCompletedHardStopTradeRecordWritten(): TestResult {
   };
 }
 
+function testOppositeSignalMovesProfitablePositionToBreakeven(): TestResult {
+  const plan = planOppositeSignalProtection(position('LONG', recent), 100.75, 'SHORT', 0.50);
+  return {
+    name: 'opposite accepted signal protects profitable position at breakeven',
+    expected: 'MOVE_TO_BREAKEVEN',
+    actual: plan.action,
+    passed: plan.action === 'MOVE_TO_BREAKEVEN' && plan.unrealizedPnlUsd > 0,
+  };
+}
+
+function testOppositeSignalRiskExitAtFiftyCentLossCap(): TestResult {
+  const plan = planOppositeSignalProtection(position('LONG', recent), 99.5, 'SHORT', 0.50);
+  return {
+    name: 'opposite accepted signal exits losing position at $0.50 loss cap',
+    expected: 'CLOSE_FOR_RISK',
+    actual: `${plan.action} pnl=${plan.unrealizedPnlUsd.toFixed(2)}`,
+    passed: plan.action === 'CLOSE_FOR_RISK' && Math.abs(plan.unrealizedPnlUsd + 0.5) <= 0.0001,
+  };
+}
+
+function testOppositeSignalDoesNotProtectSmallLoss(): TestResult {
+  const plan = planOppositeSignalProtection(position('LONG', recent), 99.75, 'SHORT', 0.50);
+  return {
+    name: 'opposite accepted signal leaves small losing position unchanged',
+    expected: 'NONE',
+    actual: `${plan.action} pnl=${plan.unrealizedPnlUsd.toFixed(2)}`,
+    passed: plan.action === 'NONE' && plan.unrealizedPnlUsd > -0.50,
+  };
+}
+
 function testEntryWritesTradeEventsJsonl(): TestResult {
   return testJsonlEventWrite('ENTRY', 'trade-events.jsonl');
 }
@@ -788,6 +832,18 @@ function testManagedTargetWritesCompletedJsonl(): TestResult {
 
 function testHardStopWritesCompletedJsonl(): TestResult {
   return testJsonlCloseWrite('HARD_STOP_EXIT');
+}
+
+function testOppositeProtectionEventsWriteTradeEventsJsonl(): TestResult {
+  return testJsonlEventWrite('OPPOSITE_SIGNAL_BE_PROTECTION', 'trade-events.jsonl');
+}
+
+function testOppositeRiskExitWritesCompletedJsonl(): TestResult {
+  return testJsonlCloseWrite('OPPOSITE_SIGNAL_RISK_EXIT');
+}
+
+function testPartialCloseSkippedWritesTradeEventsJsonl(): TestResult {
+  return testJsonlEventWrite('PARTIAL_CLOSE_SKIPPED', 'trade-events.jsonl');
 }
 
 function testRestartDoesNotEraseJsonlLogs(): TestResult {

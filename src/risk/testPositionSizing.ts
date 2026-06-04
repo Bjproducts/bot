@@ -49,6 +49,7 @@ tests.push(testMaxPositionRespected());
 tests.push(testMinPositionRespected());
 tests.push(testLowRiskRewardRejected());
 tests.push(testRiskFirstTargetsOneDollarRisk());
+tests.push(testRiskFirstTargetsFiftyCentRisk());
 tests.push(testRiskFirstTargetMultipleProfit());
 tests.push(testRiskFirstShortTargetUsesPriceRMultiple());
 tests.push(testRiskFirstRejectsWhenMaxPositionPreventsProfit());
@@ -184,6 +185,31 @@ function testRiskFirstTargetsOneDollarRisk(): TestCase {
     passed: result.status === 'ACCEPTED'
       && Math.abs(result.expectedLossUsd - 1) <= 0.0001
       && Math.abs(result.recommendedPositionSizeUsd - 100) <= 0.0001,
+  };
+}
+
+function testRiskFirstTargetsFiftyCentRisk(): TestCase {
+  const config = {
+    ...riskFirstConfig,
+    targetProfitMinUsd: 0.50,
+    targetProfitMaxUsd: 0.75,
+    maxRiskPerTradeUsd: 0.50,
+  };
+  const result = calculatePositionSizing({
+    ...baseInput,
+    entryPrice: 100,
+    targetPrice: 110,
+    stopPrice: 99,
+    config,
+  });
+  return {
+    name: 'risk-first sizing supports $0.50 max risk target',
+    expected: 'ACCEPTED expectedLoss ~= $0.50 expectedProfit ~= $0.75',
+    actual: `${result.status} expectedLoss=$${result.expectedLossUsd} expectedProfit=$${result.expectedProfitUsd} size=$${result.recommendedPositionSizeUsd}`,
+    passed: result.status === 'ACCEPTED'
+      && Math.abs(result.expectedLossUsd - 0.50) <= 0.0001
+      && Math.abs(result.expectedProfitUsd - 0.75) <= 0.0001
+      && Math.abs(result.recommendedPositionSizeUsd - 50) <= 0.0001,
   };
 }
 

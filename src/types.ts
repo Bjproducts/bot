@@ -18,6 +18,7 @@ export type BotMode = 'simulation' | 'paper_live' | 'live';
 export type EntryZoneType = 'FVG' | 'IFVG';
 export type EntryZoneDirection = 'BULLISH' | 'BEARISH';
 export type PositionSizingMode = 'PROFIT_FIRST' | 'RISK_FIRST';
+export type StopModel = 'ORIGIN' | 'TIGHT_FVG';
 
 // ─── Position state (persisted to position-state.json) ───────────────────────
 
@@ -65,6 +66,13 @@ export interface PositionState {
   stopSource:         StopSource | null;
   stopRiskDistance:   number | null;
   stopZoneSize:       number | null;
+  stopModel:          StopModel | null;
+  originalStopPrice:  number | null;
+  tightStopPrice:     number | null;
+  selectedStopPrice:  number | null;
+  stopTightened:      boolean | null;
+  stopTighteningReason: string | null;
+  oppositeSignalProtected: boolean;
   positionSizeUsd:    number | null;
   expectedProfitUsd:  number | null;
   expectedLossUsd:    number | null;
@@ -187,6 +195,7 @@ export interface BotConfig {
   positionSizingMode: PositionSizingMode;
   hardStopEnabled: boolean;
   debugIctPipeline: boolean;
+  stopModel: StopModel;
   breakevenTriggerProfitUsd: number;
   partialCloseEnabled: boolean;
   partialCloseTriggerProfitUsd: number;

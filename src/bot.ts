@@ -20,6 +20,7 @@ import {
   applyPartialClose,
   getActiveStopPrice,
   planPartialClose,
+  planOppositeSignalProtection,
   shouldActivateDollarBreakeven,
 } from './positionTradeManagement';
 import { calculatePositionSizing } from './risk/positionSizing';
@@ -71,6 +72,12 @@ interface EntryTrigger {
   stopSource?: StopSource | null;
   stopRiskDistance?: number | null;
   stopZoneSize?: number | null;
+  stopModel?: PositionState['stopModel'];
+  originalStopPrice?: number | null;
+  tightStopPrice?: number | null;
+  selectedStopPrice?: number | null;
+  stopTightened?: boolean | null;
+  stopTighteningReason?: string | null;
 }
 
 interface IctEvaluation {
@@ -80,6 +87,12 @@ interface IctEvaluation {
   targetSelection: TargetSelectionResult | null;
   stopPrice: number | null;
   stopSource: StopSource | null;
+  stopModel: PositionState['stopModel'];
+  originalStopPrice: number | null;
+  tightStopPrice: number | null;
+  selectedStopPrice: number | null;
+  stopTightened: boolean | null;
+  stopTighteningReason: string | null;
 }
 
 const MAX_ICT_CANDLE_BUFFER = 500;
@@ -414,6 +427,8 @@ export class BotEngine {
       return;
     }
 
+    this.applyOppositeSignalProtection(side, this.lastPrice, tradeSelection.action);
+
     if (!this.canOpenNewPosition()) {
       logEvent(
         'ENTRY_SKIP',
@@ -436,6 +451,12 @@ export class BotEngine {
       stopSource: selectedCandidate.stopSource,
       stopRiskDistance: selectedCandidate.riskDistance,
       stopZoneSize: selectedCandidate.zoneSize,
+      stopModel: selectedCandidate.stopModel,
+      originalStopPrice: selectedCandidate.originalStopPrice,
+      tightStopPrice: selectedCandidate.tightStopPrice,
+      selectedStopPrice: selectedCandidate.selectedStopPrice,
+      stopTightened: selectedCandidate.stopTightened,
+      stopTighteningReason: selectedCandidate.stopTighteningReason,
     });
   }
 
@@ -506,6 +527,12 @@ export class BotEngine {
       let targetSelection: TargetSelectionResult | null = null;
       let stopPrice: number | null = null;
       let stopSource: StopSource | null = null;
+      let stopModel: PositionState['stopModel'] = null;
+      let originalStopPrice: number | null = null;
+      let tightStopPrice: number | null = null;
+      let selectedStopPrice: number | null = null;
+      let stopTightened: boolean | null = null;
+      let stopTighteningReason: string | null = null;
       if (signal.signal === 'BUY' || signal.signal === 'SELL') {
         const side: TradeSide = signal.signal === 'BUY' ? 'LONG' : 'SHORT';
         const stop = resolveStopAttribution({
@@ -513,15 +540,22 @@ export class BotEngine {
           signal: signal.signal,
           entryPrice: this.lastPrice,
           candles: this.ictCandleBuffer,
+          stopModel: this.config.stopModel,
         });
         stopPrice = stop.stopPrice;
         stopSource = stop.stopSource;
+        stopModel = stop.stopModel;
+        originalStopPrice = stop.originalStopPrice;
+        tightStopPrice = stop.tightStopPrice;
+        selectedStopPrice = stop.selectedStopPrice;
+        stopTightened = stop.stopTightened;
+        stopTighteningReason = stop.stopTighteningReason;
         if (stopPrice !== null) {
           targetSelection = this.runTargetSelection(side, this.lastPrice, stopPrice);
         }
       }
 
-      return { zone, signal, reaction, targetSelection, stopPrice, stopSource };
+      return { zone, signal, reaction, targetSelection, stopPrice, stopSource, stopModel, originalStopPrice, tightStopPrice, selectedStopPrice, stopTightened, stopTighteningReason };
     });
 
     const tradeSelection = selectTradeCandidate({
@@ -802,6 +836,12 @@ export class BotEngine {
         stopSource: trigger.stopSource ?? position.stopSource,
         stopRiskDistance: trigger.stopRiskDistance ?? position.stopRiskDistance,
         stopZoneSize: trigger.stopZoneSize ?? position.stopZoneSize,
+        stopModel: trigger.stopModel ?? position.stopModel,
+        originalStopPrice: trigger.originalStopPrice ?? position.originalStopPrice,
+        tightStopPrice: trigger.tightStopPrice ?? position.tightStopPrice,
+        selectedStopPrice: trigger.selectedStopPrice ?? trigger.sizing?.hardStopPrice ?? position.selectedStopPrice,
+        stopTightened: trigger.stopTightened ?? position.stopTightened,
+        stopTighteningReason: trigger.stopTighteningReason ?? position.stopTighteningReason,
         riskUtilizationPercent: trigger.sizing?.riskUtilizationPercent ?? position.riskUtilizationPercent,
         riskUtilizationWarning: trigger.sizing?.riskUtilizationWarning ?? position.riskUtilizationWarning,
         targetRMultiple: trigger.sizing?.targetRMultiple ?? position.targetRMultiple,
@@ -1062,6 +1102,27 @@ export class BotEngine {
       partialCloseTriggerProfitUsd: this.config.partialCloseTriggerProfitUsd,
       partialCloseLockProfitUsd: this.config.partialCloseLockProfitUsd,
     });
+    if (
+      !plan.shouldClosePartial
+      && this.config.partialCloseEnabled
+      && !position.partialCloseDone
+      && plan.unrealizedProfitAtClose >= this.config.partialCloseTriggerProfitUsd - 1e-9
+      && position.activePositionSize <= 0
+    ) {
+      this.journal.logEvent({
+        ...this.makeEvent(
+          'PARTIAL_CLOSE_SKIPPED',
+          price,
+          position.activePositionSize,
+          0,
+          this.currentSignalDirection(),
+          undefined,
+          undefined,
+          position,
+        ),
+        protectionReason: 'Partial close skipped because active position size was too small',
+      });
+    }
     if (!plan.shouldClosePartial) return position;
 
     const updated = applyPartialClose(position, price, closeTime, plan);
@@ -1089,6 +1150,75 @@ export class BotEngine {
       updated,
     ));
     return updated;
+  }
+
+  private applyOppositeSignalProtection(
+    newSignalSide: TradeSide,
+    price: number,
+    signalDirection: string,
+  ): void {
+    const now = new Date();
+    for (const position of [...this.positions]) {
+      const latest = this.positions.find(active => active.id === position.id) ?? position;
+      const plan = planOppositeSignalProtection(
+        latest,
+        price,
+        newSignalSide,
+        this.config.maxRiskPerTradeUsd,
+      );
+      if (plan.action === 'NONE') continue;
+
+      if (plan.action === 'CLOSE_FOR_RISK') {
+        this.closePosition(
+          latest,
+          price,
+          'OPPOSITE_SIGNAL_RISK_EXIT',
+          undefined,
+          {
+            oldSide: latest.side,
+            newSignalSide,
+            activeStopBefore: plan.activeStopBefore ?? undefined,
+            activeStopAfter: plan.activeStopBefore ?? undefined,
+            oppositeSignalProtected: true,
+            protectionReason: plan.protectionReason,
+          },
+        );
+        continue;
+      }
+
+      const protectedPosition: PositionState = {
+        ...activateDollarBreakeven(latest, price, now),
+        oppositeSignalProtected: true,
+      };
+      this.updatePosition(protectedPosition);
+      const activeStopAfter = getActiveStopPrice(protectedPosition);
+      logEvent(
+        'OPPOSITE_SIGNAL_BE_PROTECTION',
+        latest.side,
+        this.tick,
+        `positionId=${latest.id ?? '--'}  oldSide=${latest.side}  newSignalSide=${newSignalSide}` +
+        `  pnl=$${plan.unrealizedPnlUsd.toFixed(2)}  stopBefore=${plan.activeStopBefore ?? '--'}` +
+        `  stopAfter=${activeStopAfter ?? '--'}  reason="${plan.protectionReason}"`,
+      );
+      this.journal.logEvent({
+        ...this.makeEvent(
+          'OPPOSITE_SIGNAL_BE_PROTECTION',
+          price,
+          protectedPosition.activePositionSize,
+          0,
+          signalDirection,
+          undefined,
+          undefined,
+          protectedPosition,
+        ),
+        oldSide: latest.side,
+        newSignalSide,
+        activeStopBefore: plan.activeStopBefore ?? undefined,
+        activeStopAfter: activeStopAfter ?? undefined,
+        oppositeSignalProtected: true,
+        protectionReason: plan.protectionReason,
+      });
+    }
   }
 
   private opposingTargetEncountered(position: PositionState, candle: Candle): boolean {
@@ -1156,6 +1286,7 @@ export class BotEngine {
     price: number,
     reason: PositionCloseReason,
     disrespectEvaluation?: EntryZoneDisrespectEvaluation,
+    protectionFields?: Partial<TradeEvent>,
   ): void {
     const { config } = this;
     if (position.side === 'NONE') return;
@@ -1203,6 +1334,7 @@ export class BotEngine {
         maxAdverseExcursionUsd: position.maxAdverseExcursionUsd,
       },
     );
+    Object.assign(closeEvent, protectionFields ?? {});
 
     const completed: CompletedTrade = {
       id: `${now.toISOString()}-${config.symbol}-${activeSide}`,
@@ -1231,6 +1363,7 @@ export class BotEngine {
       }),
       ...this.makePositionSizingFields(position),
       ...this.makeScoreAttributionFields(position),
+      ...protectionFields,
     };
 
     this.journal.logClose(closeEvent, completed);
@@ -1340,6 +1473,13 @@ export class BotEngine {
       stopSource: position.stopSource ?? undefined,
       riskDistance: position.stopRiskDistance ?? undefined,
       zoneSize: position.stopZoneSize ?? undefined,
+      stopModel: position.stopModel ?? undefined,
+      originalStopPrice: position.originalStopPrice ?? undefined,
+      tightStopPrice: position.tightStopPrice ?? undefined,
+      selectedStopPrice: position.selectedStopPrice ?? undefined,
+      stopTightened: position.stopTightened ?? undefined,
+      stopTighteningReason: position.stopTighteningReason ?? undefined,
+      oppositeSignalProtected: position.oppositeSignalProtected,
       expectedProfitUsd: position.expectedProfitUsd ?? undefined,
       expectedLossUsd: position.expectedLossUsd ?? undefined,
       riskRewardRatio: position.riskRewardRatio ?? undefined,
@@ -1496,6 +1636,16 @@ export class BotEngine {
       stopSource: null,
       stopRiskDistance: null,
       stopZoneSize: null,
+      stopModel: activePositions
+        .map(position => position.stopModel)
+        .filter((value): value is NonNullable<PositionState['stopModel']> => value !== null)
+        .sort()[0] ?? null,
+      originalStopPrice: null,
+      tightStopPrice: null,
+      selectedStopPrice: null,
+      stopTightened: activePositions.some(position => position.stopTightened === true),
+      stopTighteningReason: null,
+      oppositeSignalProtected: activePositions.some(position => position.oppositeSignalProtected),
       positionSizeUsd: totalUsd,
       expectedProfitUsd: activePositions.reduce((sum, position) => sum + (position.expectedProfitUsd ?? 0), 0),
       expectedLossUsd: activePositions.reduce((sum, position) => sum + (position.expectedLossUsd ?? 0), 0),
@@ -1557,6 +1707,7 @@ function closeReasonLabel(reason: PositionCloseReason): string {
   if (reason === 'MANAGED_TARGET_EXIT') return 'MANAGED_TARGET';
   if (reason === 'BREAKEVEN_STOP_EXIT') return 'BREAKEVEN_STOP';
   if (reason === 'HARD_STOP_EXIT') return 'HARD_STOP';
+  if (reason === 'OPPOSITE_SIGNAL_RISK_EXIT') return 'OPPOSITE_SIGNAL_RISK';
   return reason;
 }
 

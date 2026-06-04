@@ -21,6 +21,13 @@ export interface PartialClosePlan {
   realizedPartialPnlUsd: number;
 }
 
+export interface OppositeSignalProtectionPlan {
+  action: 'NONE' | 'MOVE_TO_BREAKEVEN' | 'CLOSE_FOR_RISK';
+  unrealizedPnlUsd: number;
+  activeStopBefore: number | null;
+  protectionReason: string;
+}
+
 export function shouldActivateDollarBreakeven(
   position: PositionState,
   currentPrice: number,
@@ -140,6 +147,44 @@ export function getActiveStopPrice(position: PositionState): number | null {
   return breakevenStop;
 }
 
+export function planOppositeSignalProtection(
+  position: PositionState,
+  currentPrice: number,
+  newSignalSide: 'LONG' | 'SHORT',
+  maxRiskPerTradeUsd: number,
+): OppositeSignalProtectionPlan {
+  const unrealizedPnlUsd = calculateUnrealizedPnl(position, currentPrice);
+  const activeStopBefore = getActiveStopPrice(position);
+  if (position.side === 'NONE' || position.side === newSignalSide) {
+    return noOppositeProtection(unrealizedPnlUsd, activeStopBefore);
+  }
+
+  if (unrealizedPnlUsd <= -Math.abs(maxRiskPerTradeUsd)) {
+    return {
+      action: 'CLOSE_FOR_RISK',
+      unrealizedPnlUsd,
+      activeStopBefore,
+      protectionReason: `Opposite accepted signal while loss exceeded $${Math.abs(maxRiskPerTradeUsd).toFixed(2)} cap`,
+    };
+  }
+
+  if (unrealizedPnlUsd > 0) {
+    return {
+      action: 'MOVE_TO_BREAKEVEN',
+      unrealizedPnlUsd,
+      activeStopBefore,
+      protectionReason: 'Opposite accepted signal while position was profitable; stop moved to breakeven',
+    };
+  }
+
+  return {
+    action: 'NONE',
+    unrealizedPnlUsd,
+    activeStopBefore,
+    protectionReason: 'Opposite accepted signal but position was not profitable and loss was below cap',
+  };
+}
+
 function noPartialClose(
   unrealizedProfitAtClose: number,
   size: number,
@@ -152,6 +197,18 @@ function noPartialClose(
     closedSize: 0,
     remainingSize: size,
     realizedPartialPnlUsd: 0,
+  };
+}
+
+function noOppositeProtection(
+  unrealizedPnlUsd: number,
+  activeStopBefore: number | null,
+): OppositeSignalProtectionPlan {
+  return {
+    action: 'NONE',
+    unrealizedPnlUsd,
+    activeStopBefore,
+    protectionReason: 'No opposite-side active position',
   };
 }
 

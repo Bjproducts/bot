@@ -14,6 +14,9 @@ const tests = [
     testBearishFvgUsesFirstCandleHigh(),
     testBullishIfvgUsesDisplacementOriginAndReducesRisk(),
     testBearishIfvgUsesDisplacementOriginAndReducesRisk(),
+    testTightBullishFvgUsesZoneLowWhenCloser(),
+    testTightBearishFvgUsesZoneHighWhenCloser(),
+    testTightStopFallsBackWhenWrongSide(),
 ];
 let failures = 0;
 for (const test of tests) {
@@ -89,6 +92,51 @@ function testBearishIfvgUsesDisplacementOriginAndReducesRisk() {
         expected: 'stopPrice=104 stopSource=displacementOrigin riskDistance < zoneBoundaryRiskDistance',
         actual: `stopPrice=${result.stopPrice} stopSource=${result.stopSource} risk=${result.riskDistance} oldRisk=${result.zoneBoundaryRiskDistance}`,
         passed: result.stopPrice === 104 && result.stopSource === 'displacementOrigin' && reduced,
+    };
+}
+function testTightBullishFvgUsesZoneLowWhenCloser() {
+    const result = (0, stopAttribution_1.resolveStopAttribution)({
+        zone: bullishFvg(),
+        signal: 'BUY',
+        entryPrice: 105,
+        candles,
+        stopModel: 'TIGHT_FVG',
+    });
+    return {
+        name: 'TIGHT_FVG bullish FVG uses nearer zone low',
+        expected: 'stopPrice=101 stopSource=zoneLow stopTightened=true',
+        actual: `stopPrice=${result.stopPrice} stopSource=${result.stopSource} tightened=${result.stopTightened}`,
+        passed: result.stopPrice === 101 && result.stopSource === 'zoneLow' && result.stopTightened,
+    };
+}
+function testTightBearishFvgUsesZoneHighWhenCloser() {
+    const result = (0, stopAttribution_1.resolveStopAttribution)({
+        zone: bearishFvg(),
+        signal: 'SELL',
+        entryPrice: 100,
+        candles,
+        stopModel: 'TIGHT_FVG',
+    });
+    return {
+        name: 'TIGHT_FVG bearish FVG uses nearer zone high',
+        expected: 'stopPrice=106 stopSource=zoneHigh stopTightened=true',
+        actual: `stopPrice=${result.stopPrice} stopSource=${result.stopSource} tightened=${result.stopTightened}`,
+        passed: result.stopPrice === 106 && result.stopSource === 'zoneHigh' && result.stopTightened,
+    };
+}
+function testTightStopFallsBackWhenWrongSide() {
+    const result = (0, stopAttribution_1.resolveStopAttribution)({
+        zone: bullishFvg(),
+        signal: 'BUY',
+        entryPrice: 100.5,
+        candles,
+        stopModel: 'TIGHT_FVG',
+    });
+    return {
+        name: 'TIGHT_FVG falls back to origin when tight stop crosses entry',
+        expected: 'stopPrice=99 stopSource=firstCandleLow stopTightened=false',
+        actual: `stopPrice=${result.stopPrice} stopSource=${result.stopSource} tightened=${result.stopTightened}`,
+        passed: result.stopPrice === 99 && result.stopSource === 'firstCandleLow' && !result.stopTightened,
     };
 }
 function bullishFvg() {

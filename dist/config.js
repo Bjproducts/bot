@@ -122,12 +122,13 @@ function loadConfig() {
         maxConcurrentPositions: envInt('MAX_CONCURRENT_POSITIONS', 3),
         targetProfitMinUsd: envFloat('TARGET_PROFIT_MIN_USD', 0.50),
         targetProfitMaxUsd: envFloat('TARGET_PROFIT_MAX_USD', 1.00),
-        maxRiskPerTradeUsd: envFloat('MAX_RISK_PER_TRADE_USD', 1.00),
+        maxRiskPerTradeUsd: envFloat('MAX_RISK_PER_TRADE_USD', 0.50),
         minPositionUsd: envFloat('MIN_POSITION_USD', 25),
         maxPositionUsd: envFloat('MAX_POSITION_USD', 500),
         positionSizingMode: envPositionSizingMode('POSITION_SIZING_MODE', 'PROFIT_FIRST'),
         hardStopEnabled: envBool('HARD_STOP_ENABLED', false),
         debugIctPipeline: envBool('DEBUG_ICT_PIPELINE', false),
+        stopModel: envStopModel('STOP_MODEL', 'TIGHT_FVG'),
         breakevenTriggerProfitUsd: envFloat('BREAKEVEN_TRIGGER_PROFIT_USD', 0.80),
         partialCloseEnabled: envBool('PARTIAL_CLOSE_ENABLED', true),
         partialCloseTriggerProfitUsd: envFloat('PARTIAL_CLOSE_TRIGGER_PROFIT_USD', 1.30),
@@ -166,6 +167,14 @@ function loadConfig() {
         baseVolume: envFloat('BASE_VOLUME', defaultVolume[symbol] ?? 800),
         startingCapital: envFloat('STARTING_CAPITAL', 10_000),
     };
+}
+function envStopModel(key, fallback) {
+    const raw = (process.env[key] ?? '').trim().toUpperCase();
+    if (raw === '')
+        return fallback;
+    if (raw === 'ORIGIN' || raw === 'TIGHT_FVG')
+        return raw;
+    throw new Error(`${key} must be "ORIGIN" or "TIGHT_FVG", got "${raw}"`);
 }
 function envPositionSizingMode(key, fallback) {
     const raw = (process.env[key] ?? '').trim().toUpperCase();

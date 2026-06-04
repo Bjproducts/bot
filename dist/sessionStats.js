@@ -368,12 +368,20 @@ function formatPerPositionRows(position, price) {
             ` target ${active.targetPrice !== null ? fp(active.targetPrice) : '--'}` +
             ` hardStop ${active.hardStopPrice !== null ? fp(active.hardStopPrice) : '--'}` +
             ` activeStop ${formatPlainPrice((0, positionTradeManagement_1.getActiveStopPrice)(active))}` +
+            ` currentStop ${formatPlainPrice((0, positionTradeManagement_1.getActiveStopPrice)(active))}` +
+            ` originalStop ${formatPlainPrice(active.originalStopPrice)}` +
+            ` stopModel ${active.stopModel ?? '--'}` +
+            ` tightened ${active.stopTightened === null ? '--' : active.stopTightened ? 'YES' : 'NO'}` +
             ` size $${fp(active.totalUsdInvested)}` +
             ` pnl ${formatSignedUsd(pnl)}` +
             ` ${currentR !== null ? currentR.toFixed(2) + 'R' : '--R'}` +
             ` progress ${progress !== null ? progress.toFixed(0) + '%' : '--'}` +
             ` BE ${active.stopAtBreakeven ? 'YES' : 'NO'}` +
             ` partial ${active.partialCloseDone ? 'YES' : 'NO'}` +
+            ` partialPnl ${formatSignedUsd(active.realizedPartialPnlUsd)}` +
+            ` runnerSize ${active.remainingSizeAfterPartial !== null ? active.remainingSizeAfterPartial.toFixed(8) : '--'}` +
+            ` runnerPnl ${formatSignedUsd(pnl)}` +
+            ` protected ${active.oppositeSignalProtected ? 'YES' : 'NO'}` +
             runner +
             ` age ${formatPositionAge(active.openedAt)}` +
             ` zone ${active.entryZoneType ?? '--'}` +

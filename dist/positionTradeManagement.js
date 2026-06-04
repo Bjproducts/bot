@@ -5,6 +5,7 @@ exports.activateDollarBreakeven = activateDollarBreakeven;
 exports.planPartialClose = planPartialClose;
 exports.applyPartialClose = applyPartialClose;
 exports.getActiveStopPrice = getActiveStopPrice;
+exports.planOppositeSignalProtection = planOppositeSignalProtection;
 const positionExitManager_1 = require("./positionExitManager");
 function shouldActivateDollarBreakeven(position, currentPrice, config) {
     if (position.side === 'NONE' || position.stopAtBreakeven)
@@ -93,6 +94,35 @@ function getActiveStopPrice(position) {
     }
     return breakevenStop;
 }
+function planOppositeSignalProtection(position, currentPrice, newSignalSide, maxRiskPerTradeUsd) {
+    const unrealizedPnlUsd = (0, positionExitManager_1.calculateUnrealizedPnl)(position, currentPrice);
+    const activeStopBefore = getActiveStopPrice(position);
+    if (position.side === 'NONE' || position.side === newSignalSide) {
+        return noOppositeProtection(unrealizedPnlUsd, activeStopBefore);
+    }
+    if (unrealizedPnlUsd <= -Math.abs(maxRiskPerTradeUsd)) {
+        return {
+            action: 'CLOSE_FOR_RISK',
+            unrealizedPnlUsd,
+            activeStopBefore,
+            protectionReason: `Opposite accepted signal while loss exceeded $${Math.abs(maxRiskPerTradeUsd).toFixed(2)} cap`,
+        };
+    }
+    if (unrealizedPnlUsd > 0) {
+        return {
+            action: 'MOVE_TO_BREAKEVEN',
+            unrealizedPnlUsd,
+            activeStopBefore,
+            protectionReason: 'Opposite accepted signal while position was profitable; stop moved to breakeven',
+        };
+    }
+    return {
+        action: 'NONE',
+        unrealizedPnlUsd,
+        activeStopBefore,
+        protectionReason: 'Opposite accepted signal but position was not profitable and loss was below cap',
+    };
+}
 function noPartialClose(unrealizedProfitAtClose, size) {
     return {
         shouldClosePartial: false,
@@ -102,6 +132,14 @@ function noPartialClose(unrealizedProfitAtClose, size) {
         closedSize: 0,
         remainingSize: size,
         realizedPartialPnlUsd: 0,
+    };
+}
+function noOppositeProtection(unrealizedPnlUsd, activeStopBefore) {
+    return {
+        action: 'NONE',
+        unrealizedPnlUsd,
+        activeStopBefore,
+        protectionReason: 'No opposite-side active position',
     };
 }
 function clamp(value, min, max) {

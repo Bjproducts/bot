@@ -3,7 +3,14 @@ import { EntryZoneDirection, EntryZoneType } from '../types';
 import { ScoreBreakdown } from '../analytics/scoreAttributionTypes';
 import { StopSource } from '../ict/tradeCandidateTypes';
 
-export type TradeAction = 'ENTRY' | 'DCA' | 'BREAKEVEN_ACTIVATED' | 'PARTIAL_CLOSE' | PositionCloseReason;
+export type TradeAction =
+  | 'ENTRY'
+  | 'DCA'
+  | 'BREAKEVEN_ACTIVATED'
+  | 'PARTIAL_CLOSE'
+  | 'PARTIAL_CLOSE_SKIPPED'
+  | 'OPPOSITE_SIGNAL_BE_PROTECTION'
+  | PositionCloseReason;
 
 export interface TradeEvent {
   timestamp: string;
@@ -60,6 +67,18 @@ export interface TradeEvent {
   riskDistance?: number;
   zoneSize?: number;
   stopSource?: StopSource;
+  stopModel?: string;
+  originalStopPrice?: number;
+  tightStopPrice?: number;
+  selectedStopPrice?: number;
+  stopTightened?: boolean;
+  stopTighteningReason?: string;
+  oppositeSignalProtected?: boolean;
+  oldSide?: string;
+  newSignalSide?: string;
+  activeStopBefore?: number;
+  activeStopAfter?: number;
+  protectionReason?: string;
   expectedProfitUsd?: number;
   expectedLossUsd?: number;
   riskRewardRatio?: number;
@@ -127,6 +146,18 @@ export interface CompletedTrade {
   riskDistance?: number;
   zoneSize?: number;
   stopSource?: StopSource;
+  stopModel?: string;
+  originalStopPrice?: number;
+  tightStopPrice?: number;
+  selectedStopPrice?: number;
+  stopTightened?: boolean;
+  stopTighteningReason?: string;
+  oppositeSignalProtected?: boolean;
+  oldSide?: string;
+  newSignalSide?: string;
+  activeStopBefore?: number;
+  activeStopAfter?: number;
+  protectionReason?: string;
   expectedProfitUsd?: number;
   expectedLossUsd?: number;
   riskRewardRatio?: number;
@@ -197,6 +228,18 @@ export const CSV_HEADER = [
   'riskDistance',
   'zoneSize',
   'stopSource',
+  'stopModel',
+  'originalStopPrice',
+  'tightStopPrice',
+  'selectedStopPrice',
+  'stopTightened',
+  'stopTighteningReason',
+  'oppositeSignalProtected',
+  'oldSide',
+  'newSignalSide',
+  'activeStopBefore',
+  'activeStopAfter',
+  'protectionReason',
   'expectedProfitUsd',
   'expectedLossUsd',
   'riskRewardRatio',

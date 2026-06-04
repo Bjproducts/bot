@@ -161,6 +161,12 @@ function buildCandidateStub(id) {
         scalpTargetFitScore: 25, zoneFreshnessScore: 10, targetDistancePenalty: 0,
         targetSelection: null, managedTarget: null,
         entryPrice: 101, stopPrice: 100, stopSource: 'zoneLow',
+        stopModel: 'TIGHT_FVG',
+        originalStopPrice: 99,
+        tightStopPrice: 100,
+        selectedStopPrice: 100,
+        stopTightened: true,
+        stopTighteningReason: 'fixture tight stop',
         riskDistance: 1, zoneSize: 2,
         realExpectedProfitUsd: null, realExpectedLossUsd: null, realRiskRewardRatio: null,
     };

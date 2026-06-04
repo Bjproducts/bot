@@ -182,6 +182,7 @@ function makeConfig(patch = {}) {
         maxPositionUsd: 500,
         positionSizingMode: 'RISK_FIRST',
         hardStopEnabled: true,
+        stopModel: 'TIGHT_FVG',
         debugIctPipeline: false,
         breakevenTriggerProfitUsd: 0.80,
         partialCloseEnabled: true,

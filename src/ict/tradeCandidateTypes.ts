@@ -1,6 +1,7 @@
 import type { IctReactionResult } from './reactionTypes';
 import type { IctSignalAction, IctSignalResult, IctSignalZone } from './ictSignalTypes';
 import type { ExitTargetMode, ManagedTarget, TargetSelectionResult } from '../risk/targetSelection';
+import type { StopModel } from '../types';
 
 export type TradeCandidateTargetFit = 'BELOW_MINIMUM' | 'PREFERRED_RANGE' | 'EXTENDED_TARGET';
 export type TradeCandidateStatus = 'SELECTED' | 'QUALIFIED' | 'REJECTED';
@@ -24,6 +25,12 @@ export interface TradeSelectionEvaluationInput {
   targetSelection?: TargetSelectionResult | null;
   stopPrice?: number | null;
   stopSource?: StopSource | null;
+  stopModel?: StopModel | null;
+  originalStopPrice?: number | null;
+  tightStopPrice?: number | null;
+  selectedStopPrice?: number | null;
+  stopTightened?: boolean | null;
+  stopTighteningReason?: string | null;
 }
 
 export interface TradeSelectionOptions {
@@ -83,6 +90,12 @@ export interface TradeCandidate {
   entryPrice: number;
   stopPrice: number | null;
   stopSource: StopSource | null;
+  stopModel: StopModel | null;
+  originalStopPrice: number | null;
+  tightStopPrice: number | null;
+  selectedStopPrice: number | null;
+  stopTightened: boolean | null;
+  stopTighteningReason: string | null;
   riskDistance: number | null;
   zoneSize: number;
   realExpectedProfitUsd: number | null;

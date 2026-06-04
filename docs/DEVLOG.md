@@ -4191,3 +4191,163 @@ Manual TradingView verification steps:
 ### Final Status
 
 The Pine overlay is synced to the current bot behavior for reaction tiers, target modes, target reach probability display, risk-first sizing mirror, and hard stop visualization without modifying TypeScript bot execution logic.
+
+---
+
+## Phase 8C - Stop Tightening, Opposite Signal Protection, and $0.50 Loss Cap
+
+### Goal
+
+Add trade-management safety only:
+
+- Use `STOP_MODEL=TIGHT_FVG` by default.
+- Preserve original stop attribution while selecting a tighter valid FVG/IFVG boundary stop when configured.
+- Default risk cap to `$0.50`.
+- Protect existing positions when an accepted opposite signal appears.
+- Keep partial-close behavior unchanged while logging skipped partial closes.
+
+No ICT entry logic, FVG/IFVG detection, MSS validation, reaction logic, trade selection scoring, target probability, or live exchange execution logic was changed.
+
+### Stop Model
+
+Supported values:
+
+```text
+STOP_MODEL=ORIGIN
+STOP_MODEL=TIGHT_FVG
+```
+
+Default:
+
+```text
+STOP_MODEL=TIGHT_FVG
+MAX_RISK_PER_TRADE_USD=0.50
+```
+
+`ORIGIN` keeps the existing Phase 6C stop source:
+
+- Bullish FVG: `firstCandleLow`
+- Bearish FVG: `firstCandleHigh`
+- IFVG: `displacementOrigin`
+
+`TIGHT_FVG` tries the closer zone invalidation boundary:
+
+- BUY: `zoneLow`
+- SELL: `zoneHigh`
+
+The tight stop is accepted only when it remains on the correct side of entry:
+
+- LONG stop must be below entry.
+- SHORT stop must be above entry.
+
+If the tight stop is invalid or farther than the original stop, the bot falls back to the original stop.
+
+### Stop Metadata
+
+Every candidate/position/journal event now carries:
+
+```text
+stopModel
+originalStopPrice
+tightStopPrice
+selectedStopPrice
+stopTightened
+stopTighteningReason
+```
+
+### Opposite Signal Protection
+
+When a new accepted signal is opposite to an existing position:
+
+- If the existing position is profitable, its active stop is moved to breakeven and `OPPOSITE_SIGNAL_BE_PROTECTION` is journaled.
+- If the existing position is losing at or beyond `-$0.50`, it is closed immediately with `OPPOSITE_SIGNAL_RISK_EXIT`.
+- If the existing position has a smaller loss, it is left unchanged.
+
+Logged protection fields:
+
+```text
+oppositeSignalProtected
+oldSide
+newSignalSide
+activeStopBefore
+activeStopAfter
+protectionReason
+```
+
+### Partial Close Logging
+
+Partial-close logic is unchanged. If a partial close is eligible but cannot execute because active position size is too small, the bot writes `PARTIAL_CLOSE_SKIPPED` to the durable trade-event log.
+
+### Dashboard
+
+Per-position dashboard rows now show:
+
+- active/current stop
+- original stop
+- stop model
+- tightened status
+- current PnL
+- progress/R context
+- break-even status
+- partial-close status
+- opposite-signal protection status
+
+### Files Modified
+
+- `.env.example`
+- `src/config.ts`
+- `src/types.ts`
+- `src/state.ts`
+- `src/bot.ts`
+- `src/positionTradeManagement.ts`
+- `src/positionExitTypes.ts`
+- `src/ict/stopAttribution.ts`
+- `src/ict/tradeCandidateTypes.ts`
+- `src/ict/tradeSelectionEngine.ts`
+- `src/journal/types.ts`
+- `src/journal/tradeJournal.ts`
+- `src/sessionStats.ts`
+- `src/ict/testStopAttribution.ts`
+- `src/risk/testPositionSizing.ts`
+- `src/testPositionExitManager.ts`
+- `src/analytics/testScoreAttribution.ts`
+- `src/analytics/testAttributionPipeline.ts`
+- `src/ict/testCandleBufferGap.ts`
+- `src/execution/testLiveExecutionManager.ts`
+- `docs/DEVLOG.md`
+
+### Commands Executed
+
+```powershell
+npm.cmd run build
+npm.cmd run ict:stop-test
+npm.cmd run position:sizing-test
+npm.cmd run position:exit-test
+npm.cmd run ict:trade-selection-test
+npm.cmd run analytics:pipeline-test
+npm.cmd run live:execution-test
+npm.cmd run ict:test
+npm.cmd run ict:reaction-test
+npm.cmd run ict:signal-test
+npm.cmd run risk:target-modes-test
+```
+
+### Verification
+
+All executed checks passed:
+
+- Build: passed
+- Stop attribution: 7/7
+- Position sizing: 14/14
+- Position exit/journal management: 40/40
+- Trade selection: 9/9
+- Analytics pipeline: 5/5
+- Live execution manager: 8/8
+- FVG/IFVG: 8/8
+- Reaction engine: 11/11
+- ICT signal engine: 6/6
+- Target modes: 9/9
+
+### Final Status
+
+Phase 8C is implemented. The bot now defaults to tight FVG/IFVG boundary stops when valid, caps risk at `$0.50`, protects profitable opposite-side positions at breakeven, immediately exits opposite-side losers at the configured loss cap, and durably journals the new lifecycle events.
