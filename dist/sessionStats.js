@@ -77,6 +77,14 @@ function createSessionStats(config, sourceName) {
         latestTargetSelection: null,
         latestFvgRejectionSummary: null,
         latestCloseReason: null,
+        recentOppositeSignalSide: null,
+        recentOppositeSignalTimestamp: null,
+        recentOppositeSignalZoneId: null,
+        recentOppositeSignalConfidence: null,
+        recentOppositeSignalReason: null,
+        recentOppositeSignalExpiresAt: null,
+        recentOppositeSignalCreatedTick: null,
+        recentOppositeSignalValid: null,
         journalStatus: 'OK',
         lastJournalWrite: null,
         completedTradesLogged: 0,
@@ -295,13 +303,22 @@ function printDashboard(stats, position, price, config, signal = null, ictSignal
             id: p.id ?? `pos-${p.openedAt ?? 'unknown'}`,
             stopAtBreakeven: p.stopAtBreakeven,
             partialCloseDone: p.partialCloseDone,
-            activeStopPrice: typeof p.hardStopPrice === 'number' ? p.hardStopPrice : null,
+            activeStopPrice: (0, positionTradeManagement_1.getActiveStopPrice)(p),
             averageEntryPrice: p.averageEntryPrice,
         }));
         const slotCounts = (0, positionSlotManager_1.countPositionSlots)(slotInputs);
+        const recentAge = stats.recentOppositeSignalCreatedTick !== null
+            ? Math.max(0, stats.ticks - stats.recentOppositeSignalCreatedTick)
+            : null;
+        console.log(line(`Breakeven Trig. +$${config.breakevenTriggerProfitUsd.toFixed(2)}`));
+        console.log(line(`Opp Profit Exit enabled`));
         console.log(line(`Open Positions  ${slotCounts.total}/${config.maxTotalOpenPositions}`));
         console.log(line(`Risk Positions  ${slotCounts.risk}/${config.maxActiveRiskPositions}`));
         console.log(line(`Protected Pos.  ${slotCounts.protected}`));
+        console.log(line(`Recent Watch    ${stats.recentOppositeSignalSide ?? 'NONE'}`));
+        console.log(line(`Recent Age      ${recentAge !== null ? String(recentAge) : '--'}`));
+        console.log(line(`Recent Zone     ${stats.recentOppositeSignalZoneId ?? '--'}`));
+        console.log(line(`Recent Valid    ${stats.recentOppositeSignalValid === null ? '--' : stats.recentOppositeSignalValid ? 'YES' : 'NO'}`));
         if (!selectedCandidate) {
             console.log(line(`Selection Reject ${shorten(tradeSelection?.rejectionReason ?? 'No selection yet', 36)}`));
         }
@@ -332,7 +349,7 @@ function printDashboard(stats, position, price, config, signal = null, ictSignal
         console.log(line(`Zone Size       ${position.stopZoneSize !== null ? position.stopZoneSize.toFixed(4) : '--'}`));
         console.log(line(`Target R        ${position.targetRMultiple !== null ? position.targetRMultiple.toFixed(2) : '--'}`));
         console.log(line(`Break Even Active ${position.stopAtBreakeven ? 'YES' : 'NO'}`));
-        console.log(line(`Break Even Trigger ${formatPercent(50)}`));
+        console.log(line(`Break Even Trigger +$${config.breakevenTriggerProfitUsd.toFixed(2)}`));
         console.log(line(`Progress To TP  ${formatProgress((0, positionExitManager_1.calculateProgressToTargetPercent)(position, price))}`));
         console.log(line(`BE Active Price ${position.breakevenActivationPrice !== null ? '$' + fp(position.breakevenActivationPrice) : '--'}`));
         console.log(line(`BE Active Time  ${formatIsoTime(position.breakevenActivationTime)}`));
@@ -347,7 +364,7 @@ function printDashboard(stats, position, price, config, signal = null, ictSignal
         console.log(line(`Invested        $${fp(position.totalUsdInvested)}  (DCA ${position.dcaCount - 1}/${maxLvls - 1})`));
         console.log(line(`Dist to TP      $${fp(distToTpUsd)}  (${distToTpPct.toFixed(3)}% away)`));
         console.log(line(`Dist to DCA     $${fp(distToDcaUsd)}  (${distToDcaPct.toFixed(3)}% away)`));
-        for (const row of formatPerPositionRows(position, price)) {
+        for (const row of formatPerPositionRows(position, price, config.oppositeSignalMaxLossUsd)) {
             console.log(line(row));
         }
     }
@@ -389,7 +406,7 @@ function appendSessionStatsHistory(stats) {
         console.error('  Journal: failed to append session stats history:', err);
     }
 }
-function formatPerPositionRows(position, price) {
+function formatPerPositionRows(position, price, oppositeSignalMaxLossUsd = 0.50) {
     const positions = position.openPositions?.length ? position.openPositions : (position.side !== 'NONE' ? [position] : []);
     return positions.map((active, index) => {
         const pnl = (0, positionExitManager_1.calculateUnrealizedPnl)(active, price);
@@ -398,13 +415,18 @@ function formatPerPositionRows(position, price) {
             : null;
         const progress = (0, positionExitManager_1.calculateProgressToTargetPercent)(active, price);
         const runner = active.partialCloseDone ? ' runner active' : '';
+        const activeStop = (0, positionTradeManagement_1.getActiveStopPrice)(active);
+        const protectedSlot = active.stopAtBreakeven
+            || (activeStop !== null && Math.abs(activeStop - active.averageEntryPrice) < 1e-9);
+        const oppositeProfitExitEligible = pnl > 0;
+        const oppositeRiskExitEligible = pnl <= -Math.abs(oppositeSignalMaxLossUsd);
         return `#${index + 1} ${active.side}` +
             ` entry ${fp(active.averageEntryPrice)}` +
             ` current ${fp(price)}` +
             ` target ${active.targetPrice !== null ? fp(active.targetPrice) : '--'}` +
             ` hardStop ${active.hardStopPrice !== null ? fp(active.hardStopPrice) : '--'}` +
-            ` activeStop ${formatPlainPrice((0, positionTradeManagement_1.getActiveStopPrice)(active))}` +
-            ` currentStop ${formatPlainPrice((0, positionTradeManagement_1.getActiveStopPrice)(active))}` +
+            ` activeStop ${formatPlainPrice(activeStop)}` +
+            ` currentStop ${formatPlainPrice(activeStop)}` +
             ` originalStop ${formatPlainPrice(active.originalStopPrice)}` +
             ` stopModel ${active.stopModel ?? '--'}` +
             ` tightened ${active.stopTightened === null ? '--' : active.stopTightened ? 'YES' : 'NO'}` +
@@ -417,7 +439,9 @@ function formatPerPositionRows(position, price) {
             ` partialPnl ${formatSignedUsd(active.realizedPartialPnlUsd)}` +
             ` runnerSize ${active.remainingSizeAfterPartial !== null ? active.remainingSizeAfterPartial.toFixed(8) : '--'}` +
             ` runnerPnl ${formatSignedUsd(pnl)}` +
-            ` protected ${active.oppositeSignalProtected ? 'YES' : 'NO'}` +
+            ` protected ${protectedSlot ? 'YES' : 'NO'}` +
+            ` oppProfitExit ${oppositeProfitExitEligible ? 'YES' : 'NO'}` +
+            ` oppRiskExit ${oppositeRiskExitEligible ? 'YES' : 'NO'}` +
             runner +
             ` age ${formatPositionAge(active.openedAt)}` +
             ` zone ${active.entryZoneType ?? '--'}` +

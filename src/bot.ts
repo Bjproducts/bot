@@ -50,6 +50,10 @@ import {
   evaluatePositionSlotGate,
   PositionSlotInput,
 } from './risk/positionSlotManager';
+import {
+  createRecentSignalWatch,
+  evaluateRecentSignalWatch,
+} from './risk/recentSignalWatch';
 import { evaluateReaction } from './ict/reactionEngine';
 import { createIctSignal } from './ict/ictSignalEngine';
 import { IctSignalResult, IctSignalZone } from './ict/ictSignalTypes';
@@ -131,6 +135,7 @@ export class BotEngine {
   private readonly ictSignalAuditLog = new IctSignalAuditLog();
   private readonly fvgRejectionLog = new ValidatedFvgRejectionLog();
   private lastIctPipelineDebugTick: number = 0;
+  private recentOppositeSignalExpiredLogged: boolean = false;
 
   private tradeEntryTime: Date | null = null;
   private tradeEntryPrice: number = 0;
@@ -359,6 +364,7 @@ export class BotEngine {
   private processIctSignal(): void {
     const tradeSelection = this.evaluateLatestIctTradeSelection();
     const ictSignal = tradeSelection.selectedCandidate?.signal ?? null;
+    this.updateRecentSignalWatchValidity(tradeSelection);
     this.latestSignal = null;
     this.latestIctSignal = ictSignal;
     this.latestTradeSelection = tradeSelection;
@@ -437,7 +443,21 @@ export class BotEngine {
       return;
     }
 
-    this.applyOppositeSignalProtection(side, this.lastPrice, tradeSelection.action);
+    const oppositeProtection = this.applyOppositeSignalProtection(
+      side,
+      this.lastPrice,
+      tradeSelection.action,
+      selectedCandidate,
+    );
+    if (oppositeProtection.closedProfitPosition) {
+      logEvent(
+        'ENTRY_SKIP_OPPOSITE_PROFIT_EXIT',
+        side,
+        this.tick,
+        'opposite profitable position closed; storing signal watch and blocking same-tick reversal entry',
+      );
+      return;
+    }
 
     // Phase 8D: after protect/close has run, if ANY opposite-side position
     // is still open (BE-armed or waiting in the small-loss zone), block
@@ -1131,6 +1151,7 @@ export class BotEngine {
       partialCloseEnabled: this.config.partialCloseEnabled,
       partialCloseTriggerProfitUsd: this.config.partialCloseTriggerProfitUsd,
       partialCloseLockProfitUsd: this.config.partialCloseLockProfitUsd,
+      partialCloseMaxFraction: this.config.partialCloseMaxFraction,
     });
     if (
       !plan.shouldClosePartial
@@ -1186,17 +1207,39 @@ export class BotEngine {
     newSignalSide: TradeSide,
     price: number,
     signalDirection: string,
-  ): void {
-    const now = new Date();
+    selectedCandidate: TradeCandidate,
+  ): { closedProfitPosition: boolean } {
+    let closedProfitPosition = false;
     for (const position of [...this.positions]) {
       const latest = this.positions.find(active => active.id === position.id) ?? position;
       const plan = planOppositeSignalProtection(
         latest,
         price,
         newSignalSide,
-        this.config.maxRiskPerTradeUsd,
+        this.config.oppositeSignalMaxLossUsd,
       );
       if (plan.action === 'NONE') continue;
+
+      if (plan.action === 'CLOSE_FOR_PROFIT') {
+        const activeStopAfter = plan.activeStopBefore;
+        this.closePosition(
+          latest,
+          price,
+          'OPPOSITE_SIGNAL_PROFIT_EXIT',
+          undefined,
+          {
+            oldSide: latest.side,
+            newSignalSide,
+            activeStopBefore: plan.activeStopBefore ?? undefined,
+            activeStopAfter: activeStopAfter ?? undefined,
+            oppositeSignalProtected: true,
+            protectionReason: plan.protectionReason,
+          },
+        );
+        this.storeRecentOppositeSignalWatch(selectedCandidate, signalDirection);
+        closedProfitPosition = true;
+        continue;
+      }
 
       if (plan.action === 'CLOSE_FOR_RISK') {
         this.closePosition(
@@ -1215,40 +1258,55 @@ export class BotEngine {
         );
         continue;
       }
-
-      const protectedPosition: PositionState = {
-        ...activateDollarBreakeven(latest, price, now),
-        oppositeSignalProtected: true,
-      };
-      this.updatePosition(protectedPosition);
-      const activeStopAfter = getActiveStopPrice(protectedPosition);
-      logEvent(
-        'OPPOSITE_SIGNAL_BE_PROTECTION',
-        latest.side,
-        this.tick,
-        `positionId=${latest.id ?? '--'}  oldSide=${latest.side}  newSignalSide=${newSignalSide}` +
-        `  pnl=$${plan.unrealizedPnlUsd.toFixed(2)}  stopBefore=${plan.activeStopBefore ?? '--'}` +
-        `  stopAfter=${activeStopAfter ?? '--'}  reason="${plan.protectionReason}"`,
-      );
-      this.journal.logEvent({
-        ...this.makeEvent(
-          'OPPOSITE_SIGNAL_BE_PROTECTION',
-          price,
-          protectedPosition.activePositionSize,
-          0,
-          signalDirection,
-          undefined,
-          undefined,
-          protectedPosition,
-        ),
-        oldSide: latest.side,
-        newSignalSide,
-        activeStopBefore: plan.activeStopBefore ?? undefined,
-        activeStopAfter: activeStopAfter ?? undefined,
-        oppositeSignalProtected: true,
-        protectionReason: plan.protectionReason,
-      });
     }
+    return { closedProfitPosition };
+  }
+
+  private storeRecentOppositeSignalWatch(
+    candidate: TradeCandidate,
+    signalDirection: string,
+  ): void {
+    if (!this.config.recentSignalWatchEnabled) return;
+    const now = new Date();
+    this.recentOppositeSignalExpiredLogged = false;
+    this.stats = {
+      ...this.stats,
+      ...createRecentSignalWatch({
+        side: signalDirection === 'BUY' || signalDirection === 'SELL' ? signalDirection : candidate.signalDirection as 'BUY' | 'SELL',
+        zoneId: candidate.zoneId,
+        confidence: candidate.confidence,
+        reason: candidate.reason,
+        currentTick: this.tick,
+        ttlCandles: this.config.recentSignalWatchTtlCandles,
+        now,
+        tickIntervalMs: this.config.tickIntervalMs,
+      }),
+    };
+  }
+
+  private updateRecentSignalWatchValidity(tradeSelection: TradeSelectionResult): void {
+    if (!this.stats.recentOppositeSignalSide || !this.stats.recentOppositeSignalZoneId) return;
+    const result = evaluateRecentSignalWatch({
+      state: this.stats,
+      candidates: tradeSelection.candidates,
+      currentTick: this.tick,
+      ttlCandles: this.config.recentSignalWatchTtlCandles,
+    });
+    if (!result.expired) {
+      this.stats = { ...this.stats, ...result.state };
+      return;
+    }
+
+    if (!this.recentOppositeSignalExpiredLogged) {
+      logEvent(
+        'RECENT_SIGNAL_EXPIRED',
+        this.stats.recentOppositeSignalSide,
+        this.tick,
+        `zone=${this.stats.recentOppositeSignalZoneId} age=${result.ageCandles} valid=${result.valid ? 'YES' : 'NO'}`,
+      );
+      this.recentOppositeSignalExpiredLogged = true;
+    }
+    this.stats = { ...this.stats, ...result.state };
   }
 
   /**
@@ -1304,7 +1362,7 @@ export class BotEngine {
         id: p.id ?? `pos-${p.openedAt ?? 'unknown'}`,
         stopAtBreakeven: p.stopAtBreakeven,
         partialCloseDone: p.partialCloseDone,
-        activeStopPrice: typeof p.hardStopPrice === 'number' ? p.hardStopPrice : null,
+        activeStopPrice: getActiveStopPrice(p),
         averageEntryPrice: p.averageEntryPrice,
       }));
     return evaluatePositionSlotGate(slotInputs, {
@@ -1812,6 +1870,7 @@ function closeReasonLabel(reason: PositionCloseReason): string {
   if (reason === 'MANAGED_TARGET_EXIT') return 'MANAGED_TARGET';
   if (reason === 'BREAKEVEN_STOP_EXIT') return 'BREAKEVEN_STOP';
   if (reason === 'HARD_STOP_EXIT') return 'HARD_STOP';
+  if (reason === 'OPPOSITE_SIGNAL_PROFIT_EXIT') return 'OPPOSITE_SIGNAL_PROFIT';
   if (reason === 'OPPOSITE_SIGNAL_RISK_EXIT') return 'OPPOSITE_SIGNAL_RISK';
   return reason;
 }

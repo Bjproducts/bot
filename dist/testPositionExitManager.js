@@ -479,11 +479,11 @@ function testTimeExitDoesNotClose() {
 }
 function testBreakevenActivatesAtDollarProfit() {
     const positionState = position('LONG', recent);
-    const activates = (0, positionTradeManagement_1.shouldActivateDollarBreakeven)(positionState, 100.8, {
-        breakevenTriggerProfitUsd: 0.80,
+    const activates = (0, positionTradeManagement_1.shouldActivateDollarBreakeven)(positionState, 100.4, {
+        breakevenTriggerProfitUsd: 0.40,
     });
     return {
-        name: 'breakeven activates at +$0.80 individual position profit',
+        name: 'breakeven activates at +$0.40 individual position profit',
         expected: 'true',
         actual: String(activates),
         passed: activates,
@@ -492,11 +492,11 @@ function testBreakevenActivatesAtDollarProfit() {
 function testBreakevenDoesNotUseAggregateBasketPnl() {
     const winner = position('LONG', recent);
     const loser = position('SHORT', recent);
-    const winnerActivates = (0, positionTradeManagement_1.shouldActivateDollarBreakeven)(winner, 100.9, {
-        breakevenTriggerProfitUsd: 0.80,
+    const winnerActivates = (0, positionTradeManagement_1.shouldActivateDollarBreakeven)(winner, 100.4, {
+        breakevenTriggerProfitUsd: 0.40,
     });
-    const loserActivates = (0, positionTradeManagement_1.shouldActivateDollarBreakeven)(loser, 100.9, {
-        breakevenTriggerProfitUsd: 0.80,
+    const loserActivates = (0, positionTradeManagement_1.shouldActivateDollarBreakeven)(loser, 100.4, {
+        breakevenTriggerProfitUsd: 0.40,
     });
     return {
         name: 'breakeven does not activate from aggregate basket PnL',
@@ -506,21 +506,21 @@ function testBreakevenDoesNotUseAggregateBasketPnl() {
     };
 }
 function testPartialCloseTriggersAtDollarProfit() {
-    const plan = (0, positionTradeManagement_1.planPartialClose)(position('LONG', recent), 101.3, partialSettings());
+    const plan = (0, positionTradeManagement_1.planPartialClose)(position('LONG', recent), 101.0, partialSettings());
     return {
-        name: 'partial close triggers at +$1.30',
+        name: 'partial close triggers at +$1.00',
         expected: 'true',
         actual: String(plan.shouldClosePartial),
         passed: plan.shouldClosePartial,
     };
 }
 function testPartialCloseRealizesExactlyOneDollar() {
-    const plan = (0, positionTradeManagement_1.planPartialClose)(position('LONG', recent), 101.3, partialSettings());
+    const plan = (0, positionTradeManagement_1.planPartialClose)(position('LONG', recent), 101.0, partialSettings());
     return {
-        name: 'partial close realizes exactly $1.00',
-        expected: '1.00',
+        name: 'partial close realizes exactly $0.75',
+        expected: '0.75',
         actual: plan.realizedPartialPnlUsd.toFixed(2),
-        passed: Math.abs(plan.realizedPartialPnlUsd - 1) < 0.000001,
+        passed: Math.abs(plan.realizedPartialPnlUsd - 0.75) < 0.000001,
     };
 }
 function testPartialCloseOnlyOnce() {
@@ -528,7 +528,7 @@ function testPartialCloseOnlyOnce() {
         ...position('LONG', recent),
         partialCloseDone: true,
     };
-    const plan = (0, positionTradeManagement_1.planPartialClose)(alreadyPartial, 101.3, partialSettings());
+    const plan = (0, positionTradeManagement_1.planPartialClose)(alreadyPartial, 101.0, partialSettings());
     return {
         name: 'partial close only happens once per position',
         expected: 'false',
@@ -538,8 +538,8 @@ function testPartialCloseOnlyOnce() {
 }
 function testRunnerRemainsOpenAfterPartialClose() {
     const original = position('LONG', recent);
-    const plan = (0, positionTradeManagement_1.planPartialClose)(original, 101.3, partialSettings());
-    const updated = (0, positionTradeManagement_1.applyPartialClose)(original, 101.3, now, plan);
+    const plan = (0, positionTradeManagement_1.planPartialClose)(original, 101.0, partialSettings());
+    const updated = (0, positionTradeManagement_1.applyPartialClose)(original, 101.0, now, plan);
     return {
         name: 'runner remains open after partial close',
         expected: 'side=LONG remaining>0 partial=true',
@@ -595,8 +595,9 @@ function testDashboardFormatsMultipleActivePositions() {
 function partialSettings() {
     return {
         partialCloseEnabled: true,
-        partialCloseTriggerProfitUsd: 1.30,
-        partialCloseLockProfitUsd: 1.00,
+        partialCloseTriggerProfitUsd: 1.00,
+        partialCloseLockProfitUsd: 0.75,
+        partialCloseMaxFraction: 0.85,
     };
 }
 function testCompletedHardStopTradeRecordWritten() {
@@ -669,10 +670,10 @@ function testCompletedHardStopTradeRecordWritten() {
 function testOppositeSignalMovesProfitablePositionToBreakeven() {
     const plan = (0, positionTradeManagement_1.planOppositeSignalProtection)(position('LONG', recent), 100.75, 'SHORT', 0.50);
     return {
-        name: 'opposite accepted signal protects profitable position at breakeven',
-        expected: 'MOVE_TO_BREAKEVEN',
+        name: 'opposite accepted signal closes profitable position',
+        expected: 'CLOSE_FOR_PROFIT',
         actual: plan.action,
-        passed: plan.action === 'MOVE_TO_BREAKEVEN' && plan.unrealizedPnlUsd > 0,
+        passed: plan.action === 'CLOSE_FOR_PROFIT' && plan.unrealizedPnlUsd > 0,
     };
 }
 function testOppositeSignalRiskExitAtFiftyCentLossCap() {

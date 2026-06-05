@@ -9,6 +9,7 @@ export interface PartialCloseManagementConfig {
   partialCloseEnabled: boolean;
   partialCloseTriggerProfitUsd: number;
   partialCloseLockProfitUsd: number;
+  partialCloseMaxFraction?: number;
 }
 
 export interface PartialClosePlan {
@@ -22,7 +23,7 @@ export interface PartialClosePlan {
 }
 
 export interface OppositeSignalProtectionPlan {
-  action: 'NONE' | 'MOVE_TO_BREAKEVEN' | 'CLOSE_FOR_RISK';
+  action: 'NONE' | 'CLOSE_FOR_PROFIT' | 'CLOSE_FOR_RISK';
   unrealizedPnlUsd: number;
   activeStopBefore: number | null;
   protectionReason: string;
@@ -72,7 +73,7 @@ export function planPartialClose(
   const partialCloseFraction = clamp(
     config.partialCloseLockProfitUsd / unrealizedProfitAtClose,
     0,
-    1,
+    config.partialCloseMaxFraction ?? 1,
   );
   if (partialCloseFraction <= 0) {
     return noPartialClose(unrealizedProfitAtClose, position.activePositionSize);
@@ -170,10 +171,10 @@ export function planOppositeSignalProtection(
 
   if (unrealizedPnlUsd > 0) {
     return {
-      action: 'MOVE_TO_BREAKEVEN',
+      action: 'CLOSE_FOR_PROFIT',
       unrealizedPnlUsd,
       activeStopBefore,
-      protectionReason: 'Opposite accepted signal while position was profitable; stop moved to breakeven',
+      protectionReason: 'Opposite accepted signal while position was profitable; closing profit before reversal.',
     };
   }
 

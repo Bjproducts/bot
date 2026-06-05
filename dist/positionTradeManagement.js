@@ -32,7 +32,7 @@ function planPartialClose(position, currentPrice, config) {
         || position.activePositionSize <= 0) {
         return noPartialClose(unrealizedProfitAtClose, position.activePositionSize);
     }
-    const partialCloseFraction = clamp(config.partialCloseLockProfitUsd / unrealizedProfitAtClose, 0, 1);
+    const partialCloseFraction = clamp(config.partialCloseLockProfitUsd / unrealizedProfitAtClose, 0, config.partialCloseMaxFraction ?? 1);
     if (partialCloseFraction <= 0) {
         return noPartialClose(unrealizedProfitAtClose, position.activePositionSize);
     }
@@ -110,10 +110,10 @@ function planOppositeSignalProtection(position, currentPrice, newSignalSide, max
     }
     if (unrealizedPnlUsd > 0) {
         return {
-            action: 'MOVE_TO_BREAKEVEN',
+            action: 'CLOSE_FOR_PROFIT',
             unrealizedPnlUsd,
             activeStopBefore,
-            protectionReason: 'Opposite accepted signal while position was profitable; stop moved to breakeven',
+            protectionReason: 'Opposite accepted signal while position was profitable; closing profit before reversal.',
         };
     }
     return {

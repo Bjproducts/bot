@@ -1,0 +1,19 @@
+[
+  {
+    "id": "opposite-profit-1",
+    "symbol": "BTC",
+    "side": "LONG",
+    "marketDataSource": "TEST",
+    "entryTimestamp": "2026-06-05T05:22:46.252Z",
+    "exitTimestamp": "2026-06-05T05:22:46.252Z",
+    "entryPrice": 66100,
+    "avgEntryPrice": 66100,
+    "exitPrice": 66200,
+    "dcaCount": 0,
+    "totalInvestedUsd": 66,
+    "realizedPnlUsd": 0.1,
+    "pnlPct": 0.15,
+    "reason": "OPPOSITE_SIGNAL_PROFIT_EXIT",
+    "tradeDurationMinutes": 1
+  }
+]

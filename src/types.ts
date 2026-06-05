@@ -117,6 +117,14 @@ export interface SessionStats {
   latestTargetSelection: TargetSelectionResult | null;
   latestFvgRejectionSummary: ValidatedFvgRejectionSummary | null;
   latestCloseReason: PositionCloseReason | null;
+  recentOppositeSignalSide: 'BUY' | 'SELL' | null;
+  recentOppositeSignalTimestamp: string | null;
+  recentOppositeSignalZoneId: string | null;
+  recentOppositeSignalConfidence: number | null;
+  recentOppositeSignalReason: string | null;
+  recentOppositeSignalExpiresAt: string | null;
+  recentOppositeSignalCreatedTick: number | null;
+  recentOppositeSignalValid: boolean | null;
   journalStatus: 'OK' | 'ERROR';
   lastJournalWrite: string | null;
   completedTradesLogged: number;
@@ -200,6 +208,7 @@ export interface BotConfig {
   partialCloseEnabled: boolean;
   partialCloseTriggerProfitUsd: number;
   partialCloseLockProfitUsd: number;
+  partialCloseMaxFraction: number;
   startupCandleLimit: number;
 
   // Exit target mode (Phase 5g)
@@ -210,8 +219,11 @@ export interface BotConfig {
 
   // Phase 8D: max tolerable loss on an opposite-direction position before
   // we either close it (on a new opposite signal) or cleanup-close it
-  // (on every tick when mixed exposure exists). Default $0.30.
+  // (on every tick when mixed exposure exists). Default $0.50.
   oppositeSignalMaxLossUsd: number;
+
+  recentSignalWatchEnabled: boolean;
+  recentSignalWatchTtlCandles: number;
 
   // Phase 8E: position-slot caps. Protected positions (BE-armed or stop
   // at entry) do not consume a risk slot, only the total slot.

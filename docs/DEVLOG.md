@@ -4351,3 +4351,138 @@ All executed checks passed:
 ### Final Status
 
 Phase 8C is implemented. The bot now defaults to tight FVG/IFVG boundary stops when valid, caps risk at `$0.50`, protects profitable opposite-side positions at breakeven, immediately exits opposite-side losers at the configured loss cap, and durably journals the new lifecycle events.
+
+---
+
+## Fast TradingView Pine Parity Script
+
+### Goal
+
+Create a lighter TradingView overlay that mirrors the current bot decision path closely enough for live chart inspection while keeping compile time low.
+
+### File Added
+
+- `tradingview/NADO_BOT_FAST_PARITY_V8C.pine`
+
+### Logic Mirrored
+
+- Validated FVG creation:
+  - 3-candle FVG gap
+  - displacement candle body/range check
+  - displacement range multiple check
+  - MSS break on the FVG creation candle
+- FVG invalidation by candle body close beyond boundary
+- IFVG creation from invalidated FVG body close
+- Reaction tiers:
+  - `NONE`
+  - `TOUCH`
+  - `BOUNDARY`
+  - `DISPLACEMENT`
+- Signal threshold using `ICT_MIN_CONFIDENCE`
+- Candidate rejection for weak reaction tiers, missing targets, low RR, and sizing failure
+- `STOP_MODEL=ORIGIN` / `STOP_MODEL=TIGHT_FVG`
+- Risk-first sizing with `$0.50` default max risk
+- TP from true price R multiple:
+  - BUY: `entry + riskDistance * TARGET_R_MULTIPLE`
+  - SELL: `entry - riskDistance * TARGET_R_MULTIPLE`
+
+### Compile-Time Simplifications
+
+- No arrays
+- No loops
+- No `request.security`
+- One active selected-zone box
+- One active TP line
+- One active SL line
+- One active entry line
+- One active entry/skip label
+- Compact table dashboard
+
+### Manual Verification
+
+Paste `tradingview/NADO_BOT_FAST_PARITY_V8C.pine` into TradingView Pine Editor and compile. Use this script when the full overlay is too slow to compile.
+
+---
+
+## Phase 8F - Earlier Breakeven, Opposite Profit Exit, and Recent Signal Watch
+
+### Goal
+
+Tighten trade management without changing ICT detection, FVG/IFVG detection, MSS validation, reaction logic, trade selection scoring, target logic, durable journal format, or live exchange execution.
+
+### Behavior Added
+
+- Breakeven now activates per individual position at `+$0.40`.
+- Profitable opposite-side positions close immediately on a newly accepted opposite signal.
+- New close reason: `OPPOSITE_SIGNAL_PROFIT_EXIT`.
+- Losing opposite-side positions close at `-$0.50` or worse with `OPPOSITE_SIGNAL_RISK_EXIT`.
+- Opposite-side positions between `0` and `-$0.50` block the new opposite entry and keep being managed.
+- After a profitable opposite-signal close, the signal is stored as a recent watch candidate.
+- Recent signal watch expires after `RECENT_SIGNAL_WATCH_TTL_CANDLES`.
+- Partial close now triggers at `+$1.00`, locks `$0.75`, and caps close fraction at `0.85`.
+- Position slot logic still counts BE-armed/active-stop-at-entry positions as protected.
+
+### Config Defaults
+
+```text
+BREAKEVEN_TRIGGER_PROFIT_USD=0.40
+PARTIAL_CLOSE_TRIGGER_PROFIT_USD=1.00
+PARTIAL_CLOSE_LOCK_PROFIT_USD=0.75
+PARTIAL_CLOSE_MAX_FRACTION=0.85
+OPPOSITE_SIGNAL_MAX_LOSS_USD=0.50
+RECENT_SIGNAL_WATCH_ENABLED=true
+RECENT_SIGNAL_WATCH_TTL_CANDLES=3
+TARGET_PROFIT_MIN_USD=0.50
+TARGET_PROFIT_MAX_USD=0.75
+```
+
+### Dashboard Updates
+
+Dashboard now shows breakeven trigger, opposite profit exit, opposite max loss, recent signal watch side/age/zone/validity, and open/risk/protected position counts.
+
+Per-position rows now include protected status, opposite profit-exit eligibility, and opposite risk-exit eligibility.
+
+### Files Modified
+
+- `.env.example`
+- `package.json`
+- `src/bot.ts`
+- `src/config.ts`
+- `src/types.ts`
+- `src/sessionStats.ts`
+- `src/positionExitTypes.ts`
+- `src/positionTradeManagement.ts`
+- `src/risk/oppositeExposureManager.ts`
+- `src/risk/recentSignalWatch.ts`
+- `src/risk/testRecentSignalWatch.ts`
+- `src/risk/testOppositeExposureManager.ts`
+- `src/testPositionExitManager.ts`
+- `src/execution/testLiveExecutionManager.ts`
+- `src/journal/tradeJournal.ts`
+- `docs/DEVLOG.md`
+
+### Commands Executed
+
+```powershell
+npm.cmd run build
+npm.cmd run position:exit-test
+npx.cmd ts-node src/risk/testOppositeExposureManager.ts
+npm.cmd run risk:recent-watch-test
+npx.cmd ts-node src/risk/testPositionSlotManager.ts
+npm.cmd run live:execution-test
+npm.cmd run ict:trade-selection-test
+```
+
+### Verification
+
+- Build: passed
+- Position exit / trade management: `40/40`
+- Opposite exposure manager: `12/12`
+- Recent signal watch: `4/4`
+- Position slot manager: `7/7`
+- Live execution manager: `8/8`
+- ICT trade selection: `9/9`
+
+### Final Status
+
+Phase 8F is implemented. The bot now protects positions at `+$0.40`, takes partials at `+$1.00` locking `$0.75`, closes profitable positions on accepted opposite signals, closes opposite-side losers at `-$0.50`, blocks mixed-direction reversal entries on the same tick, and tracks recent opposite signals without forcing entries.

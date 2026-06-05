@@ -1894,5 +1894,321 @@
       "failures": [],
       "checkedAt": "2026-06-04T18:00:35.157Z"
     }
+  },
+  {
+    "timestamp": "2026-06-05T04:58:19.381Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "BOT_MODE_NOT_LIVE",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "BOT_MODE_NOT_LIVE"
+      ],
+      "checkedAt": "2026-06-05T04:58:19.380Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T04:58:19.386Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "LIVE_TRADING_DISABLED",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "LIVE_TRADING_DISABLED"
+      ],
+      "checkedAt": "2026-06-05T04:58:19.386Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T04:58:19.388Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "MANUAL_ARM_NOT_CONFIRMED",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "MANUAL_ARM_NOT_CONFIRMED"
+      ],
+      "checkedAt": "2026-06-05T04:58:19.388Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T04:58:19.391Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 11,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "ORDER_SIZE_EXCEEDS_MAX",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "ORDER_SIZE_EXCEEDS_MAX"
+      ],
+      "checkedAt": "2026-06-05T04:58:19.391Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T04:58:19.394Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "MAX_DAILY_TRADES_REACHED",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "MAX_DAILY_TRADES_REACHED"
+      ],
+      "checkedAt": "2026-06-05T04:58:19.394Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T04:58:19.396Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "MAX_DAILY_LOSS_REACHED",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "MAX_DAILY_LOSS_REACHED"
+      ],
+      "checkedAt": "2026-06-05T04:58:19.396Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T04:58:19.399Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 10,
+    "requestedPrice": 65000,
+    "executedPrice": 65000,
+    "status": "FILLED",
+    "exchangeOrderId": "STUB-1",
+    "reason": "TEST_BUY_SIGNAL",
+    "safetyGateResult": {
+      "passed": true,
+      "failures": [],
+      "checkedAt": "2026-06-05T04:58:19.398Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T04:58:19.402Z",
+    "symbol": "BTC",
+    "side": "SELL",
+    "action": "CLOSE",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 10,
+    "requestedPrice": 65000,
+    "executedPrice": 65000,
+    "status": "FILLED",
+    "exchangeOrderId": "STUB-1",
+    "reason": "TAKE_PROFIT_EXIT",
+    "safetyGateResult": {
+      "passed": true,
+      "failures": [],
+      "checkedAt": "2026-06-05T04:58:19.402Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T05:22:59.498Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "BOT_MODE_NOT_LIVE",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "BOT_MODE_NOT_LIVE"
+      ],
+      "checkedAt": "2026-06-05T05:22:59.497Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T05:22:59.501Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "LIVE_TRADING_DISABLED",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "LIVE_TRADING_DISABLED"
+      ],
+      "checkedAt": "2026-06-05T05:22:59.501Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T05:22:59.503Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "MANUAL_ARM_NOT_CONFIRMED",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "MANUAL_ARM_NOT_CONFIRMED"
+      ],
+      "checkedAt": "2026-06-05T05:22:59.503Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T05:22:59.506Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 11,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "ORDER_SIZE_EXCEEDS_MAX",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "ORDER_SIZE_EXCEEDS_MAX"
+      ],
+      "checkedAt": "2026-06-05T05:22:59.506Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T05:22:59.509Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "MAX_DAILY_TRADES_REACHED",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "MAX_DAILY_TRADES_REACHED"
+      ],
+      "checkedAt": "2026-06-05T05:22:59.508Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T05:22:59.512Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 0,
+    "requestedPrice": 65000,
+    "status": "REJECTED",
+    "exchangeOrderId": "",
+    "reason": "MAX_DAILY_LOSS_REACHED",
+    "safetyGateResult": {
+      "passed": false,
+      "failures": [
+        "MAX_DAILY_LOSS_REACHED"
+      ],
+      "checkedAt": "2026-06-05T05:22:59.511Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T05:22:59.513Z",
+    "symbol": "BTC",
+    "side": "BUY",
+    "action": "OPEN",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 10,
+    "requestedPrice": 65000,
+    "executedPrice": 65000,
+    "status": "FILLED",
+    "exchangeOrderId": "STUB-1",
+    "reason": "TEST_BUY_SIGNAL",
+    "safetyGateResult": {
+      "passed": true,
+      "failures": [],
+      "checkedAt": "2026-06-05T05:22:59.513Z"
+    }
+  },
+  {
+    "timestamp": "2026-06-05T05:22:59.515Z",
+    "symbol": "BTC",
+    "side": "SELL",
+    "action": "CLOSE",
+    "orderType": "MARKET",
+    "requestedSizeUsd": 10,
+    "executedSizeUsd": 10,
+    "requestedPrice": 65000,
+    "executedPrice": 65000,
+    "status": "FILLED",
+    "exchangeOrderId": "STUB-1",
+    "reason": "TAKE_PROFIT_EXIT",
+    "safetyGateResult": {
+      "passed": true,
+      "failures": [],
+      "checkedAt": "2026-06-05T05:22:59.515Z"
+    }
   }
 ]

@@ -48,6 +48,14 @@ export function createSessionStats(config: BotConfig, sourceName: string): Sessi
     latestTargetSelection: null,
     latestFvgRejectionSummary: null,
     latestCloseReason: null,
+    recentOppositeSignalSide: null,
+    recentOppositeSignalTimestamp: null,
+    recentOppositeSignalZoneId: null,
+    recentOppositeSignalConfidence: null,
+    recentOppositeSignalReason: null,
+    recentOppositeSignalExpiresAt: null,
+    recentOppositeSignalCreatedTick: null,
+    recentOppositeSignalValid: null,
     journalStatus: 'OK',
     lastJournalWrite: null,
     completedTradesLogged: 0,
@@ -300,13 +308,22 @@ export function printDashboard(
         id: p.id ?? `pos-${p.openedAt ?? 'unknown'}`,
         stopAtBreakeven: p.stopAtBreakeven,
         partialCloseDone: p.partialCloseDone,
-        activeStopPrice: typeof p.hardStopPrice === 'number' ? p.hardStopPrice : null,
+        activeStopPrice: getActiveStopPrice(p),
         averageEntryPrice: p.averageEntryPrice,
       }));
     const slotCounts = countPositionSlots(slotInputs);
+    const recentAge = stats.recentOppositeSignalCreatedTick !== null
+      ? Math.max(0, stats.ticks - stats.recentOppositeSignalCreatedTick)
+      : null;
+    console.log(line(`Breakeven Trig. +$${config.breakevenTriggerProfitUsd.toFixed(2)}`));
+    console.log(line(`Opp Profit Exit enabled`));
     console.log(line(`Open Positions  ${slotCounts.total}/${config.maxTotalOpenPositions}`));
     console.log(line(`Risk Positions  ${slotCounts.risk}/${config.maxActiveRiskPositions}`));
     console.log(line(`Protected Pos.  ${slotCounts.protected}`));
+    console.log(line(`Recent Watch    ${stats.recentOppositeSignalSide ?? 'NONE'}`));
+    console.log(line(`Recent Age      ${recentAge !== null ? String(recentAge) : '--'}`));
+    console.log(line(`Recent Zone     ${stats.recentOppositeSignalZoneId ?? '--'}`));
+    console.log(line(`Recent Valid    ${stats.recentOppositeSignalValid === null ? '--' : stats.recentOppositeSignalValid ? 'YES' : 'NO'}`));
     if (!selectedCandidate) {
       console.log(line(`Selection Reject ${shorten(tradeSelection?.rejectionReason ?? 'No selection yet', 36)}`));
     }
@@ -339,7 +356,7 @@ export function printDashboard(
     console.log(line(`Zone Size       ${position.stopZoneSize !== null ? position.stopZoneSize.toFixed(4) : '--'}`));
     console.log(line(`Target R        ${position.targetRMultiple !== null ? position.targetRMultiple.toFixed(2) : '--'}`));
     console.log(line(`Break Even Active ${position.stopAtBreakeven ? 'YES' : 'NO'}`));
-    console.log(line(`Break Even Trigger ${formatPercent(50)}`));
+    console.log(line(`Break Even Trigger +$${config.breakevenTriggerProfitUsd.toFixed(2)}`));
     console.log(line(`Progress To TP  ${formatProgress(calculateProgressToTargetPercent(position, price))}`));
     console.log(line(`BE Active Price ${position.breakevenActivationPrice !== null ? '$' + fp(position.breakevenActivationPrice) : '--'}`));
     console.log(line(`BE Active Time  ${formatIsoTime(position.breakevenActivationTime)}`));
@@ -354,7 +371,7 @@ export function printDashboard(
     console.log(line(`Invested        $${fp(position.totalUsdInvested)}  (DCA ${position.dcaCount - 1}/${maxLvls - 1})`));
     console.log(line(`Dist to TP      $${fp(distToTpUsd)}  (${distToTpPct.toFixed(3)}% away)`));
     console.log(line(`Dist to DCA     $${fp(distToDcaUsd)}  (${distToDcaPct.toFixed(3)}% away)`));
-    for (const row of formatPerPositionRows(position, price)) {
+    for (const row of formatPerPositionRows(position, price, config.oppositeSignalMaxLossUsd)) {
       console.log(line(row));
     }
   } else {
@@ -401,7 +418,11 @@ export function appendSessionStatsHistory(stats: SessionStats): void {
   }
 }
 
-export function formatPerPositionRows(position: PositionState, price: number): string[] {
+export function formatPerPositionRows(
+  position: PositionState,
+  price: number,
+  oppositeSignalMaxLossUsd: number = 0.50,
+): string[] {
   const positions = position.openPositions?.length ? position.openPositions : (position.side !== 'NONE' ? [position] : []);
   return positions.map((active, index) => {
     const pnl = calculateUnrealizedPnl(active, price);
@@ -410,13 +431,18 @@ export function formatPerPositionRows(position: PositionState, price: number): s
       : null;
     const progress = calculateProgressToTargetPercent(active, price);
     const runner = active.partialCloseDone ? ' runner active' : '';
+    const activeStop = getActiveStopPrice(active);
+    const protectedSlot = active.stopAtBreakeven
+      || (activeStop !== null && Math.abs(activeStop - active.averageEntryPrice) < 1e-9);
+    const oppositeProfitExitEligible = pnl > 0;
+    const oppositeRiskExitEligible = pnl <= -Math.abs(oppositeSignalMaxLossUsd);
     return `#${index + 1} ${active.side}` +
       ` entry ${fp(active.averageEntryPrice)}` +
       ` current ${fp(price)}` +
       ` target ${active.targetPrice !== null ? fp(active.targetPrice) : '--'}` +
       ` hardStop ${active.hardStopPrice !== null ? fp(active.hardStopPrice) : '--'}` +
-      ` activeStop ${formatPlainPrice(getActiveStopPrice(active))}` +
-      ` currentStop ${formatPlainPrice(getActiveStopPrice(active))}` +
+      ` activeStop ${formatPlainPrice(activeStop)}` +
+      ` currentStop ${formatPlainPrice(activeStop)}` +
       ` originalStop ${formatPlainPrice(active.originalStopPrice)}` +
       ` stopModel ${active.stopModel ?? '--'}` +
       ` tightened ${active.stopTightened === null ? '--' : active.stopTightened ? 'YES' : 'NO'}` +
@@ -429,7 +455,9 @@ export function formatPerPositionRows(position: PositionState, price: number): s
       ` partialPnl ${formatSignedUsd(active.realizedPartialPnlUsd)}` +
       ` runnerSize ${active.remainingSizeAfterPartial !== null ? active.remainingSizeAfterPartial.toFixed(8) : '--'}` +
       ` runnerPnl ${formatSignedUsd(pnl)}` +
-      ` protected ${active.oppositeSignalProtected ? 'YES' : 'NO'}` +
+      ` protected ${protectedSlot ? 'YES' : 'NO'}` +
+      ` oppProfitExit ${oppositeProfitExitEligible ? 'YES' : 'NO'}` +
+      ` oppRiskExit ${oppositeRiskExitEligible ? 'YES' : 'NO'}` +
       runner +
       ` age ${formatPositionAge(active.openedAt)}` +
       ` zone ${active.entryZoneType ?? '--'}` +

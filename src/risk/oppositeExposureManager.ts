@@ -30,8 +30,10 @@ export interface OppositeSignalEvaluation {
   blockNewEntry: boolean;
   /** Human-readable reason for ENTRY_SKIP_OPPOSITE_EXPOSURE. */
   blockReason: string;
-  /** Positions that are profitable and should be moved to breakeven. */
+  /** Deprecated alias retained for callers/tests that only inspect shape. */
   positionsToProtect: PositionSnapshot[];
+  /** Positions that are profitable and should close before reversal. */
+  positionsToProfitClose: PositionSnapshot[];
   /** Positions losing >= maxLoss that should be closed immediately
    *  with reason OPPOSITE_SIGNAL_RISK_EXIT. */
   positionsToClose: PositionSnapshot[];
@@ -52,7 +54,7 @@ export interface MixedExposureCleanup {
   mixedExposureActive: boolean;
 }
 
-export const DEFAULT_OPPOSITE_SIGNAL_MAX_LOSS_USD = 0.30;
+export const DEFAULT_OPPOSITE_SIGNAL_MAX_LOSS_USD = 0.50;
 
 /**
  * Determine the directional state of the currently-active positions.
@@ -76,7 +78,8 @@ export function assessDirectionalExposure(
  * Decide what to do when an opposite-direction signal arrives.
  *
  * Rules (Phase 8D §B):
- *   - profitable opposite (pnl >= 0) and not BE-armed -> move to BE
+ *   - profitable opposite (pnl > 0) -> close with
+ *     OPPOSITE_SIGNAL_PROFIT_EXIT
  *   - losing opposite (pnl <= -maxLoss) -> close with
  *     OPPOSITE_SIGNAL_RISK_EXIT
  *   - small-loss opposite (between 0 and -maxLoss) -> wait
@@ -92,13 +95,14 @@ export function evaluateOppositeSignalProtection(
   const existingOpposite = positions.filter(p => p.side !== newSignalSide);
 
   const positionsToProtect: PositionSnapshot[] = [];
+  const positionsToProfitClose: PositionSnapshot[] = [];
   const positionsToClose: PositionSnapshot[] = [];
   const positionsWaiting: PositionSnapshot[] = [];
 
   for (const p of existingOpposite) {
-    if (p.unrealizedPnlUsd >= 0) {
-      if (!p.stopAtBreakeven) positionsToProtect.push(p);
-      // already BE-protected positions are left alone
+    if (p.unrealizedPnlUsd > 0) {
+      positionsToProfitClose.push(p);
+      positionsToProtect.push(p);
     } else if (p.unrealizedPnlUsd <= -maxLoss) {
       positionsToClose.push(p);
     } else {
@@ -116,6 +120,7 @@ export function evaluateOppositeSignalProtection(
     blockNewEntry,
     blockReason,
     positionsToProtect,
+    positionsToProfitClose,
     positionsToClose,
     positionsWaiting,
     newSignalSide,

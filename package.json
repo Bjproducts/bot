@@ -22,6 +22,7 @@
     "position:exit-test": "ts-node src/testPositionExitManager.ts",
     "position:sizing-test": "ts-node src/risk/testPositionSizing.ts",
     "risk:target-modes-test": "ts-node src/risk/testTargetModes.ts",
+    "risk:recent-watch-test": "ts-node src/risk/testRecentSignalWatch.ts",
     "risk:opposite-exposure-test": "ts-node src/risk/testOppositeExposureManager.ts",
     "risk:position-slot-test": "ts-node src/risk/testPositionSlotManager.ts",
     "analytics:test": "ts-node src/analytics/testScoreAttribution.ts",
