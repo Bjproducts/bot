@@ -48,6 +48,16 @@ export function createSessionStats(config: BotConfig, sourceName: string): Sessi
     latestTargetSelection: null,
     latestFvgRejectionSummary: null,
     latestCloseReason: null,
+    sessionGuardStatus: 'OK',
+    sessionGuardReason: null,
+    sessionGuardPauseStartedAt: null,
+    sessionGuardPauseEndsAt: null,
+    consecutiveLosses: 0,
+    rollingWindowTrades: 0,
+    rollingWinRate: null,
+    rollingPnlUsd: null,
+    dailyRealizedPnlUsd: 0,
+    dailyLossLimitHit: false,
     recentOppositeSignalSide: null,
     recentOppositeSignalTimestamp: null,
     recentOppositeSignalZoneId: null,
@@ -279,6 +289,14 @@ export function printDashboard(
     console.log(line(`Sizing Status   ${sizing ? sizing.status : '--'}`));
     console.log(line(`Sizing Reject   ${sizing && sizing.status === 'REJECTED' ? shorten(sizing.rejectionReason, 50) : '--'}`));
     console.log(line(`Sizing Rejects  ${stats.sizingRejections}  last: ${stats.lastSizingRejectionReason ? shorten(stats.lastSizingRejectionReason, 36) : '--'}`));
+    console.log(line(`Session Guard   ${stats.sessionGuardStatus}`));
+    console.log(line(`Pause Reason    ${stats.sessionGuardReason ?? '--'}`));
+    console.log(line(`Pause Ends      ${formatIsoTime(stats.sessionGuardPauseEndsAt)}`));
+    console.log(line(`Consec Losses   ${stats.consecutiveLosses}/${config.maxConsecutiveLosses}`));
+    console.log(line(`Rolling ${config.rollingWindowTrades} WR ${stats.rollingWinRate !== null ? (stats.rollingWinRate * 100).toFixed(1) + '%' : '--'}`));
+    console.log(line(`Rolling ${config.rollingPnlWindowTrades} PnL ${stats.rollingPnlUsd !== null ? formatSignedUsd(stats.rollingPnlUsd) : '--'}`));
+    console.log(line(`Today PnL       ${formatSignedUsd(stats.dailyRealizedPnlUsd)}`));
+    console.log(line(`Daily Max Loss  $${config.maxDailyRealizedLossUsd.toFixed(2)}`));
 
     // Phase 8D — directional exposure summary
     const exposureSnapshots: PositionSnapshot[] = (position.openPositions ?? [position])

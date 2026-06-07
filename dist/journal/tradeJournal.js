@@ -57,6 +57,12 @@ const DURABLE_EVENT_TYPES = new Set([
     'OPPOSITE_SIGNAL_BE_PROTECTION',
     'OPPOSITE_SIGNAL_RISK_EXIT',
     'PARTIAL_CLOSE_SKIPPED',
+    'SESSION_PAUSE_CONSECUTIVE_LOSSES',
+    'SESSION_PAUSE_LOW_ROLLING_WIN_RATE',
+    'SESSION_PAUSE_ROLLING_DRAWDOWN',
+    'SESSION_STOP_DAILY_LOSS_LIMIT',
+    'ENTRY_SKIP_SESSION_PAUSED',
+    'SESSION_GUARD_RESUMED',
 ]);
 /**
  * TradeJournal — writes every trade event to three log targets:
@@ -355,6 +361,15 @@ class TradeJournal {
             expectedLossUsd: event.expectedLossUsd ?? null,
             riskRewardRatio: event.riskRewardRatio ?? null,
             exitReason: event.action.endsWith('_EXIT') ? event.action : null,
+            guardStatus: event.guardStatus ?? null,
+            pauseStartedAt: event.pauseStartedAt ?? null,
+            pauseEndsAt: event.pauseEndsAt ?? null,
+            consecutiveLosses: event.consecutiveLosses ?? null,
+            rollingWindowTrades: event.rollingWindowTrades ?? null,
+            rollingWinRate: event.rollingWinRate ?? null,
+            rollingPnlUsd: event.rollingPnlUsd ?? null,
+            dailyRealizedPnlUsd: event.dailyRealizedPnlUsd ?? null,
+            maxDailyLossUsd: event.maxDailyLossUsd ?? null,
         };
         this.appendJsonLine(this.tradeEventsJsonlPath, record);
         this.tradeEventsLogged += 1;

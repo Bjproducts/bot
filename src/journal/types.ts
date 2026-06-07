@@ -2,6 +2,7 @@ import { PositionCloseReason } from '../positionExitTypes';
 import { EntryZoneDirection, EntryZoneType } from '../types';
 import { ScoreBreakdown } from '../analytics/scoreAttributionTypes';
 import { StopSource } from '../ict/tradeCandidateTypes';
+import type { SessionGuardEventType, SessionGuardStatus } from '../risk/sessionGuard';
 
 export type TradeAction =
   | 'ENTRY'
@@ -10,6 +11,7 @@ export type TradeAction =
   | 'PARTIAL_CLOSE'
   | 'PARTIAL_CLOSE_SKIPPED'
   | 'OPPOSITE_SIGNAL_BE_PROTECTION'
+  | SessionGuardEventType
   | PositionCloseReason;
 
 export interface TradeEvent {
@@ -94,6 +96,15 @@ export interface TradeEvent {
   disrespectCandleClose?: number;
   zoneBoundaryViolated?: 'HIGH' | 'LOW';
   tradeDurationMinutes?: number;
+  guardStatus?: SessionGuardStatus;
+  pauseStartedAt?: string;
+  pauseEndsAt?: string;
+  consecutiveLosses?: number;
+  rollingWindowTrades?: number;
+  rollingWinRate?: number | null;
+  rollingPnlUsd?: number | null;
+  dailyRealizedPnlUsd?: number;
+  maxDailyLossUsd?: number;
 }
 
 export interface CompletedTrade {

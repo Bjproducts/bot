@@ -7,6 +7,7 @@ import { ScoreAttribution } from './analytics/scoreAttributionTypes';
 import { ExitTargetMode, ManagedTargetSource, TargetSelectionResult } from './risk/targetSelection';
 import { ValidatedFvgRejectionSummary } from './ict/validatedFvgRejectionLog';
 import { StopSource } from './ict/tradeCandidateTypes';
+import type { SessionGuardStatus } from './risk/sessionGuard';
 
 // ─── Re-export Candle so the rest of the app imports from one place ───────────
 export type { Candle } from './signals/types';
@@ -117,6 +118,16 @@ export interface SessionStats {
   latestTargetSelection: TargetSelectionResult | null;
   latestFvgRejectionSummary: ValidatedFvgRejectionSummary | null;
   latestCloseReason: PositionCloseReason | null;
+  sessionGuardStatus: SessionGuardStatus;
+  sessionGuardReason: string | null;
+  sessionGuardPauseStartedAt: string | null;
+  sessionGuardPauseEndsAt: string | null;
+  consecutiveLosses: number;
+  rollingWindowTrades: number;
+  rollingWinRate: number | null;
+  rollingPnlUsd: number | null;
+  dailyRealizedPnlUsd: number;
+  dailyLossLimitHit: boolean;
   recentOppositeSignalSide: 'BUY' | 'SELL' | null;
   recentOppositeSignalTimestamp: string | null;
   recentOppositeSignalZoneId: string | null;
@@ -224,6 +235,15 @@ export interface BotConfig {
 
   recentSignalWatchEnabled: boolean;
   recentSignalWatchTtlCandles: number;
+  maxConsecutiveLosses: number;
+  consecutiveLossPauseMinutes: number;
+  rollingWindowTrades: number;
+  minRollingWinRate: number;
+  rollingWinRatePauseMinutes: number;
+  rollingPnlWindowTrades: number;
+  maxRollingLossUsd: number;
+  rollingPnlPauseMinutes: number;
+  maxDailyRealizedLossUsd: number;
 
   // Phase 8E: position-slot caps. Protected positions (BE-armed or stop
   // at entry) do not consume a risk slot, only the total slot.

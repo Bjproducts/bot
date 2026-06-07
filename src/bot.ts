@@ -54,6 +54,15 @@ import {
   createRecentSignalWatch,
   evaluateRecentSignalWatch,
 } from './risk/recentSignalWatch';
+import {
+  CompletedTradeOutcome,
+  DEFAULT_SESSION_GUARD_STATE,
+  SessionGuardEventType,
+  SessionGuardState,
+  defaultCompletedTradesJsonlPath,
+  evaluateSessionGuard,
+  loadCompletedTradeOutcomesFromJsonl,
+} from './risk/sessionGuard';
 import { evaluateReaction } from './ict/reactionEngine';
 import { createIctSignal } from './ict/ictSignalEngine';
 import { IctSignalResult, IctSignalZone } from './ict/ictSignalTypes';
@@ -132,6 +141,7 @@ export class BotEngine {
   private latestIctSignal: IctSignalResult | null = null;
   private latestTradeSelection: TradeSelectionResult | null = null;
   private latestIctZones: IctSignalZone[] = [];
+  private completedTradeOutcomes: CompletedTradeOutcome[] = [];
   private readonly ictSignalAuditLog = new IctSignalAuditLog();
   private readonly fvgRejectionLog = new ValidatedFvgRejectionLog();
   private lastIctPipelineDebugTick: number = 0;
@@ -153,7 +163,9 @@ export class BotEngine {
         : position);
       this.persistPositions();
     }
+    this.completedTradeOutcomes = loadCompletedTradeOutcomesFromJsonl(defaultCompletedTradesJsonlPath());
     this.stats = createSessionStats(config, dataSource.sourceName);
+    this.refreshSessionGuard(new Date(), false);
     this.lastPrice = config.startPrice;
     this.tradeEntryTime = this.position.openedAt ? new Date(this.position.openedAt) : null;
     this.tradeEntryPrice = this.position.averageEntryPrice;
@@ -241,6 +253,7 @@ export class BotEngine {
 
     this.tick++;
     this.stats = { ...this.stats, ticks: this.tick };
+    this.resumeExpiredSessionGuard(new Date());
     this.position = this.aggregatePositions();
     this.stats = this.updatePortfolioUnrealized(this.stats, this.lastPrice);
 
@@ -353,6 +366,7 @@ export class BotEngine {
     };
 
     if (this.position.side === 'NONE' && signal.direction === 'BUY') {
+      if (this.isSessionGuardBlockingEntry(this.config.side, 0, signal.direction)) return;
       this.openInitialPosition(this.lastPrice, {
         side: this.config.side,
         signalDirection: signal.direction,
@@ -387,6 +401,7 @@ export class BotEngine {
     const side = tradeSelection.action === 'BUY' ? 'LONG' : 'SHORT';
     const entryPrice = this.lastPrice;
     const scoreAttribution = createScoreAttribution(selectedCandidate);
+    if (this.isSessionGuardBlockingEntry(side, selectedCandidate.confidence, tradeSelection.action)) return;
     const stopPrice = selectedCandidate.stopPrice
       ?? (side === 'LONG' ? selectedCandidate.zone.low : selectedCandidate.zone.high);
     // Phase 5h: the selector ran target selection per zone, so reuse the
@@ -1262,6 +1277,159 @@ export class BotEngine {
     return { closedProfitPosition };
   }
 
+  private isSessionGuardBlockingEntry(
+    side: TradeSide,
+    confidence: number,
+    signalDirection: string,
+  ): boolean {
+    this.resumeExpiredSessionGuard(new Date());
+    if (this.stats.sessionGuardStatus === 'OK') return false;
+
+    const detail =
+      `candidateSide=${side} confidence=${confidence.toFixed(2)}` +
+      ` guard=${this.stats.sessionGuardStatus}` +
+      ` reason=${this.stats.sessionGuardReason ?? '--'}` +
+      ` pauseEnds=${this.stats.sessionGuardPauseEndsAt ?? '--'}` +
+      ` dailyPnl=$${this.stats.dailyRealizedPnlUsd.toFixed(2)}` +
+      ` rollingWR=${this.stats.rollingWinRate !== null ? (this.stats.rollingWinRate * 100).toFixed(1) + '%' : '--'}` +
+      ` rollingPnl=${this.stats.rollingPnlUsd !== null ? '$' + this.stats.rollingPnlUsd.toFixed(2) : '--'}` +
+      ` consecutiveLosses=${this.stats.consecutiveLosses}`;
+    logEvent('ENTRY_SKIP_SESSION_PAUSED', side, this.tick, detail);
+    this.journal.logEvent(this.makeSessionGuardEvent(
+      'ENTRY_SKIP_SESSION_PAUSED',
+      side,
+      signalDirection,
+      this.stats.sessionGuardReason ?? 'SESSION_GUARD_ACTIVE',
+      confidence,
+    ));
+    return true;
+  }
+
+  private refreshSessionGuard(now: Date, logEvents: boolean): void {
+    const evaluation = evaluateSessionGuard({
+      trades: this.completedTradeOutcomes,
+      previousState: this.currentSessionGuardState(),
+      config: this.config,
+      now,
+    });
+    this.stats = {
+      ...this.stats,
+      ...evaluation.state,
+    };
+    if (logEvents && evaluation.eventType) {
+      logEvent(
+        evaluation.eventType,
+        this.config.side,
+        this.tick,
+        `status=${evaluation.state.sessionGuardStatus}` +
+        ` reason=${evaluation.state.sessionGuardReason ?? '--'}` +
+        ` pauseEnds=${evaluation.state.sessionGuardPauseEndsAt ?? '--'}` +
+        ` losses=${evaluation.state.consecutiveLosses}` +
+        ` rollingWR=${evaluation.state.rollingWinRate !== null ? (evaluation.state.rollingWinRate * 100).toFixed(1) + '%' : '--'}` +
+        ` rollingPnl=${evaluation.state.rollingPnlUsd !== null ? '$' + evaluation.state.rollingPnlUsd.toFixed(2) : '--'}` +
+        ` dailyPnl=$${evaluation.state.dailyRealizedPnlUsd.toFixed(2)}`,
+      );
+      this.journal.logEvent(this.makeSessionGuardEvent(
+        evaluation.eventType,
+        this.config.side,
+        this.currentSignalDirection(),
+        evaluation.state.sessionGuardReason ?? evaluation.eventType,
+      ));
+    }
+  }
+
+  private resumeExpiredSessionGuard(now: Date): void {
+    const previousStatus = this.stats.sessionGuardStatus;
+    if (previousStatus !== 'PAUSED' && previousStatus !== 'STOPPED') return;
+
+    const evaluation = evaluateSessionGuard({
+      trades: this.completedTradeOutcomes,
+      previousState: this.currentSessionGuardState(),
+      config: this.config,
+      now,
+    });
+
+    if (previousStatus === 'STOPPED' && evaluation.state.sessionGuardStatus === 'STOPPED') {
+      this.stats = { ...this.stats, ...evaluation.state };
+      return;
+    }
+
+    if (evaluation.eventType !== 'SESSION_GUARD_RESUMED') return;
+
+    this.stats = {
+      ...this.stats,
+      ...evaluation.state,
+    };
+    logEvent(
+      evaluation.eventType,
+      this.config.side,
+      this.tick,
+      `status=${evaluation.state.sessionGuardStatus}` +
+      ` reason=${evaluation.state.sessionGuardReason ?? '--'}` +
+      ` pauseEnds=${evaluation.state.sessionGuardPauseEndsAt ?? '--'}` +
+      ` losses=${evaluation.state.consecutiveLosses}` +
+      ` rollingWR=${evaluation.state.rollingWinRate !== null ? (evaluation.state.rollingWinRate * 100).toFixed(1) + '%' : '--'}` +
+      ` rollingPnl=${evaluation.state.rollingPnlUsd !== null ? '$' + evaluation.state.rollingPnlUsd.toFixed(2) : '--'}` +
+      ` dailyPnl=$${evaluation.state.dailyRealizedPnlUsd.toFixed(2)}`,
+    );
+    this.journal.logEvent(this.makeSessionGuardEvent(
+      evaluation.eventType,
+      this.config.side,
+      this.currentSignalDirection(),
+      evaluation.state.sessionGuardReason ?? evaluation.eventType,
+    ));
+  }
+
+  private currentSessionGuardState(): SessionGuardState {
+    return {
+      sessionGuardStatus: this.stats.sessionGuardStatus ?? DEFAULT_SESSION_GUARD_STATE.sessionGuardStatus,
+      sessionGuardReason: this.stats.sessionGuardReason ?? null,
+      sessionGuardPauseStartedAt: this.stats.sessionGuardPauseStartedAt ?? null,
+      sessionGuardPauseEndsAt: this.stats.sessionGuardPauseEndsAt ?? null,
+      consecutiveLosses: this.stats.consecutiveLosses ?? 0,
+      rollingWindowTrades: this.stats.rollingWindowTrades ?? 0,
+      rollingWinRate: this.stats.rollingWinRate ?? null,
+      rollingPnlUsd: this.stats.rollingPnlUsd ?? null,
+      dailyRealizedPnlUsd: this.stats.dailyRealizedPnlUsd ?? 0,
+      dailyLossLimitHit: this.stats.dailyLossLimitHit ?? false,
+    };
+  }
+
+  private makeSessionGuardEvent(
+    action: SessionGuardEventType,
+    side: TradeSide,
+    signalDirection: string,
+    reason: string,
+    confidence?: number,
+  ): TradeEvent {
+    return {
+      timestamp: new Date().toISOString(),
+      symbol: this.config.symbol,
+      marketDataSource: this.dataSource.sourceName,
+      action,
+      side,
+      price: this.lastPrice,
+      size: 0,
+      investedUsd: 0,
+      avgEntry: 0,
+      dcaCount: 0,
+      realizedPnlUsd: 0,
+      signalDirection,
+      signalSource: this.config.signalSource,
+      ictConfidence: confidence,
+      protectionReason: reason,
+      guardStatus: this.stats.sessionGuardStatus,
+      pauseStartedAt: this.stats.sessionGuardPauseStartedAt ?? undefined,
+      pauseEndsAt: this.stats.sessionGuardPauseEndsAt ?? undefined,
+      consecutiveLosses: this.stats.consecutiveLosses,
+      rollingWindowTrades: this.stats.rollingWindowTrades,
+      rollingWinRate: this.stats.rollingWinRate,
+      rollingPnlUsd: this.stats.rollingPnlUsd,
+      dailyRealizedPnlUsd: this.stats.dailyRealizedPnlUsd,
+      maxDailyLossUsd: this.config.maxDailyRealizedLossUsd,
+    };
+  }
+
   private storeRecentOppositeSignalWatch(
     candidate: TradeCandidate,
     signalDirection: string,
@@ -1531,12 +1699,17 @@ export class BotEngine {
 
     this.journal.logClose(closeEvent, completed);
     generateScoreAttributionReports();
+    this.completedTradeOutcomes.push({
+      realizedPnlUsd: totalPnlUsd,
+      exitTimestamp: completed.exitTimestamp,
+    });
 
     this.stats = {
       ...recordClosedTrade(this.stats, totalPnlUsd, config),
       latestCloseReason: reason,
       latestPositionExit: null,
     };
+    this.refreshSessionGuard(now, true);
     this.positions = this.positions.filter(active => active.id !== position.id);
     this.persistPositions();
     this.position = this.aggregatePositions();

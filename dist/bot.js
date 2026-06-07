@@ -53,6 +53,7 @@ const candleBufferGap_1 = require("./ict/candleBufferGap");
 const oppositeExposureManager_1 = require("./risk/oppositeExposureManager");
 const positionSlotManager_1 = require("./risk/positionSlotManager");
 const recentSignalWatch_1 = require("./risk/recentSignalWatch");
+const sessionGuard_1 = require("./risk/sessionGuard");
 const reactionEngine_1 = require("./ict/reactionEngine");
 const ictSignalEngine_1 = require("./ict/ictSignalEngine");
 const tradeSelectionEngine_1 = require("./ict/tradeSelectionEngine");
@@ -83,6 +84,7 @@ class BotEngine {
     latestIctSignal = null;
     latestTradeSelection = null;
     latestIctZones = [];
+    completedTradeOutcomes = [];
     ictSignalAuditLog = new ictSignalAuditLog_1.IctSignalAuditLog();
     fvgRejectionLog = new validatedFvgRejectionLog_1.ValidatedFvgRejectionLog();
     lastIctPipelineDebugTick = 0;
@@ -101,7 +103,9 @@ class BotEngine {
                 : position);
             this.persistPositions();
         }
+        this.completedTradeOutcomes = (0, sessionGuard_1.loadCompletedTradeOutcomesFromJsonl)((0, sessionGuard_1.defaultCompletedTradesJsonlPath)());
         this.stats = (0, sessionStats_1.createSessionStats)(config, dataSource.sourceName);
+        this.refreshSessionGuard(new Date(), false);
         this.lastPrice = config.startPrice;
         this.tradeEntryTime = this.position.openedAt ? new Date(this.position.openedAt) : null;
         this.tradeEntryPrice = this.position.averageEntryPrice;
@@ -178,6 +182,7 @@ class BotEngine {
         this.lastPrice = this.dataSource.currentPrice();
         this.tick++;
         this.stats = { ...this.stats, ticks: this.tick };
+        this.resumeExpiredSessionGuard(new Date());
         this.position = this.aggregatePositions();
         this.stats = this.updatePortfolioUnrealized(this.stats, this.lastPrice);
         if (candle !== null) {
@@ -280,6 +285,8 @@ class BotEngine {
                 : this.stats.signalsFired,
         };
         if (this.position.side === 'NONE' && signal.direction === 'BUY') {
+            if (this.isSessionGuardBlockingEntry(this.config.side, 0, signal.direction))
+                return;
             this.openInitialPosition(this.lastPrice, {
                 side: this.config.side,
                 signalDirection: signal.direction,
@@ -310,6 +317,8 @@ class BotEngine {
         const side = tradeSelection.action === 'BUY' ? 'LONG' : 'SHORT';
         const entryPrice = this.lastPrice;
         const scoreAttribution = (0, scoreAttribution_1.createScoreAttribution)(selectedCandidate);
+        if (this.isSessionGuardBlockingEntry(side, selectedCandidate.confidence, tradeSelection.action))
+            return;
         const stopPrice = selectedCandidate.stopPrice
             ?? (side === 'LONG' ? selectedCandidate.zone.low : selectedCandidate.zone.high);
         // Phase 5h: the selector ran target selection per zone, so reuse the
@@ -974,6 +983,115 @@ class BotEngine {
         }
         return { closedProfitPosition };
     }
+    isSessionGuardBlockingEntry(side, confidence, signalDirection) {
+        this.resumeExpiredSessionGuard(new Date());
+        if (this.stats.sessionGuardStatus === 'OK')
+            return false;
+        const detail = `candidateSide=${side} confidence=${confidence.toFixed(2)}` +
+            ` guard=${this.stats.sessionGuardStatus}` +
+            ` reason=${this.stats.sessionGuardReason ?? '--'}` +
+            ` pauseEnds=${this.stats.sessionGuardPauseEndsAt ?? '--'}` +
+            ` dailyPnl=$${this.stats.dailyRealizedPnlUsd.toFixed(2)}` +
+            ` rollingWR=${this.stats.rollingWinRate !== null ? (this.stats.rollingWinRate * 100).toFixed(1) + '%' : '--'}` +
+            ` rollingPnl=${this.stats.rollingPnlUsd !== null ? '$' + this.stats.rollingPnlUsd.toFixed(2) : '--'}` +
+            ` consecutiveLosses=${this.stats.consecutiveLosses}`;
+        logEvent('ENTRY_SKIP_SESSION_PAUSED', side, this.tick, detail);
+        this.journal.logEvent(this.makeSessionGuardEvent('ENTRY_SKIP_SESSION_PAUSED', side, signalDirection, this.stats.sessionGuardReason ?? 'SESSION_GUARD_ACTIVE', confidence));
+        return true;
+    }
+    refreshSessionGuard(now, logEvents) {
+        const evaluation = (0, sessionGuard_1.evaluateSessionGuard)({
+            trades: this.completedTradeOutcomes,
+            previousState: this.currentSessionGuardState(),
+            config: this.config,
+            now,
+        });
+        this.stats = {
+            ...this.stats,
+            ...evaluation.state,
+        };
+        if (logEvents && evaluation.eventType) {
+            logEvent(evaluation.eventType, this.config.side, this.tick, `status=${evaluation.state.sessionGuardStatus}` +
+                ` reason=${evaluation.state.sessionGuardReason ?? '--'}` +
+                ` pauseEnds=${evaluation.state.sessionGuardPauseEndsAt ?? '--'}` +
+                ` losses=${evaluation.state.consecutiveLosses}` +
+                ` rollingWR=${evaluation.state.rollingWinRate !== null ? (evaluation.state.rollingWinRate * 100).toFixed(1) + '%' : '--'}` +
+                ` rollingPnl=${evaluation.state.rollingPnlUsd !== null ? '$' + evaluation.state.rollingPnlUsd.toFixed(2) : '--'}` +
+                ` dailyPnl=$${evaluation.state.dailyRealizedPnlUsd.toFixed(2)}`);
+            this.journal.logEvent(this.makeSessionGuardEvent(evaluation.eventType, this.config.side, this.currentSignalDirection(), evaluation.state.sessionGuardReason ?? evaluation.eventType));
+        }
+    }
+    resumeExpiredSessionGuard(now) {
+        const previousStatus = this.stats.sessionGuardStatus;
+        if (previousStatus !== 'PAUSED' && previousStatus !== 'STOPPED')
+            return;
+        const evaluation = (0, sessionGuard_1.evaluateSessionGuard)({
+            trades: this.completedTradeOutcomes,
+            previousState: this.currentSessionGuardState(),
+            config: this.config,
+            now,
+        });
+        if (previousStatus === 'STOPPED' && evaluation.state.sessionGuardStatus === 'STOPPED') {
+            this.stats = { ...this.stats, ...evaluation.state };
+            return;
+        }
+        if (evaluation.eventType !== 'SESSION_GUARD_RESUMED')
+            return;
+        this.stats = {
+            ...this.stats,
+            ...evaluation.state,
+        };
+        logEvent(evaluation.eventType, this.config.side, this.tick, `status=${evaluation.state.sessionGuardStatus}` +
+            ` reason=${evaluation.state.sessionGuardReason ?? '--'}` +
+            ` pauseEnds=${evaluation.state.sessionGuardPauseEndsAt ?? '--'}` +
+            ` losses=${evaluation.state.consecutiveLosses}` +
+            ` rollingWR=${evaluation.state.rollingWinRate !== null ? (evaluation.state.rollingWinRate * 100).toFixed(1) + '%' : '--'}` +
+            ` rollingPnl=${evaluation.state.rollingPnlUsd !== null ? '$' + evaluation.state.rollingPnlUsd.toFixed(2) : '--'}` +
+            ` dailyPnl=$${evaluation.state.dailyRealizedPnlUsd.toFixed(2)}`);
+        this.journal.logEvent(this.makeSessionGuardEvent(evaluation.eventType, this.config.side, this.currentSignalDirection(), evaluation.state.sessionGuardReason ?? evaluation.eventType));
+    }
+    currentSessionGuardState() {
+        return {
+            sessionGuardStatus: this.stats.sessionGuardStatus ?? sessionGuard_1.DEFAULT_SESSION_GUARD_STATE.sessionGuardStatus,
+            sessionGuardReason: this.stats.sessionGuardReason ?? null,
+            sessionGuardPauseStartedAt: this.stats.sessionGuardPauseStartedAt ?? null,
+            sessionGuardPauseEndsAt: this.stats.sessionGuardPauseEndsAt ?? null,
+            consecutiveLosses: this.stats.consecutiveLosses ?? 0,
+            rollingWindowTrades: this.stats.rollingWindowTrades ?? 0,
+            rollingWinRate: this.stats.rollingWinRate ?? null,
+            rollingPnlUsd: this.stats.rollingPnlUsd ?? null,
+            dailyRealizedPnlUsd: this.stats.dailyRealizedPnlUsd ?? 0,
+            dailyLossLimitHit: this.stats.dailyLossLimitHit ?? false,
+        };
+    }
+    makeSessionGuardEvent(action, side, signalDirection, reason, confidence) {
+        return {
+            timestamp: new Date().toISOString(),
+            symbol: this.config.symbol,
+            marketDataSource: this.dataSource.sourceName,
+            action,
+            side,
+            price: this.lastPrice,
+            size: 0,
+            investedUsd: 0,
+            avgEntry: 0,
+            dcaCount: 0,
+            realizedPnlUsd: 0,
+            signalDirection,
+            signalSource: this.config.signalSource,
+            ictConfidence: confidence,
+            protectionReason: reason,
+            guardStatus: this.stats.sessionGuardStatus,
+            pauseStartedAt: this.stats.sessionGuardPauseStartedAt ?? undefined,
+            pauseEndsAt: this.stats.sessionGuardPauseEndsAt ?? undefined,
+            consecutiveLosses: this.stats.consecutiveLosses,
+            rollingWindowTrades: this.stats.rollingWindowTrades,
+            rollingWinRate: this.stats.rollingWinRate,
+            rollingPnlUsd: this.stats.rollingPnlUsd,
+            dailyRealizedPnlUsd: this.stats.dailyRealizedPnlUsd,
+            maxDailyLossUsd: this.config.maxDailyRealizedLossUsd,
+        };
+    }
     storeRecentOppositeSignalWatch(candidate, signalDirection) {
         if (!this.config.recentSignalWatchEnabled)
             return;
@@ -1176,11 +1294,16 @@ class BotEngine {
         };
         this.journal.logClose(closeEvent, completed);
         (0, tradeOutcomeAnalytics_1.generateScoreAttributionReports)();
+        this.completedTradeOutcomes.push({
+            realizedPnlUsd: totalPnlUsd,
+            exitTimestamp: completed.exitTimestamp,
+        });
         this.stats = {
             ...(0, sessionStats_1.recordClosedTrade)(this.stats, totalPnlUsd, config),
             latestCloseReason: reason,
             latestPositionExit: null,
         };
+        this.refreshSessionGuard(now, true);
         this.positions = this.positions.filter(active => active.id !== position.id);
         this.persistPositions();
         this.position = this.aggregatePositions();

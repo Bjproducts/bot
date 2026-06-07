@@ -1,5 +1,85 @@
 # Development Log
 
+## Phase 8G - Session Guard / Circuit Breaker
+
+### Objective
+
+Add session-level risk protection that blocks new entries after poor realized performance while leaving open-position management untouched. No ICT logic, FVG/IFVG detection, MSS, reaction scoring, trade selection scoring, target selection, stop model, breakeven, partial close, opposite exposure, position slot, or live exchange logic was changed.
+
+### Guard Rules
+
+Added `src/risk/sessionGuard.ts` with durable guard state and event generation for:
+
+- `MAX_CONSECUTIVE_LOSSES=5` -> pause new entries for `CONSECUTIVE_LOSS_PAUSE_MINUTES=30`
+- `ROLLING_WINDOW_TRADES=20` with win rate below `MIN_ROLLING_WIN_RATE=0.35` -> pause for `ROLLING_WIN_RATE_PAUSE_MINUTES=60`
+- `ROLLING_PNL_WINDOW_TRADES=20` with PnL <= `-MAX_ROLLING_LOSS_USD` -> pause for `ROLLING_PNL_PAUSE_MINUTES=60`
+- `MAX_DAILY_REALIZED_LOSS_USD=5.00` -> stop new entries until the rest of the UTC day
+
+The guard is evaluated from completed trade outcomes. New pauses/stops are triggered when completed trade history changes or on startup recovery. Tick processing and entry attempts only keep daily stops active or resume expired pauses, so an expired cooldown does not immediately re-pause from the same old trade history.
+
+### Durable Events
+
+Added guard events to `logs/trade-events.jsonl`:
+
+- `SESSION_PAUSE_CONSECUTIVE_LOSSES`
+- `SESSION_PAUSE_LOW_ROLLING_WIN_RATE`
+- `SESSION_PAUSE_ROLLING_DRAWDOWN`
+- `SESSION_STOP_DAILY_LOSS_LIMIT`
+- `ENTRY_SKIP_SESSION_PAUSED`
+- `SESSION_GUARD_RESUMED`
+
+Each event records guard status, reason, pause start/end, consecutive losses, rolling trade count, rolling win rate, rolling PnL, daily realized PnL, and max daily loss.
+
+### Dashboard
+
+Session stats now include:
+
+- `sessionGuardStatus`
+- `sessionGuardReason`
+- `sessionGuardPauseStartedAt`
+- `sessionGuardPauseEndsAt`
+- `consecutiveLosses`
+- `rollingWindowTrades`
+- `rollingWinRate`
+- `rollingPnlUsd`
+- `dailyRealizedPnlUsd`
+- `dailyLossLimitHit`
+
+The dashboard prints session guard status, pause reason/end time, consecutive losses, rolling win rate, rolling PnL, and daily max loss.
+
+### Tests Added
+
+Added `src/risk/testSessionGuard.ts` and `npm run risk:session-guard-test` covering:
+
+- consecutive-loss pause
+- winning trade resetting consecutive losses
+- entry skip while paused
+- open-position management remains allowed while paused
+- pause expiry
+- `SESSION_GUARD_RESUMED`
+- low rolling win-rate pause
+- rolling drawdown pause
+- daily loss stop
+- daily stop blocking same UTC day
+- daily stop ending next UTC day
+- rolling guards waiting for full windows
+- configured pause duration
+- rebuild from `completed-trades.jsonl`
+- durable JSONL guard event writes
+
+### Verification
+
+Passed:
+
+- `npm run build`
+- `npm run risk:session-guard-test`
+- `npm run position:exit-test`
+- `npm run risk:opposite-exposure-test`
+- `npm run risk:position-slot-test`
+- `npm run live:execution-test`
+- `npm run ict:trade-selection-test`
+- `npm run risk:recent-watch-test`
+
 ## Phase 8B - Durable Journaling and Recovery-Safe Logging
 
 ### Objective
